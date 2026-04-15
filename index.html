@@ -69,7 +69,19 @@
   .app-container { max-width: 500px; width: 100%; display: flex; flex-direction: column; gap: 12px; position: relative; z-index: 1; }
   input[type="file"] { display: none; }
 
-  .card { width:100%; background:var(--card); border:1px solid var(--line); border-radius:16px; padding: 12px; box-shadow:0 10px 30px rgba(0,0,0,.5); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); }
+  /* 卡片主體 (修正：支援 AR 全透視) */
+  .card { 
+    width:100%; background:var(--card); border:2px solid var(--line); 
+    border-radius:16px; padding: 12px; box-shadow:0 10px 30px rgba(0,0,0,.5); 
+    backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); 
+    transition: border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+  }
+  .card.camera-mode {
+    background: rgba(15, 22, 35, 0.2) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: none !important;
+  }
   
   /* 👑 標題列排版 */
   .topbar { display: flex; align-items: center; margin-bottom: 12px; }
@@ -91,12 +103,12 @@
   .icon-btn:active { background: var(--line); transform: scale(0.95); }
   .icon-btn.active { background: var(--safe); color: var(--bg); border-color: var(--safe); }
 
-  /* 畫布容器 */
-  .svgWrap { position:relative; width:100%; height: 500px; background: transparent; border-radius: 12px; border: 1px dashed var(--line); overflow: hidden; touch-action: none; }
+  /* 畫布容器 (修正：移除全局 touch-action: none 解除滑動封印) */
+  .svgWrap { position:relative; width:100%; height: 500px; background: transparent; border-radius: 12px; border: 1px dashed var(--line); overflow: hidden; }
   svg { display: block; width: 100%; height: 100%; }
 
-  /* 🖱️ 拖曳游標 */
-  .anchor-dot, .draggable-pulley { cursor: grab; }
+  /* 🖱️ 拖曳游標 (僅鎖定操作點的滑動) */
+  .anchor-dot, .draggable-pulley { cursor: grab; touch-action: none; }
   .anchor-dot:active, .draggable-pulley:active { cursor: grabbing; }
 
   /* 🚀 戰術 HUD 面板 */
@@ -106,8 +118,9 @@
     border-radius: 8px; padding: 6px 10px; color: var(--text); font-size: 12px; font-weight: bold;
     backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); pointer-events: auto;
     display: flex; flex-direction: column; gap: 4px; box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    transition: border-color 0.3s ease;
   }
-  .hud-panel .val { font-size: 14px; font-family: monospace; }
+  .hud-panel .val { font-size: 14px; font-family: monospace; transition: color 0.3s ease; }
   .hud-panel input {
     background: rgba(0,0,0,0.5); border: none; border-bottom: 1px solid var(--line); border-radius: 4px;
     color: var(--warn); font-weight: bold; font-size: 14px; text-align: center; padding: 2px 4px; outline: none; font-family: monospace; width: 45px;
@@ -116,21 +129,21 @@
 
   .hud-tl { top: 10px; left: 10px; border-left: 3px solid var(--safe); } 
   .hud-tr { top: 10px; right: 10px; border-right: 3px solid var(--safe); text-align: right; align-items: flex-end; } 
-  .hud-tc { top: 10px; left: 50%; transform: translateX(-50%); flex-direction: row; align-items: center; border-bottom: 3px solid var(--line); } 
+  /* 修正：移除佔位在中間的繩長區塊，整合到右下角 */
   .hud-br { bottom: 10px; right: 10px; border-bottom: 3px solid var(--line); align-items: flex-end; z-index: 30; } 
   .hud-bl { bottom: 10px; left: 10px; background: transparent; border: none; box-shadow: none; padding: 0; color: var(--warn); } 
 
-  /* 💡 高亮度黃底負重標籤 */
+  /* 💡 縮小版的負重標籤 */
   .stretcher-tag {
     position: absolute; background: var(--warn); border: 2px solid #ca8a04;
-    border-radius: 8px; padding: 4px 8px; color: var(--bg); font-size: 14px; font-weight: bold;
+    border-radius: 6px; padding: 2px 6px; color: var(--bg); font-size: 14px; font-weight: bold;
     transform: translateX(-50%); 
-    display: flex; align-items: center; gap: 4px; z-index: 50;
+    display: flex; align-items: center; gap: 2px; z-index: 50;
     box-shadow: 0 4px 10px rgba(0,0,0,0.6); pointer-events: auto;
   }
   .stretcher-tag input { 
-    width: 55px; background: rgba(0,0,0,0.1); border: none; border-bottom: 2px solid var(--bg); 
-    color: var(--bg); font-size: 18px; font-weight: bold; text-align: center; outline: none; font-family: monospace;
+    width: 45px; background: rgba(0,0,0,0.1); border: none; border-bottom: 2px solid var(--bg); 
+    color: var(--bg); font-size: 16px; font-weight: bold; text-align: center; outline: none; font-family: monospace;
   }
   .stretcher-tag input:focus { border-bottom-color: #000; background: rgba(255,255,255,0.5); }
 
@@ -195,7 +208,7 @@
 
 <div class="app-container" id="capture-area">
 
-  <div class="card">
+  <div class="card" id="mainCard">
     <!-- 👑 標題列置於第一行 -->
     <div class="topbar">
       <div class="title-tag">
@@ -226,12 +239,12 @@
         <text id="tagLineText" fill="var(--tagline)" font-size="12" font-weight="bold"></text>
 
         <!-- 主繩 -->
-        <line id="ropeL" stroke="var(--safe)" stroke-width="6" stroke-linecap="round" />
-        <line id="ropeR" stroke="var(--safe)" stroke-width="6" stroke-linecap="round" />
+        <line id="ropeL" stroke="var(--safe)" stroke-width="6" stroke-linecap="round" style="transition: stroke 0.3s ease;" />
+        <line id="ropeR" stroke="var(--safe)" stroke-width="6" stroke-linecap="round" style="transition: stroke 0.3s ease;" />
         
         <!-- 夾角顯示 -->
-        <path id="angleArc" fill="rgba(255, 216, 77, 0.15)" stroke="var(--warn)" stroke-width="2" />
-        <text id="angleText" fill="var(--warn)" font-size="14" font-weight="bold" text-anchor="middle"></text>
+        <path id="angleArc" fill="none" stroke="var(--warn)" stroke-width="2" style="transition: stroke 0.3s ease;" />
+        <text id="angleText" fill="var(--warn)" font-size="15" font-weight="bold" text-anchor="middle" style="transition: fill 0.3s ease;"></text>
 
         <!-- 🎯 儀表滑輪 -->
         <g id="pulleyGroup" class="draggable-pulley">
@@ -241,30 +254,31 @@
             <line id="pulleyNeedle" stroke="#000" stroke-width="2" stroke-linecap="round" />
         </g>
 
-        <!-- 🚑 戰術擔架 -->
+        <!-- 🚑 戰術擔架 (放大調整版) -->
         <g id="stretcherGroup" class="draggable-pulley">
-           <path d="M 0 -35 L -12 -15 M 0 -35 L 12 -15" stroke="var(--muted)" stroke-width="2" />
-           <circle cx="0" cy="-35" r="3" fill="var(--muted)" />
-           <!-- 橘色硬式救生吊籃 -->
-           <rect x="-18" y="-15" width="36" height="12" fill="#ea580c" rx="3" />
-           <text x="0" y="-6" font-size="7" fill="#ffffff" font-weight="bold" text-anchor="middle" pointer-events="none">RESCUE</text>
+           <!-- 加長懸吊線 -->
+           <path d="M 0 -45 L -16 -18 M 0 -45 L 16 -18" stroke="var(--muted)" stroke-width="2.5" />
+           <circle cx="0" cy="-45" r="4.5" fill="var(--muted)" />
+           <!-- 放大橘色硬式救生吊籃 -->
+           <rect x="-24" y="-18" width="48" height="14" fill="#ea580c" rx="4" />
+           <text x="0" y="-7" font-size="9" fill="#ffffff" font-weight="bold" text-anchor="middle" pointer-events="none">RESCUE</text>
         </g>
         
         <!-- 錨點 A, B -->
         <g id="anchorGroupA" class="anchor-dot">
            <circle cx="0" cy="0" r="30" fill="transparent" /> 
-           <circle r="14" fill="var(--bg)" stroke="var(--safe)" stroke-width="3.5" />
+           <circle r="14" fill="var(--bg)" stroke="var(--safe)" stroke-width="3.5" style="transition: stroke 0.3s ease;" id="dotA" />
            <text y="4" fill="var(--text)" font-size="13" font-weight="bold" text-anchor="middle" pointer-events="none">A</text>
         </g>
         
         <g id="anchorGroupB" class="anchor-dot">
            <circle cx="0" cy="0" r="30" fill="transparent" />
-           <circle r="14" fill="var(--bg)" stroke="var(--safe)" stroke-width="3.5" />
+           <circle r="14" fill="var(--bg)" stroke="var(--safe)" stroke-width="3.5" style="transition: stroke 0.3s ease;" id="dotB" />
            <text y="4" fill="var(--text)" font-size="13" font-weight="bold" text-anchor="middle" pointer-events="none">B</text>
         </g>
       </svg>
 
-      <!-- 🖥️ 四角 HUD 抬頭顯示器 -->
+      <!-- 🖥️ 戰術 HUD 抬頭顯示器 -->
       <div class="hud-panel hud-tl" id="hudA">
          <div style="color:var(--muted)">A點狀態</div>
          <div id="txtTenA" class="val" style="color:var(--safe)">張力: -- kg</div>
@@ -275,20 +289,21 @@
          <div id="txtTenB" class="val" style="color:var(--safe)">張力: -- kg</div>
          <div id="txtVertB" class="val" style="color:var(--warn)">抗重: -- kg</div>
       </div>
-      <div class="hud-panel hud-tc">
-         ➰ 主繩長 <input type="number" id="inRope" value="22" step="0.5"> m
-      </div>
+      
+      <!-- 修正：將繩長、跨距、高差統一放在右下角面板，清空中央視野 -->
       <div class="hud-panel hud-br">
-         <div style="display:flex; align-items:center; gap:4px;">↔️ 跨距 <input type="number" id="inSpan" value="20" min="5" step="1"> m</div>
-         <div style="display:flex; align-items:center; gap:4px;">↕️ 高差 <input type="number" id="inHeight" value="0" step="0.5"> m</div>
+         <div style="display:flex; align-items:center; gap:4px; justify-content:flex-end;">➰ 繩長 <input type="number" id="inRope" value="22" step="0.5"> m</div>
+         <div style="display:flex; align-items:center; gap:4px; justify-content:flex-end;">↔️ 跨距 <input type="number" id="inSpan" value="20" min="5" step="1"> m</div>
+         <div style="display:flex; align-items:center; gap:4px; justify-content:flex-end;">↕️ 高差 <input type="number" id="inHeight" value="0" step="0.5"> m</div>
       </div>
+
       <div class="hud-panel hud-bl" id="sagText">
          下垂: -- m (--%)
       </div>
 
-      <!-- 💡 浮動擔架標籤 -->
+      <!-- 💡 浮動擔架標籤 (修正：移除圖示，縮小輸入框) -->
       <div id="floatLoad" class="stretcher-tag">
-         ⚖️ <input type="number" id="inLoad" value="100" step="10"> kg
+         <input type="number" id="inLoad" value="100" step="10"> kg
       </div>
     </div>
     
@@ -335,7 +350,7 @@
           </div>
         </details>
 
-        <!-- 📱 加入主畫面說明 (取代舊版彈窗) -->
+        <!-- 📱 加入主畫面說明 -->
         <details class="menu-item">
           <summary>
             <div class="menu-header-left"><span class="menu-icon">📱</span>加入主畫面說明</div>
@@ -432,11 +447,13 @@ const inSpan = document.getElementById('inSpan'), inHeight = document.getElement
       taglineInfo = document.getElementById('taglineInfo');
 
 const svgEl = document.getElementById('canvas');
+const mainCard = document.getElementById('mainCard');
 const els = {
   ropeL: document.getElementById('ropeL'), ropeR: document.getElementById('ropeR'),
   pulleyGroup: document.getElementById('pulleyGroup'), pulleyNeedle: document.getElementById('pulleyNeedle'),
   stretcherGroup: document.getElementById('stretcherGroup'), 
   anchorA: document.getElementById('anchorGroupA'), anchorB: document.getElementById('anchorGroupB'), 
+  dotA: document.getElementById('dotA'), dotB: document.getElementById('dotB'),
   txtTenA: document.getElementById('txtTenA'), txtVertA: document.getElementById('txtVertA'),
   txtTenB: document.getElementById('txtTenB'), txtVertB: document.getElementById('txtVertB'),
   sagText: document.getElementById('sagText'),
@@ -495,18 +512,29 @@ function updateEngine() {
   let Fx = tension * cos1 + tension * cos2; 
   let tagForce = Math.abs(Fx);
 
-  let isDanger = tension > W * 5; let color = isDanger ? "var(--bad)" : "var(--safe)";
+  // 💡 新增：警示與危險燈號判斷 (同步二點張力儀邏輯)
+  let isDanger = interiorAngle >= 150 || tension >= W * 4; 
+  let isWarn = !isDanger && (interiorAngle >= 120 || tension >= W * 1.5);
+  let color = isDanger ? "var(--bad)" : (isWarn ? "var(--warn)" : "var(--safe)");
 
+  // 實裝燈號顏色
+  mainCard.style.borderColor = color;
+  mainCard.style.boxShadow = `0 10px 30px ${isDanger ? 'rgba(239, 68, 68, 0.2)' : (isWarn ? 'rgba(255, 216, 77, 0.15)' : 'rgba(0,0,0,0.5)')}`;
+  
   let s_ax = toX(ax), s_ay = toY(ay), s_bx = toX(bx), s_by = toY(by), s_px = toX(px), s_py = toY(py);
   
   els.anchorA.setAttribute('transform', `translate(${s_ax}, ${s_ay})`);
   els.anchorB.setAttribute('transform', `translate(${s_bx}, ${s_by})`);
+  els.dotA.setAttribute('stroke', color);
+  els.dotB.setAttribute('stroke', color);
 
   els.ropeL.setAttribute('x1', s_ax); els.ropeL.setAttribute('y1', s_ay); els.ropeL.setAttribute('x2', s_px); els.ropeL.setAttribute('y2', s_py); els.ropeL.setAttribute('stroke', color);
   els.ropeR.setAttribute('x1', s_px); els.ropeR.setAttribute('y1', s_py); els.ropeR.setAttribute('x2', s_bx); els.ropeR.setAttribute('y2', s_by); els.ropeR.setAttribute('stroke', color);
 
   els.angleArc.setAttribute("d", describeArc(s_px, s_py, 28, angleRad1, angleRad2));
+  els.angleArc.setAttribute("stroke", color);
   els.angleText.textContent = interiorAngle.toFixed(1) + "°";
+  els.angleText.setAttribute('fill', color);
   els.angleText.setAttribute('x', s_px); els.angleText.setAttribute('y', s_py - 35);
 
   if (tagForce > 0.5) {
@@ -527,7 +555,7 @@ function updateEngine() {
   let needleAngle = isDanger ? 45 : -45 + (tension / (W*5)) * 90; let nRad = needleAngle * Math.PI / 180;
   els.pulleyNeedle.setAttribute('x1', 0); els.pulleyNeedle.setAttribute('y1', 0); els.pulleyNeedle.setAttribute('x2', 8 * Math.sin(nRad)); els.pulleyNeedle.setAttribute('y2', -8 * Math.cos(nRad));
   
-  let loadDrop = 40; 
+  let loadDrop = 55; // 修正：因擔架變大，需將掛載點往下推
   els.stretcherGroup.setAttribute('transform', `translate(${s_px}, ${s_py + loadDrop})`);
 
   let tText = tension > 9999 ? "死線!" : tension.toFixed(1) + " kg";
@@ -546,7 +574,7 @@ function updateEngine() {
   let ratioX = wrapRect.width / svgW;
   let ratioY = wrapRect.height / svgH;
   let flX = s_px * ratioX; 
-  let flY = (s_py + loadDrop + 15) * ratioY;
+  let flY = (s_py + loadDrop + 10) * ratioY;
   
   if (flY > wrapRect.height - 35) flY = wrapRect.height - 35;
   
@@ -601,12 +629,14 @@ async function toggleCamera() {
     stream.getTracks().forEach(track => track.stop()); stream = null; videoTrack = null; 
     video.style.opacity = "0"; btnCamera.classList.remove('active'); 
     torchOn = false; btnFlashlight.classList.remove('active');
+    mainCard.classList.remove('camera-mode');
   } else { 
     try { 
       image.style.opacity = "0"; 
       stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }); 
       videoTrack = stream.getVideoTracks()[0];
       video.srcObject = stream; video.style.opacity = "1"; btnCamera.classList.add('active'); 
+      mainCard.classList.add('camera-mode');
     } catch (err) { alert("⚠️ 鏡頭啟動失敗：" + err.message); } 
   } 
 }
@@ -622,7 +652,19 @@ async function toggleFlashlight() {
   } catch(e) { alert("⚠️ 手電筒切換失敗：" + e.message); }
 }
 
-function loadImage(event) { const file = event.target.files[0]; if (file) { if(stream) toggleCamera(); const reader = new FileReader(); reader.onload = function(e) { image.src = e.target.result; image.style.opacity = "1"; }; reader.readAsDataURL(file); } }
+function loadImage(event) { 
+  const file = event.target.files[0]; 
+  if (file) { 
+    if(stream) toggleCamera(); 
+    const reader = new FileReader(); 
+    reader.onload = function(e) { 
+      image.src = e.target.result; 
+      image.style.opacity = "1"; 
+      mainCard.classList.add('camera-mode');
+    }; 
+    reader.readAsDataURL(file); 
+  } 
+}
 function toggleGrid() { gridVisible = !gridVisible; gridOverlay.style.opacity = gridVisible ? "0.5" : "0"; }
 
 function toggleHUD() {
