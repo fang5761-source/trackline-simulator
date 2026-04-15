@@ -77,7 +77,6 @@
     box-shadow: none !important;
   }
   
-  /* 👑 標題列排版 (左側圖示、中間文字、右側LOGO) */
   .topbar { display: flex; align-items: center; margin-bottom: 12px; width: 100%; }
   .title-tag { 
     font-size: 16px; font-weight: bold; display: flex; align-items: center; gap: 8px; 
@@ -99,8 +98,19 @@
   }
   .icon-btn:active { background: var(--line); transform: scale(0.95); }
   .icon-btn.active { background: var(--safe); color: var(--bg); border-color: var(--safe); }
+  .icon-btn.active-shock { background: var(--bad); color: #fff; border-color: var(--bad); animation: pulse 1.5s infinite; }
 
-  /* 💡 防捲動鎖定：畫布與擔架使用 touch-action: none 阻擋螢幕滑動 */
+  @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+  
+  /* 💡 震動動畫特效 */
+  @keyframes vibrate { 
+    0%, 100% { transform: translate(0, 0); } 
+    25% { transform: translate(-1px, 2px) rotate(-1deg); } 
+    50% { transform: translate(2px, -1px) rotate(1deg); } 
+    75% { transform: translate(-2px, -1px) rotate(0deg); } 
+  }
+  .shock-mode #stretcherVisuals { animation: vibrate 0.15s linear infinite; }
+
   .svgWrap { position:relative; width:100%; height: 500px; background: transparent; border-radius: 12px; border: 1px dashed var(--line); overflow: hidden; touch-action: none; }
   svg { display: block; width: 100%; height: 100%; }
 
@@ -115,14 +125,13 @@
     display: flex; flex-direction: column; gap: 4px; box-shadow: 0 4px 6px rgba(0,0,0,0.3);
     transition: border-color 0.3s ease;
   }
-  .hud-panel .val { font-size: 13px; font-family: monospace; transition: color 0.3s ease; white-space: nowrap; }
+  .hud-panel .val { font-size: 13px; font-family: monospace; transition: color 0.3s ease; white-space: nowrap; display: flex; align-items: baseline; gap: 4px; }
   .hud-panel input {
     background: rgba(0,0,0,0.5); border: none; border-bottom: 1px solid var(--line); border-radius: 4px;
     color: var(--warn); font-weight: bold; font-size: 14px; text-align: center; padding: 2px 4px; outline: none; font-family: monospace; width: 42px;
   }
   .hud-panel input:focus { border-color: var(--safe); background: rgba(0,0,0,0.8); }
 
-  /* 💡 修正：A/B 面板防重疊，設定最大寬度 */
   .hud-tl { top: 10px; left: 5px; border-left: 3px solid var(--safe); max-width: 48%; overflow: hidden; } 
   .hud-tr { top: 10px; right: 5px; border-right: 3px solid var(--safe); text-align: right; align-items: flex-end; max-width: 48%; overflow: hidden; } 
   
@@ -130,10 +139,8 @@
   .hud-br .input-row { display: flex; align-items: center; justify-content: flex-end; gap: 4px; margin-bottom: 2px; }
   .hud-br .unit { font-size: 11px; color: var(--muted); }
   
-  /* 💡 修正：下垂文字往上推，避開手機橫條 */
   .hud-bl { bottom: 25px; left: 10px; background: transparent; border: none; box-shadow: none; padding: 0; color: var(--warn); } 
 
-  /* 💡 新版擔架輸入框 (直接做成大擔架造型，方便拖曳) */
   .stretcher-tag {
     position: absolute; background: #ea580c; border: 2px solid #9a3412;
     border-radius: 6px; padding: 4px; color: var(--bg); font-size: 12px; font-weight: bold;
@@ -151,7 +158,6 @@
 
   .tagline-info { margin-top: 10px; padding: 10px; background: rgba(56, 189, 248, 0.1); border-radius: 8px; border: 1px solid var(--tagline); text-align: center; font-size: 13px; font-weight: bold; color: var(--tagline); }
   
-  /* 💡 角度滑動拉桿 */
   .angle-slider-container { margin-top: 10px; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 8px; border: 1px solid var(--line); }
   .angle-slider-header { display: flex; justify-content: space-between; font-size: 12px; color: var(--warn); margin-bottom: 4px; font-weight: bold; }
   input[type="range"]{ -webkit-appearance:none; width:100%; margin: 8px 0; background:transparent; cursor:pointer; }
@@ -161,7 +167,6 @@
     border:2px solid var(--bg); margin-top:-9px; box-shadow: 0 2px 6px rgba(0,0,0,0.5);
   }
 
-  /* 🧰 後勤選單樣式 */
   .menu-list { display: flex; flex-direction: column; gap: 10px; margin-top: 5px; width: 100%; }
   details.main-accordion { background: var(--card); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
   details.main-accordion > summary { padding: 14px 16px; font-weight: bold; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; color: var(--warn); background: rgba(0,0,0,0.3); font-size: 15px; }
@@ -220,7 +225,7 @@
 <div class="app-container" id="capture-area">
 
   <div class="card" id="mainCard">
-    <!-- 👑 標題列排版 (左：特戰Icon，右：散木LOGO) -->
+    <!-- 👑 標題列排版 -->
     <div class="topbar">
       <div class="title-tag">
         <div class="title-left">
@@ -246,6 +251,7 @@
       <input type="file" id="upload-image" accept="image/*" onchange="loadImage(event)">
       <button class="icon-btn" onclick="toggleGrid()" title="工程網格">🌐</button>
       <button class="icon-btn" onclick="toggleHUD()" title="淨空模式">☀️</button>
+      <button class="icon-btn" id="btn-shock" onclick="toggleShock()" title="動態震動衝擊">📳</button>
       <button class="icon-btn" onclick="takeScreenshot()" title="戰術截圖">📸</button>
       <button class="icon-btn" onclick="resetEngine()" title="重置沙盤">↺</button>
     </div>
@@ -275,8 +281,12 @@
 
         <!-- 懸吊線 (連接到浮動 HTML 擔架) -->
         <g id="stretcherSuspension">
-           <path d="M 0 -40 L -12 -10 M 0 -40 L 12 -10" stroke="var(--muted)" stroke-width="2.5" />
-           <circle cx="0" cy="-40" r="4" fill="var(--muted)" />
+           <!-- 💡 內層 Visual 群組：用來執行震動動畫，不影響 JS 的座標定位 -->
+           <g id="stretcherVisuals">
+               <path d="M 0 -40 L -12 -10 M 0 -40 L 12 -10" stroke="var(--muted)" stroke-width="2.5" />
+               <circle cx="0" cy="-40" r="4" fill="var(--muted)" />
+               <text id="shockLabel" x="0" y="0" font-size="10" fill="var(--bad)" font-weight="bold" text-anchor="middle" style="opacity: 0; pointer-events: none;">⚡震動 +30%</text>
+           </g>
         </g>
         
         <!-- 錨點 A, B -->
@@ -355,6 +365,7 @@
               <li>拖曳畫布上的 <b>A點/B點</b>，可快速設定跨距與高低差。</li>
               <li>拖曳橘色 <b>大擔架</b> 或滑輪，可模擬傷患過河時的張力與牽引力。</li>
               <li>滑動下方的 <b>夾角拉桿</b>，系統會自動反推繩長並平滑變形。</li>
+              <li>點擊頂部 <b>📳震動</b> 按鈕，可模擬拖曳擔架時產生之動態衝擊 (重量放大一點三倍計算峰值)。</li>
               <li>點擊頂部 <b>📷實境 / 🌐網格 / ☀️淨空</b> 等工具，可進行實地疊圖測量與 <b>📸截圖</b> 存檔。</li>
             </ul>
             <button type="button" class="btn-collapse-inner" onclick="this.closest('details').removeAttribute('open')">🔼 收起說明</button>
@@ -368,7 +379,7 @@
           </summary>
           <div class="menu-content">
             <div style="text-align: center; margin-bottom: 15px;">
-              <span style="display:inline-block; background:var(--safe); color:#0f1623; font-weight:bold; padding:4px 14px; border-radius:20px; font-size:13px; letter-spacing:0.5px; box-shadow: 0 2px 6px rgba(34,197,94,0.3);">V6.0 索道繩動態張力估算儀</span>
+              <span style="display:inline-block; background:var(--safe); color:#0f1623; font-weight:bold; padding:4px 14px; border-radius:20px; font-size:13px; letter-spacing:0.5px; box-shadow: 0 2px 6px rgba(34,197,94,0.3);">V6.1 動態衝擊運算版</span>
             </div>
             <p style="margin-top: 0; margin-bottom: 6px; font-weight: bold; color: var(--text); text-align: center;">本工具由 <span style="color:var(--warn);">散木團隊</span> 開發製作</p>
             <p style="margin-top: 0; margin-bottom: 4px; font-size: 13px; text-align: center;">教學架構與工程判斷／徐世豐</p>
@@ -480,6 +491,7 @@ const els = {
   ropeL: document.getElementById('ropeL'), ropeR: document.getElementById('ropeR'),
   pulleyGroup: document.getElementById('pulleyGroup'), pulleyNeedle: document.getElementById('pulleyNeedle'),
   stretcherSuspension: document.getElementById('stretcherSuspension'), 
+  stretcherVisuals: document.getElementById('stretcherVisuals'), shockLabel: document.getElementById('shockLabel'),
   anchorA: document.getElementById('anchorGroupA'), anchorB: document.getElementById('anchorGroupB'), 
   dotA: document.getElementById('dotA'), dotB: document.getElementById('dotB'),
   txtTenA: document.getElementById('txtTenA'), txtVertA: document.getElementById('txtVertA'),
@@ -494,6 +506,10 @@ const els = {
 const svgW = 400, svgH = 500; 
 let scale = 10, offsetX = 50, offsetY = 120; 
 let currentSliderPct = 0.5;
+
+// 💡 震動衝擊模式變數
+let isShockOn = false;
+const SHOCK_FACTOR = 1.3; // 模擬拖曳時增加 30% 動態載荷
 
 function toX(mX) { return offsetX + mX * scale; }
 function toY(mY) { return offsetY + mY * scale; }
@@ -524,7 +540,6 @@ function getAngleFromL(S, H, pct, L) {
     return interiorAngle;
 }
 
-// 💡 二分搜尋法：反推繩長 L 以達到目標夾角
 function adjustLForAngle(targetAngle) {
     let S = parseFloat(inSpan.value) || 20, H = parseFloat(inHeight.value) || 0;
     let minL = Math.hypot(S, H);
@@ -538,8 +553,8 @@ function adjustLForAngle(targetAngle) {
     for(let i=0; i<35; i++) {
         let mid = (low + high) / 2;
         let ang = getAngleFromL(S, H, currentSliderPct, mid);
-        if (ang > targetAngle) low = mid; // 繩太緊(角度太大)，放長繩子
-        else high = mid; // 繩太鬆(角度太小)，收短繩子
+        if (ang > targetAngle) low = mid; 
+        else high = mid; 
         bestL = mid;
     }
     inRope.value = bestL.toFixed(1);
@@ -547,11 +562,13 @@ function adjustLForAngle(targetAngle) {
 }
 
 function updateEngine(skipSliderUpdate = false) {
-  let S = parseFloat(inSpan.value) || 20, H = parseFloat(inHeight.value) || 0, W = parseFloat(inLoad.value) || 100;
+  let S = parseFloat(inSpan.value) || 20, H = parseFloat(inHeight.value) || 0, baseW = parseFloat(inLoad.value) || 100;
   let L = parseFloat(inRope.value) || 22;
   
+  // 💡 動態衝擊加乘 (若開啟震動模式，重量放大 1.3 倍)
+  let W = isShockOn ? baseW * SHOCK_FACTOR : baseW;
+  
   let minL = Math.hypot(S, H);
-  // 不強制覆寫輸入框，只在背後運算確保物理合理性
   let calcL = Math.max(L, minL + 0.05);
 
   let maxCanvasH = svgH - 120; 
@@ -575,9 +592,8 @@ function updateEngine(skipSliderUpdate = false) {
   let Fx = tension * cos1 + tension * cos2; 
   let tagForce = Math.abs(Fx);
 
-  // 💡 警示燈號：大於 160 度紅色，大於 120 度黃色
-  let isDanger = interiorAngle >= 160 || tension >= W * 4; 
-  let isWarn = !isDanger && (interiorAngle >= 120 || tension >= W * 1.5);
+  let isDanger = interiorAngle >= 160 || tension >= baseW * 4; 
+  let isWarn = !isDanger && (interiorAngle >= 120 || tension >= baseW * 1.5);
   let color = isDanger ? "var(--bad)" : (isWarn ? "var(--warn)" : "var(--safe)");
 
   mainCard.style.borderColor = color;
@@ -603,7 +619,8 @@ function updateEngine(skipSliderUpdate = false) {
       els.tagLine.style.display = "block"; els.tagLineText.style.display = "block";
       let tagEndX = Fx > 0 ? s_px + 70 : s_px - 70;
       els.tagLine.setAttribute('x1', s_px); els.tagLine.setAttribute('y1', s_py); els.tagLine.setAttribute('x2', tagEndX); els.tagLine.setAttribute('y2', s_py);
-      els.tagLineText.textContent = `${tagForce.toFixed(1)}kg`;
+      let tagLabelText = isShockOn ? `${tagForce.toFixed(1)}kg (峰值)` : `${tagForce.toFixed(1)}kg`;
+      els.tagLineText.textContent = tagLabelText;
       els.tagLineText.setAttribute('x', tagEndX + (Fx>0?5:-5)); els.tagLineText.setAttribute('y', s_py + 4); els.tagLineText.setAttribute('text-anchor', Fx>0?'start':'end');
       taglineInfo.textContent = `↔️ 牽引力: ${tagForce.toFixed(1)} kg (${Fx > 0 ? '往 B 側拉' : '往 A 側拉'})`;
       taglineInfo.style.background = "rgba(56, 189, 248, 0.15)";
@@ -614,19 +631,22 @@ function updateEngine(skipSliderUpdate = false) {
   }
 
   els.pulleyGroup.setAttribute('transform', `translate(${s_px}, ${s_py})`);
-  let needleAngle = isDanger ? 45 : -45 + (tension / (W*5)) * 90; let nRad = needleAngle * Math.PI / 180;
+  let needleAngle = isDanger ? 45 : -45 + (tension / (baseW*5)) * 90; let nRad = needleAngle * Math.PI / 180;
   els.pulleyNeedle.setAttribute('x1', 0); els.pulleyNeedle.setAttribute('y1', 0); els.pulleyNeedle.setAttribute('x2', 8 * Math.sin(nRad)); els.pulleyNeedle.setAttribute('y2', -8 * Math.cos(nRad));
   
   let loadDrop = 40; 
   els.stretcherSuspension.setAttribute('transform', `translate(${s_px}, ${s_py + loadDrop})`);
 
+  // 💡 HUD 加入震動峰值標籤
   let tText = tension > 9999 ? "死線!" : tension.toFixed(1);
-  els.txtTenA.innerHTML = `張力 <span style="font-size:15px">${tText}</span><span style="font-size:11px">kg</span>`; els.txtTenA.style.color = color;
-  els.txtVertA.innerHTML = `抗重 <span style="font-size:15px">${verticalA.toFixed(1)}</span><span style="font-size:11px">kg</span>`;
+  let shockBadge = isShockOn ? `<span style="font-size:10px; color:var(--bad); margin-left:4px;">⚡峰值</span>` : '';
+  
+  els.txtTenA.innerHTML = `張力 <span style="font-size:15px">${tText}</span><span style="font-size:11px">kg</span>${shockBadge}`; els.txtTenA.style.color = color;
+  els.txtVertA.innerHTML = `抗重 <span style="font-size:15px">${verticalA.toFixed(1)}</span><span style="font-size:11px">kg</span>${shockBadge}`;
   els.hudA.style.borderLeftColor = color; 
 
-  els.txtTenB.innerHTML = `張力 <span style="font-size:15px">${tText}</span><span style="font-size:11px">kg</span>`; els.txtTenB.style.color = color;
-  els.txtVertB.innerHTML = `抗重 <span style="font-size:15px">${verticalB.toFixed(1)}</span><span style="font-size:11px">kg</span>`;
+  els.txtTenB.innerHTML = `張力 <span style="font-size:15px">${tText}</span><span style="font-size:11px">kg</span>${shockBadge}`; els.txtTenB.style.color = color;
+  els.txtVertB.innerHTML = `抗重 <span style="font-size:15px">${verticalB.toFixed(1)}</span><span style="font-size:11px">kg</span>${shockBadge}`;
   els.hudB.style.borderRightColor = color;
 
   let sagBaseY = ay + (by - ay) * currentSliderPct, actualSag = py - sagBaseY;
@@ -644,7 +664,6 @@ function updateEngine(skipSliderUpdate = false) {
   els.floatLoad.style.top = `${flY}px`;
 }
 
-// 💡 修復輸入框防呆：失去焦點時才檢查繩長是否過短
 inRope.addEventListener('change', () => {
    let S = parseFloat(inSpan.value) || 20;
    let H = parseFloat(inHeight.value) || 0;
@@ -656,7 +675,6 @@ inRope.addEventListener('change', () => {
 [inSpan, inHeight, inLoad].forEach(el => el.addEventListener('input', () => updateEngine()));
 inRope.addEventListener('input', () => updateEngine());
 
-// 💡 夾角自由拖曳
 angleSlider.addEventListener('input', (e) => {
     let targetAngle = parseFloat(e.target.value);
     adjustLForAngle(targetAngle);
@@ -679,12 +697,10 @@ function startDrag(e, node) {
 els.anchorA.onmousedown = els.anchorA.ontouchstart = (e) => startDrag(e, 'A');
 els.anchorB.onmousedown = els.anchorB.ontouchstart = (e) => startDrag(e, 'B');
 els.pulleyGroup.onmousedown = els.pulleyGroup.ontouchstart = (e) => startDrag(e, 'P');
-// 💡 HTML 大擔架也能拖曳
 els.floatLoad.onmousedown = els.floatLoad.ontouchstart = (e) => startDrag(e, 'P'); 
 
 window.onmousemove = window.ontouchmove = (e) => {
   if(!isDragging) return;
-  // 💡 只有在拖曳 A/B 點或擔架時，才取消原生捲動
   if(e.cancelable) e.preventDefault(); 
   let pos = getSVGPos(e);
   if (isDragging === 'P') {
@@ -703,6 +719,22 @@ window.onmouseup = window.ontouchend = () => isDragging = null;
 let stream = null, videoTrack = null, torchOn = false; 
 const video = document.getElementById('bg-video'), image = document.getElementById('bg-image'), btnCamera = document.getElementById('btn-camera'), btnFlashlight = document.getElementById('btn-flashlight'), gridOverlay = document.getElementById('grid-overlay'); 
 let gridVisible = true, hudVisible = true;
+
+// 💡 震動模式切換邏輯
+function toggleShock() {
+  isShockOn = !isShockOn;
+  const btnShock = document.getElementById('btn-shock');
+  if(isShockOn) {
+    btnShock.classList.add('active-shock');
+    mainCard.classList.add('shock-mode');
+    els.shockLabel.style.opacity = "1";
+  } else {
+    btnShock.classList.remove('active-shock');
+    mainCard.classList.remove('shock-mode');
+    els.shockLabel.style.opacity = "0";
+  }
+  updateEngine();
+}
 
 async function toggleCamera() { 
   if (stream) { 
@@ -758,6 +790,7 @@ function toggleHUD() {
 
 function resetEngine() {
   inSpan.value = 20; inHeight.value = 0; inLoad.value = 100; inRope.value = 22; currentSliderPct = 0.5;
+  if(isShockOn) toggleShock(); // 關閉震動
   updateEngine();
 }
 
