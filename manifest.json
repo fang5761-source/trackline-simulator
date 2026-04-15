@@ -1,0 +1,21 @@
+{
+  "name": "水平軌道繩張力模擬儀",
+  "short_name": "軌道繩儀",
+  "description": "散木團隊專屬：水平主繩與軌道繩系統動態張力模擬沙盤。",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0f1623",
+  "theme_color": "#0f1623",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+
+<!-- 散木團隊正式名稱 -->
+<title>水平軌道繩模擬儀 | 散木團隊</title>
+
+<!-- 🍎 APP 模式設定 -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="軌道繩儀">
+<meta name="mobile-web-app-capable" content="yes">
+
+<!-- 🔗 LINE/FB 預覽卡片設定 -->
+<meta property="og:title" content="水平軌道繩模擬儀 | 散木團隊">
+<meta property="og:description" content="多點張力自動估算：自由拖曳、精準預測，結合實境相機，解開垂直抗重與主繩張力的物理之謎。">
+<meta property="og:image" content="https://fang5761-source.github.io/trackline-simulator/icon-512.png">
+<meta property="og:url" content="https://fang5761-source.github.io/trackline-simulator/">
+<meta property="og:type" content="website">
+
+<link rel="manifest" href="manifest.json">
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&display=swap');
+
+  :root{
+    /* 戰術工程藍圖配色 */
+    --bg: #0f1623;
+    --card: rgba(18, 26, 42, 0.85);
+    --line: #1b2940;
+    --grid: #1e3a5f;
+    --text: #e8eef7;
+    --muted: #a8b3c5;
+    --safe: #22c55e;
+    --warn: #ffd84d;
+    --bad: #ef4444;
+    --base: #94a3b8;
+    --tagline: #38bdf8; 
+  }
+
+  /* 🛡️ 防禦裝甲：禁止整個網頁的文字被反白與選取 */
+  body {
+    margin: 0; background-color: var(--bg); color: var(--text); font-family: 'Noto Serif TC', serif;
+    display: flex; justify-content: center; align-items: flex-start;
+    padding: 10px 10px 40px 10px; touch-action: manipulation;
+    min-height: 100vh; overflow-x: hidden;
+    -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;
+  }
+  
+  /* 允許輸入框可以正常輸入與選取 */
+  input, textarea { -webkit-user-select: auto; user-select: auto; box-sizing: border-box; }
+  *{box-sizing:border-box}
+
+  /* 📷 背景層與網格 */
+  #bg-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; background-color: var(--bg); overflow: hidden; }
+  #bg-video, #bg-image { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; opacity: 0; transition: opacity 0.3s; }
+  #grid-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+    background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 20px 20px; opacity: 0.5; pointer-events: none; transition: opacity 0.3s;
+  }
+
+  .app-container { max-width: 500px; width: 100%; display: flex; flex-direction: column; gap: 12px; position: relative; z-index: 1; }
+  input[type="file"] { display: none; }
+
+  .card { width:100%; background:var(--card); border:1px solid var(--line); border-radius:16px; padding: 12px; box-shadow:0 10px 30px rgba(0,0,0,.5); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); }
+  
+  /* 👑 標題列排版 */
+  .topbar { display: flex; align-items: center; margin-bottom: 12px; }
+  .title-tag { font-size: 18px; font-weight: bold; display: flex; align-items: center; gap: 10px; white-space: nowrap; }
+  .title-divider { width: 3px; height: 22px; background-color: var(--warn); border-radius: 2px; }
+
+  /* 🎛️ 經典戰術工具列 */
+  .icon-bar {
+    display: flex; justify-content: space-between; align-items: center; gap: 6px; 
+    background: rgba(0,0,0,0.4); padding: 8px; border-radius: 12px; margin-bottom: 12px;
+    border: 1px solid var(--line);
+  }
+  .icon-btn {
+    flex: 1; aspect-ratio: 1/1; max-height: 42px; border-radius: 8px; 
+    background: rgba(255,255,255,0.05); border: 1px solid transparent;
+    display: flex; justify-content: center; align-items: center; 
+    cursor: pointer; transition: all 0.2s; font-size: 18px; color: var(--text); padding: 0;
+  }
+  .icon-btn:active { background: var(--line); transform: scale(0.95); }
+  .icon-btn.active { background: var(--safe); color: var(--bg); border-color: var(--safe); }
+
+  /* 畫布容器 */
+  .svgWrap { position:relative; width:100%; height: 500px; background: transparent; border-radius: 12px; border: 1px dashed var(--line); overflow: hidden; touch-action: none; }
+  svg { display: block; width: 100%; height: 100%; }
+
+  /* 🖱️ 拖曳游標 */
+  .anchor-dot, .draggable-pulley { cursor: grab; }
+  .anchor-dot:active, .draggable-pulley:active { cursor: grabbing; }
+
+  /* 🚀 戰術 HUD 面板 */
+  .hud-panel, .stretcher-tag, .tagline-info { transition: opacity 0.3s ease; }
+  .hud-panel {
+    position: absolute; background: rgba(10, 15, 25, 0.7); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px; padding: 6px 10px; color: var(--text); font-size: 12px; font-weight: bold;
+    backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); pointer-events: auto;
+    display: flex; flex-direction: column; gap: 4px; box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+  }
+  .hud-panel .val { font-size: 14px; font-family: monospace; }
+  .hud-panel input {
+    background: rgba(0,0,0,0.5); border: none; border-bottom: 1px solid var(--line); border-radius: 4px;
+    color: var(--warn); font-weight: bold; font-size: 14px; text-align: center; padding: 2px 4px; outline: none; font-family: monospace; width: 45px;
+  }
+  .hud-panel input:focus { border-color: var(--safe); background: rgba(0,0,0,0.8); }
+
+  .hud-tl { top: 10px; left: 10px; border-left: 3px solid var(--safe); } 
+  .hud-tr { top: 10px; right: 10px; border-right: 3px solid var(--safe); text-align: right; align-items: flex-end; } 
+  .hud-tc { top: 10px; left: 50%; transform: translateX(-50%); flex-direction: row; align-items: center; border-bottom: 3px solid var(--line); } 
+  .hud-br { bottom: 10px; right: 10px; border-bottom: 3px solid var(--line); align-items: flex-end; z-index: 30; } 
+  .hud-bl { bottom: 10px; left: 10px; background: transparent; border: none; box-shadow: none; padding: 0; color: var(--warn); } 
+
+  /* 💡 高亮度黃底負重標籤 */
+  .stretcher-tag {
+    position: absolute; background: var(--warn); border: 2px solid #ca8a04;
+    border-radius: 8px; padding: 4px 8px; color: var(--bg); font-size: 14px; font-weight: bold;
+    transform: translateX(-50%); 
+    display: flex; align-items: center; gap: 4px; z-index: 50;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.6); pointer-events: auto;
+  }
+  .stretcher-tag input { 
+    width: 55px; background: rgba(0,0,0,0.1); border: none; border-bottom: 2px solid var(--bg); 
+    color: var(--bg); font-size: 18px; font-weight: bold; text-align: center; outline: none; font-family: monospace;
+  }
+  .stretcher-tag input:focus { border-bottom-color: #000; background: rgba(255,255,255,0.5); }
+
+  .tagline-info { margin-top: 10px; padding: 10px; background: rgba(56, 189, 248, 0.1); border-radius: 8px; border: 1px solid var(--tagline); text-align: center; font-size: 13px; font-weight: bold; color: var(--tagline); }
+  
+  /* 🧰 後勤選單樣式 */
+  .menu-list { display: flex; flex-direction: column; gap: 10px; margin-top: 5px; width: 100%; }
+  details.main-accordion { background: var(--card); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
+  details.main-accordion > summary { padding: 14px 16px; font-weight: bold; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; color: var(--warn); background: rgba(0,0,0,0.3); font-size: 15px; }
+  details.main-accordion > summary::-webkit-details-marker { display: none; }
+  .menu-group { display: flex; flex-direction: column; }
+  .menu-item { border-top: 1px solid var(--line); }
+  .menu-item summary { padding: 12px 16px; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; font-size: 14px; transition: background 0.2s; color: var(--text); }
+  .menu-item summary::-webkit-details-marker { display: none; }
+  .menu-item summary:active { background: var(--line); }
+  .menu-header-left { display: flex; align-items: center; gap: 10px; }
+  .menu-icon { font-size: 18px; }
+  .menu-arrow { color: var(--muted); font-size: 12px; transition: transform 0.3s; }
+  .menu-item[open] > summary .menu-arrow { transform: rotate(90deg); }
+  .menu-content { padding: 16px; font-size: 13.5px; color: var(--muted); line-height: 1.6; background: rgba(0,0,0,0.4); }
+  .menu-content ul { padding-left: 22px; margin-bottom: 0; }
+  .menu-content li { margin-bottom: 8px; }
+  .menu-action-btn { padding: 14px 16px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 14px; border-top: 1px solid var(--line); transition: background 0.2s; color: var(--text); }
+  .menu-action-btn:active { background: var(--line); }
+  .btn-collapse-inner { width: 100%; padding: 10px; margin-top: 12px; background: rgba(255,255,255,0.05); border: 1px solid var(--line); border-radius: 8px; color: var(--text); cursor: pointer; font-family: inherit; font-weight: bold; }
+  .highlight-coffee summary { background: rgba(217, 119, 6, 0.1); }
+  .highlight-heart { background: rgba(239, 68, 68, 0.1); }
+  .footer-disclaimer { margin-top: 5px; padding: 12px; font-size: 12px; color: var(--muted); line-height: 1.5; background: rgba(0,0,0,0.3); border-radius: 8px; border-left: 4px solid var(--bad); }
+
+  .watermark { display: none; position: absolute; bottom: 10px; right: 10px; font-size: 10px; color: rgba(255,255,255,0.5); pointer-events: none; }
+  .capture-mode .watermark { display: block; }
+</style>
+</head>
+<body>
+
+<script>
+// 🛡️ 散木團隊專屬雙重防護裝甲 (V1.1)
+(function protectOurApp() {
+  if (window.self !== window.top) { window.top.location = window.self.location; }
+  document.addEventListener('contextmenu', event => event.preventDefault());
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i')) || (e.ctrlKey && (e.key === 'U' || e.key === 'u')) || (e.metaKey && e.altKey && (e.key === 'I' || e.key === 'i')) || (e.metaKey && e.altKey && (e.key === 'U' || e.key === 'u'))) {
+      e.preventDefault();
+    }
+  });
+  const myDomain = "fang5761-source.github.io"; 
+  const currentDomain = window.location.hostname;
+  if (currentDomain !== "" && currentDomain !== "localhost" && currentDomain !== "127.0.0.1") {
+    if (!currentDomain.includes(myDomain)) {
+      alert("⚠️ 系統安全警告：偵測到非官方網域！\n\n本工具為【散木團隊】專屬研發，未經授權禁止盜用。\n系統防護機制啟動，即將強制鎖定。");
+      document.addEventListener("DOMContentLoaded", () => {
+          document.body.innerHTML = "<div style='display:flex; flex-direction:column; height:100vh; width:100vw; background:#0f1623; color:#ef4444; justify-content:center; align-items:center; font-size:24px; font-weight:bold; text-align:center; padding:20px;'><span style='font-size:60px; margin-bottom:20px;'>💀</span><br>未經授權的盜用版本<br>系統已鎖定</div>";
+      });
+      throw new Error("Security Breach: Unauthorized Domain. System Terminated.");
+    }
+  }
+})();
+</script>
+
+<div id="bg-layer"><video id="bg-video" autoplay playsinline muted></video><img id="bg-image" src="" alt="背景圖片"></div>
+<div id="grid-overlay"></div>
+
+<div class="app-container" id="capture-area">
+
+  <div class="card">
+    <!-- 👑 標題列置於第一行 -->
+    <div class="topbar">
+      <div class="title-tag">
+        <!-- 散木團隊正式 LOGO -->
+        <img src="./sunmoon_logo.png" alt="散木團隊" style="width: 36px; height: 36px; border-radius: 8px; object-fit: cover; box-shadow: 0 2px 4px rgba(0,0,0,0.5);">
+        <div class="title-divider"></div>
+        <span>水平軌道繩模擬儀</span>
+      </div>
+    </div>
+
+    <!-- 🎛️ 經典戰術工具列 (圖示按鈕) -->
+    <div class="icon-bar" data-html2canvas-ignore="true">
+      <button class="icon-btn" id="btn-camera" onclick="toggleCamera()" title="實境相機">📷</button>
+      <button class="icon-btn" id="btn-flashlight" onclick="toggleFlashlight()" title="手電筒">🔦</button>
+      <label class="icon-btn" for="upload-image" title="載入照片" style="margin:0;">📁</label>
+      <input type="file" id="upload-image" accept="image/*" onchange="loadImage(event)">
+      <button class="icon-btn" onclick="toggleGrid()" title="工程網格">🌐</button>
+      <button class="icon-btn" onclick="toggleHUD()" title="淨空模式">☀️</button>
+      <button class="icon-btn" onclick="takeScreenshot()" title="戰術截圖">📸</button>
+      <button class="icon-btn" onclick="resetEngine()" title="重置沙盤">↺</button>
+    </div>
+
+    <!-- 動態沙盤區 -->
+    <div class="svgWrap" id="svgWrap">
+      <svg id="canvas" viewBox="0 0 400 500">
+        <!-- 動態牽引繩 -->
+        <line id="tagLine" stroke="var(--tagline)" stroke-width="4" stroke-dasharray="6 4" stroke-linecap="round" />
+        <text id="tagLineText" fill="var(--tagline)" font-size="12" font-weight="bold"></text>
+
+        <!-- 主繩 -->
+        <line id="ropeL" stroke="var(--safe)" stroke-width="6" stroke-linecap="round" />
+        <line id="ropeR" stroke="var(--safe)" stroke-width="6" stroke-linecap="round" />
+        
+        <!-- 夾角顯示 -->
+        <path id="angleArc" fill="rgba(255, 216, 77, 0.15)" stroke="var(--warn)" stroke-width="2" />
+        <text id="angleText" fill="var(--warn)" font-size="14" font-weight="bold" text-anchor="middle"></text>
+
+        <!-- 🎯 儀表滑輪 -->
+        <g id="pulleyGroup" class="draggable-pulley">
+            <circle cx="0" cy="0" r="30" fill="transparent" />
+            <circle id="pulley" r="14" fill="var(--warn)" stroke="var(--bg)" stroke-width="2" />
+            <circle id="pulleyCenter" r="3" fill="var(--bg)" />
+            <line id="pulleyNeedle" stroke="#000" stroke-width="2" stroke-linecap="round" />
+        </g>
+
+        <!-- 🚑 戰術擔架 -->
+        <g id="stretcherGroup" class="draggable-pulley">
+           <path d="M 0 -35 L -12 -15 M 0 -35 L 12 -15" stroke="var(--muted)" stroke-width="2" />
+           <circle cx="0" cy="-35" r="3" fill="var(--muted)" />
+           <!-- 橘色硬式救生吊籃 -->
+           <rect x="-18" y="-15" width="36" height="12" fill="#ea580c" rx="3" />
+           <text x="0" y="-6" font-size="7" fill="#ffffff" font-weight="bold" text-anchor="middle" pointer-events="none">RESCUE</text>
+        </g>
+        
+        <!-- 錨點 A, B -->
+        <g id="anchorGroupA" class="anchor-dot">
+           <circle cx="0" cy="0" r="30" fill="transparent" /> 
+           <circle r="14" fill="var(--bg)" stroke="var(--safe)" stroke-width="3.5" />
+           <text y="4" fill="var(--text)" font-size="13" font-weight="bold" text-anchor="middle" pointer-events="none">A</text>
+        </g>
+        
+        <g id="anchorGroupB" class="anchor-dot">
+           <circle cx="0" cy="0" r="30" fill="transparent" />
+           <circle r="14" fill="var(--bg)" stroke="var(--safe)" stroke-width="3.5" />
+           <text y="4" fill="var(--text)" font-size="13" font-weight="bold" text-anchor="middle" pointer-events="none">B</text>
+        </g>
+      </svg>
+
+      <!-- 🖥️ 四角 HUD 抬頭顯示器 -->
+      <div class="hud-panel hud-tl" id="hudA">
+         <div style="color:var(--muted)">A點狀態</div>
+         <div id="txtTenA" class="val" style="color:var(--safe)">張力: -- kg</div>
+         <div id="txtVertA" class="val" style="color:var(--warn)">抗重: -- kg</div>
+      </div>
+      <div class="hud-panel hud-tr" id="hudB">
+         <div style="color:var(--muted)">B點狀態</div>
+         <div id="txtTenB" class="val" style="color:var(--safe)">張力: -- kg</div>
+         <div id="txtVertB" class="val" style="color:var(--warn)">抗重: -- kg</div>
+      </div>
+      <div class="hud-panel hud-tc">
+         ➰ 主繩長 <input type="number" id="inRope" value="22" step="0.5"> m
+      </div>
+      <div class="hud-panel hud-br">
+         <div style="display:flex; align-items:center; gap:4px;">↔️ 跨距 <input type="number" id="inSpan" value="20" min="5" step="1"> m</div>
+         <div style="display:flex; align-items:center; gap:4px;">↕️ 高差 <input type="number" id="inHeight" value="0" step="0.5"> m</div>
+      </div>
+      <div class="hud-panel hud-bl" id="sagText">
+         下垂: -- m (--%)
+      </div>
+
+      <!-- 💡 浮動擔架標籤 -->
+      <div id="floatLoad" class="stretcher-tag">
+         ⚖️ <input type="number" id="inLoad" value="100" step="10"> kg
+      </div>
+    </div>
+    
+    <!-- 牽引力提示 -->
+    <div class="tagline-info" id="taglineInfo">📍 拖曳上方滑輪或擔架進行動態模擬</div>
+  </div>
+  
+  <!-- 🧰 後勤系統：設定選單與教學彈窗 -->
+  <div class="menu-list" data-html2canvas-ignore="true">
+    
+    <details class="main-accordion">
+      <summary>⚙️ 系統工具與說明</summary>
+      <div class="menu-group">
+        
+        <details class="menu-item">
+          <summary>
+            <div class="menu-header-left"><span class="menu-icon">📖</span>系統使用說明書</div>
+            <span class="menu-arrow">❯</span>
+          </summary>
+          <div class="menu-content">
+            <ul style="margin-top: 0;">
+              <li>拖曳畫布上的 <b>A點/B點</b>，可快速設定峽谷或建築物的跨距與高低差。</li>
+              <li>拖曳橘色 <b>救援吊籃</b>，即可模擬傷患過河時，主繩張力與所需牽引力的動態變化。</li>
+              <li>點擊頂部 <b>📷實境 / 🌐網格 / ☀️淨空</b> 等戰術工具，可輔助現場環境定位，並使用 <b>📸截圖</b> 產出報告。</li>
+            </ul>
+            <button type="button" class="btn-collapse-inner" onclick="this.closest('details').removeAttribute('open')">🔼 收起說明</button>
+          </div>
+        </details>
+
+        <details class="menu-item">
+          <summary>
+            <div class="menu-header-left"><span class="menu-icon">ℹ️</span>版本與開發資訊</div>
+            <span class="menu-arrow">❯</span>
+          </summary>
+          <div class="menu-content">
+            <div style="text-align: center; margin-bottom: 15px;">
+              <span style="display:inline-block; background:var(--safe); color:#0f1623; font-weight:bold; padding:4px 14px; border-radius:20px; font-size:13px; letter-spacing:0.5px; box-shadow: 0 2px 6px rgba(34,197,94,0.3);">V5.1 水平軌道繩模擬儀</span>
+            </div>
+            <p style="margin-top: 0; margin-bottom: 6px; font-weight: bold; color: var(--text); text-align: center;">本工具由 <span style="color:var(--warn);">散木團隊</span> 開發製作</p>
+            <p style="margin-top: 0; margin-bottom: 4px; font-size: 13px; text-align: center;">教學架構與工程判斷／徐世豐</p>
+            <p style="margin-top: 0; margin-bottom: 12px; font-size: 13px; text-align: center;">工具設計與互動介面／吳佩芳（朵朵）</p>
+            <p style="margin-bottom: 0; text-align: justify;">多點張力自動估算：自由拖曳、精準預測，結合實境相機，解開垂直抗重與主繩張力的物理之謎。讓特戰救援推演更直覺、更安全。</p>
+            <button type="button" class="btn-collapse-inner" onclick="this.closest('details').removeAttribute('open')">🔼 收起說明</button>
+          </div>
+        </details>
+
+        <!-- 📱 加入主畫面說明 (取代舊版彈窗) -->
+        <details class="menu-item">
+          <summary>
+            <div class="menu-header-left"><span class="menu-icon">📱</span>加入主畫面說明</div>
+            <span class="menu-arrow">❯</span>
+          </summary>
+          <div class="menu-content">
+            <p style="margin-top: 0; margin-bottom: 8px; color: var(--text);">將捷徑加至主畫面，獲得無網址列的 100% 沉浸式體驗：</p>
+            
+            <div style="background: rgba(150,150,150,0.05); padding: 12px; border-radius: 8px; margin-bottom: 12px;">
+              <p style="margin-top: 0; margin-bottom: 8px; font-weight: bold; color: var(--safe);">🤖 Android (安卓版)</p>
+              <ol style="padding-left: 20px; margin: 0; font-size: 13px;">
+                <li style="margin-bottom: 4px;">點開連結（可直接從 LINE 開啟）</li>
+                <li style="margin-bottom: 4px;">點選畫面右下角的「⋮」</li>
+                <li style="margin-bottom: 4px;">選擇「使用預設瀏覽器開啟」</li>
+                <li style="margin-bottom: 4px;">在畫面右上角點選「⋮」</li>
+                <li style="margin-bottom: 4px;">往下滑，選擇「加到主畫面」</li>
+                <li style="margin-bottom: 0;">點選「安裝」，即可將捷徑加到主畫面</li>
+              </ol>
+            </div>
+
+            <div style="background: rgba(150,150,150,0.05); padding: 12px; border-radius: 8px;">
+              <p style="margin-top: 0; margin-bottom: 8px; font-weight: bold; color: var(--safe);">🍎 iOS (iPhone)</p>
+              <ol style="padding-left: 20px; margin: 0; font-size: 13px;">
+                <li style="margin-bottom: 4px;">點開連結（可直接從 LINE 開啟）</li>
+                <li style="margin-bottom: 4px;">點選下方的「分享」圖示，往下滑</li>
+                <li style="margin-bottom: 4px;">選擇「加入主畫面」</li>
+                <li style="margin-bottom: 0;">點選「加入」，即可將捷徑加到主畫面</li>
+              </ol>
+            </div>
+
+            <button type="button" class="btn-collapse-inner" onclick="this.closest('details').removeAttribute('open')">🔼 收起說明</button>
+          </div>
+        </details>
+
+        <div class="menu-action-btn" id="shareBtnAction">
+          <div class="menu-header-left"><span class="menu-icon">🔗</span>分享此APP給好友</div>
+          <span class="menu-arrow">❯</span>
+        </div>
+
+        <div class="menu-action-btn" onclick="checkForUpdates()">
+          <div class="menu-header-left"><span class="menu-icon">🔄</span>檢查並下載新版</div>
+          <span class="menu-arrow">❯</span>
+        </div>
+      </div>
+    </details>
+
+    <details class="main-accordion">
+      <summary>💖 支持與回饋</summary>
+      <div class="menu-group">
+        <details class="menu-item highlight-coffee">
+          <summary>
+            <div class="menu-header-left"><span class="menu-icon">☕</span>喜歡這APP嗎?歡迎請我喝咖啡</div>
+            <span class="menu-arrow">❯</span>
+          </summary>
+          <div class="menu-content">
+            <p style="margin-top: 0; text-align: justify;">若您覺得這套 APP 對您執行的任務有幫助，歡迎請我們喝咖啡，支持散木團隊持續研發！</p>
+            <div style="background: rgba(150,150,150,0.05); padding: 16px; border-radius: 12px; margin-top: 15px; border: 1px solid var(--line);">
+              <div style="text-align: center; margin-bottom: 12px;">
+                <span style="display:inline-block; background:#d97706; color:#fff; font-weight:bold; padding:4px 12px; border-radius:20px; font-size:13px; box-shadow: 0 2px 6px rgba(217, 119, 6, 0.3);">☕ 一杯咖啡 50 元 (杯數隨喜)</span>
+              </div>
+              <div style="background: var(--bg); padding: 12px; border-radius: 8px; border: 1px solid rgba(150,150,150,0.1);">
+                <div style="margin-bottom: 8px; font-size: 13px;">銀行代碼 <span style="color: var(--text); font-weight: bold; margin-left: 4px;">807 (永豐銀行)</span></div>
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                  <div style="font-size: 13px;">帳號 <span style="color: var(--warn); font-weight: bold; font-size: 16px; margin-left: 4px; letter-spacing: 1px;">20401800252531</span></div>
+                  <button type="button" onclick="copyCoffee()" style="background: var(--safe); color: #0f1623; border: none; padding: 6px 16px; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 4px rgba(34,197,94,0.3);">複製</button>
+                </div>
+              </div>
+            </div>
+            <div id="coffeeMsg" style="display:none; color: var(--safe); font-size: 13px; text-align: center; margin-top: 12px; font-weight: bold;">✓ 帳號已複製成功！</div>
+            <button type="button" class="btn-collapse-inner" onclick="this.closest('details').removeAttribute('open')">🔼 收起說明</button>
+          </div>
+        </details>
+
+        <div class="menu-action-btn highlight-heart" onclick="window.open('https://forms.gle/Uykr5jeQP6fgVhxh9', '_blank')">
+          <div class="menu-header-left"><span class="menu-icon">💬</span>想跟朵朵說些什麼？</div>
+          <span class="menu-arrow">❯</span>
+        </div>
+      </div>
+    </details>
+
+    <div class="footer-disclaimer">
+      <strong style="color: var(--bad); font-size: 14px;">⚠️ 教學聲明：</strong><br>
+      系統運算基於理想物理模型，不含繩索材質疲勞、摩擦力損耗等環境變數。實際救援操作時，請務必遵循專業教官之指導，開發團隊不負任何實地操作之法律責任。
+    </div>
+  </div>
+
+  <div class="watermark">水平軌道繩模擬儀 | 散木團隊</div>
+</div>
+
+<script>
+// --- 核心變數與綁定 ---
+const inSpan = document.getElementById('inSpan'), inHeight = document.getElementById('inHeight'),
+      inLoad = document.getElementById('inLoad'), inRope = document.getElementById('inRope'),
+      taglineInfo = document.getElementById('taglineInfo');
+
+const svgEl = document.getElementById('canvas');
+const els = {
+  ropeL: document.getElementById('ropeL'), ropeR: document.getElementById('ropeR'),
+  pulleyGroup: document.getElementById('pulleyGroup'), pulleyNeedle: document.getElementById('pulleyNeedle'),
+  stretcherGroup: document.getElementById('stretcherGroup'), 
+  anchorA: document.getElementById('anchorGroupA'), anchorB: document.getElementById('anchorGroupB'), 
+  txtTenA: document.getElementById('txtTenA'), txtVertA: document.getElementById('txtVertA'),
+  txtTenB: document.getElementById('txtTenB'), txtVertB: document.getElementById('txtVertB'),
+  sagText: document.getElementById('sagText'),
+  angleArc: document.getElementById('angleArc'), angleText: document.getElementById('angleText'),
+  tagLine: document.getElementById('tagLine'), tagLineText: document.getElementById('tagLineText'),
+  svgWrap: document.getElementById('svgWrap'), floatLoad: document.getElementById('floatLoad'),
+  hudA: document.getElementById('hudA'), hudB: document.getElementById('hudB')
+};
+
+const svgW = 400, svgH = 500; 
+let scale = 10, offsetX = 50, offsetY = 120; 
+let currentSliderPct = 0.5;
+
+function toX(mX) { return offsetX + mX * scale; }
+function toY(mY) { return offsetY + mY * scale; }
+
+function findPulleyY(xA, yA, xB, yB, pulleyX, targetL) {
+  let low = Math.max(yA, yB), high = Math.max(yA, yB) + targetL, mid;
+  for(let i=0; i<40; i++) {
+    mid = (low + high) / 2;
+    let d1 = Math.hypot(pulleyX - xA, mid - yA), d2 = Math.hypot(pulleyX - xB, mid - yB);
+    if (d1 + d2 > targetL) high = mid; else low = mid;
+  }
+  return mid;
+}
+
+function describeArc(x, y, r, startAngle, endAngle) {
+    let start = { x: x + r * Math.cos(endAngle), y: y + r * Math.sin(endAngle) };
+    let end = { x: x + r * Math.cos(startAngle), y: y + r * Math.sin(startAngle) };
+    let largeArcFlag = endAngle - startAngle <= Math.PI ? "0" : "1";
+    return ["M", start.x, start.y, "A", r, r, 0, largeArcFlag, 0, end.x, end.y].join(" ");
+}
+
+function updateEngine() {
+  let S = parseFloat(inSpan.value) || 20, H = parseFloat(inHeight.value) || 0, W = parseFloat(inLoad.value) || 100, L = parseFloat(inRope.value) || 22;
+  
+  let minL = Math.hypot(S, H);
+  if (L <= minL + 0.1) { L = parseFloat((minL + 0.5).toFixed(1)); inRope.value = L; }
+
+  let maxCanvasH = svgH - 120; 
+  scale = Math.min((svgW - 100) / Math.max(10, S), maxCanvasH / Math.max(10, Math.abs(H) + L*0.5));
+  offsetY = 110 + (H < 0 ? Math.abs(H)*scale : 0); 
+
+  let ax = 0, ay = 0, bx = S, by = H, px = S * currentSliderPct, py = findPulleyY(ax, ay, bx, by, px, L);
+  let len1 = Math.hypot(px - ax, py - ay), len2 = Math.hypot(px - bx, py - by);
+  
+  let sin1 = (py - ay) / len1, sin2 = (py - by) / len2;
+  let tension = W / (sin1 + sin2);
+  let verticalA = tension * sin1, verticalB = tension * sin2;
+
+  let angleRad1 = Math.atan2(ay - py, ax - px), angleRad2 = Math.atan2(by - py, bx - px);
+  let interiorAngle = (angleRad2 - angleRad1) * 180 / Math.PI;
+  if(interiorAngle < 0) interiorAngle += 360;
+  
+  let cos1 = (ax - px) / len1, cos2 = (bx - px) / len2;
+  let Fx = tension * cos1 + tension * cos2; 
+  let tagForce = Math.abs(Fx);
+
+  let isDanger = tension > W * 5; let color = isDanger ? "var(--bad)" : "var(--safe)";
+
+  let s_ax = toX(ax), s_ay = toY(ay), s_bx = toX(bx), s_by = toY(by), s_px = toX(px), s_py = toY(py);
+  
+  els.anchorA.setAttribute('transform', `translate(${s_ax}, ${s_ay})`);
+  els.anchorB.setAttribute('transform', `translate(${s_bx}, ${s_by})`);
+
+  els.ropeL.setAttribute('x1', s_ax); els.ropeL.setAttribute('y1', s_ay); els.ropeL.setAttribute('x2', s_px); els.ropeL.setAttribute('y2', s_py); els.ropeL.setAttribute('stroke', color);
+  els.ropeR.setAttribute('x1', s_px); els.ropeR.setAttribute('y1', s_py); els.ropeR.setAttribute('x2', s_bx); els.ropeR.setAttribute('y2', s_by); els.ropeR.setAttribute('stroke', color);
+
+  els.angleArc.setAttribute("d", describeArc(s_px, s_py, 28, angleRad1, angleRad2));
+  els.angleText.textContent = interiorAngle.toFixed(1) + "°";
+  els.angleText.setAttribute('x', s_px); els.angleText.setAttribute('y', s_py - 35);
+
+  if (tagForce > 0.5) {
+      els.tagLine.style.display = "block"; els.tagLineText.style.display = "block";
+      let tagEndX = Fx > 0 ? s_px + 70 : s_px - 70;
+      els.tagLine.setAttribute('x1', s_px); els.tagLine.setAttribute('y1', s_py); els.tagLine.setAttribute('x2', tagEndX); els.tagLine.setAttribute('y2', s_py);
+      els.tagLineText.textContent = `${tagForce.toFixed(1)}kg`;
+      els.tagLineText.setAttribute('x', tagEndX + (Fx>0?5:-5)); els.tagLineText.setAttribute('y', s_py + 4); els.tagLineText.setAttribute('text-anchor', Fx>0?'start':'end');
+      taglineInfo.textContent = `↔️ 牽引力: ${tagForce.toFixed(1)} kg (${Fx > 0 ? '往 B 側拉' : '往 A 側拉'})`;
+      taglineInfo.style.background = "rgba(56, 189, 248, 0.15)";
+  } else {
+      els.tagLine.style.display = "none"; els.tagLineText.style.display = "none";
+      taglineInfo.textContent = `📍 滑輪處於自然平衡點 (不需牽引力)`;
+      taglineInfo.style.background = "rgba(34, 197, 94, 0.1)";
+  }
+
+  els.pulleyGroup.setAttribute('transform', `translate(${s_px}, ${s_py})`);
+  let needleAngle = isDanger ? 45 : -45 + (tension / (W*5)) * 90; let nRad = needleAngle * Math.PI / 180;
+  els.pulleyNeedle.setAttribute('x1', 0); els.pulleyNeedle.setAttribute('y1', 0); els.pulleyNeedle.setAttribute('x2', 8 * Math.sin(nRad)); els.pulleyNeedle.setAttribute('y2', -8 * Math.cos(nRad));
+  
+  let loadDrop = 40; 
+  els.stretcherGroup.setAttribute('transform', `translate(${s_px}, ${s_py + loadDrop})`);
+
+  let tText = tension > 9999 ? "死線!" : tension.toFixed(1) + " kg";
+  els.txtTenA.textContent = `張力: ${tText}`; els.txtTenA.style.color = color;
+  els.txtVertA.textContent = `抗重: ${verticalA.toFixed(1)} kg`;
+  els.hudA.style.borderLeftColor = color; 
+
+  els.txtTenB.textContent = `張力: ${tText}`; els.txtTenB.style.color = color;
+  els.txtVertB.textContent = `抗重: ${verticalB.toFixed(1)} kg`;
+  els.hudB.style.borderRightColor = color;
+
+  let sagBaseY = ay + (by - ay) * currentSliderPct, actualSag = py - sagBaseY;
+  els.sagText.textContent = `下垂: ${actualSag.toFixed(2)}m (${(actualSag/S*100).toFixed(1)}%)`;
+
+  let wrapRect = els.svgWrap.getBoundingClientRect();
+  let ratioX = wrapRect.width / svgW;
+  let ratioY = wrapRect.height / svgH;
+  let flX = s_px * ratioX; 
+  let flY = (s_py + loadDrop + 15) * ratioY;
+  
+  if (flY > wrapRect.height - 35) flY = wrapRect.height - 35;
+  
+  els.floatLoad.style.left = `${flX}px`;
+  els.floatLoad.style.top = `${flY}px`;
+}
+
+[inSpan, inHeight, inLoad, inRope].forEach(el => el.addEventListener('input', updateEngine));
+
+let pt = svgEl.createSVGPoint();
+function getSVGPos(e) {
+  pt.x = e.touches ? e.touches[0].clientX : e.clientX; pt.y = e.touches ? e.touches[0].clientY : e.clientY;
+  return pt.matrixTransform(svgEl.getScreenCTM().inverse());
+}
+
+let isDragging = null, dragStartX, dragStartY, startSpan, startHeight;
+function startDrag(e, node) { 
+  if(e.target.tagName.toLowerCase() === 'input') return; 
+  isDragging = node; let pos = getSVGPos(e); 
+  dragStartX = pos.x; dragStartY = pos.y; 
+  startSpan = parseFloat(inSpan.value); startHeight = parseFloat(inHeight.value); 
+  e.preventDefault(); 
+}
+
+els.anchorA.onmousedown = els.anchorA.ontouchstart = (e) => startDrag(e, 'A');
+els.anchorB.onmousedown = els.anchorB.ontouchstart = (e) => startDrag(e, 'B');
+els.pulleyGroup.onmousedown = els.pulleyGroup.ontouchstart = (e) => startDrag(e, 'P');
+els.stretcherGroup.onmousedown = els.stretcherGroup.ontouchstart = (e) => startDrag(e, 'P'); 
+
+window.onmousemove = window.ontouchmove = (e) => {
+  if(!isDragging) return;
+  let pos = getSVGPos(e);
+  if (isDragging === 'P') {
+      let pct = (pos.x - offsetX) / (parseFloat(inSpan.value) * scale);
+      currentSliderPct = Math.max(0.01, Math.min(0.99, pct));
+  } else {
+      let dx = (pos.x - dragStartX) / scale, dy = (pos.y - dragStartY) / scale;
+      if (isDragging === 'B') { inSpan.value = Math.max(5, (startSpan + dx)).toFixed(1); inHeight.value = (startHeight + dy).toFixed(1); }
+      else if (isDragging === 'A') { inSpan.value = Math.max(5, (startSpan - dx)).toFixed(1); inHeight.value = (startHeight - dy).toFixed(1); }
+  }
+  updateEngine();
+};
+window.onmouseup = window.ontouchend = () => isDragging = null;
+
+// --- 戰術模組 (相機/手電筒/網格/HUD/截圖/重置) ---
+let stream = null, videoTrack = null, torchOn = false; 
+const video = document.getElementById('bg-video'), image = document.getElementById('bg-image'), btnCamera = document.getElementById('btn-camera'), btnFlashlight = document.getElementById('btn-flashlight'), gridOverlay = document.getElementById('grid-overlay'); 
+let gridVisible = true, hudVisible = true;
+
+async function toggleCamera() { 
+  if (stream) { 
+    stream.getTracks().forEach(track => track.stop()); stream = null; videoTrack = null; 
+    video.style.opacity = "0"; btnCamera.classList.remove('active'); 
+    torchOn = false; btnFlashlight.classList.remove('active');
+  } else { 
+    try { 
+      image.style.opacity = "0"; 
+      stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }); 
+      videoTrack = stream.getVideoTracks()[0];
+      video.srcObject = stream; video.style.opacity = "1"; btnCamera.classList.add('active'); 
+    } catch (err) { alert("⚠️ 鏡頭啟動失敗：" + err.message); } 
+  } 
+}
+
+async function toggleFlashlight() {
+  if (!videoTrack) { alert("⚠️ 請先開啟 📷 實境鏡頭！"); return; }
+  try {
+    const capabilities = videoTrack.getCapabilities();
+    if (!capabilities.torch) { alert("⚠️ 您的裝置或瀏覽器不支援手電筒功能！"); return; }
+    torchOn = !torchOn;
+    await videoTrack.applyConstraints({ advanced: [{ torch: torchOn }] });
+    if(torchOn) btnFlashlight.classList.add('active'); else btnFlashlight.classList.remove('active');
+  } catch(e) { alert("⚠️ 手電筒切換失敗：" + e.message); }
+}
+
+function loadImage(event) { const file = event.target.files[0]; if (file) { if(stream) toggleCamera(); const reader = new FileReader(); reader.onload = function(e) { image.src = e.target.result; image.style.opacity = "1"; }; reader.readAsDataURL(file); } }
+function toggleGrid() { gridVisible = !gridVisible; gridOverlay.style.opacity = gridVisible ? "0.5" : "0"; }
+
+function toggleHUD() {
+  hudVisible = !hudVisible;
+  const huds = document.querySelectorAll('.hud-panel, .stretcher-tag, .tagline-info');
+  huds.forEach(el => el.style.opacity = hudVisible ? "1" : "0");
+}
+
+function resetEngine() {
+  inSpan.value = 20; inHeight.value = 0; inLoad.value = 100; inRope.value = 22; currentSliderPct = 0.5;
+  updateEngine();
+}
+
+async function takeScreenshot() {
+  const target = document.getElementById('capture-area'); target.classList.add('capture-mode');
+  let bgCanvas = document.createElement('canvas'), bgCtx = bgCanvas.getContext('2d'); bgCanvas.width = window.innerWidth; bgCanvas.height = window.innerHeight;
+  bgCtx.fillStyle = '#0f1623'; bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
+  if (image.style.opacity === "1") bgCtx.drawImage(image, 0, 0, bgCanvas.width, bgCanvas.height); else if (video.style.opacity === "1") bgCtx.drawImage(video, 0, 0, bgCanvas.width, bgCanvas.height);
+  if(gridVisible) { bgCtx.strokeStyle = '#1e3a5f'; bgCtx.lineWidth = 1; for(let x=0; x<bgCanvas.width; x+=20) { bgCtx.beginPath(); bgCtx.moveTo(x,0); bgCtx.lineTo(x,bgCanvas.height); bgCtx.stroke(); } for(let y=0; y<bgCanvas.height; y+=20) { bgCtx.beginPath(); bgCtx.moveTo(0,y); bgCtx.lineTo(bgCanvas.width,y); bgCtx.stroke(); } }
+  try {
+    const canvas = await html2canvas(target, { backgroundColor: null, scale: 2, useCORS: true, ignoreElements: (el) => el.hasAttribute('data-html2canvas-ignore') });
+    let finalCanvas = document.createElement('canvas'), finalCtx = finalCanvas.getContext('2d'); finalCanvas.width = target.offsetWidth * 2; finalCanvas.height = target.offsetHeight * 2;
+    let rect = target.getBoundingClientRect(); finalCtx.drawImage(bgCanvas, rect.left, rect.top, rect.width, rect.height, 0, 0, finalCanvas.width, finalCanvas.height); finalCtx.drawImage(canvas, 0, 0);
+    const link = document.createElement('a'); link.download = `水平軌道繩戰術分析_${new Date().getTime()}.png`; link.href = finalCanvas.toDataURL('image/png'); link.click();
+  } catch(e) { alert("截圖失敗：" + e); }
+  target.classList.remove('capture-mode');
+}
+
+// --- PWA 與選單互動後勤腳本 ---
+if ('serviceWorker' in navigator) { window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js')); }
+
+window.copyCoffee = function() {
+  const acc = '20401800252531';
+  const showMsg = () => { const msg = document.getElementById('coffeeMsg'); if(msg) { msg.style.display = 'block'; setTimeout(() => { msg.style.display = 'none'; }, 2000); } };
+  if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(acc).then(() => showMsg()); } 
+  else {
+      let textArea = document.createElement("textarea"); textArea.value = acc; textArea.style.position = "fixed";
+      document.body.appendChild(textArea); textArea.select();
+      try { document.execCommand('copy'); showMsg(); } catch (err) { alert('複製失敗，請手動選取複製'); }
+      textArea.remove();
+  }
+};
+
+function checkForUpdates() {
+  if (confirm("系統回報：即將為您清除快取，並重新載入最新版本！\n\n請問是否繼續執行？")) { window.location.href = window.location.href.split('?')[0] + '?v=' + new Date().getTime(); }
+}
+
+const shareBtnAction = document.getElementById('shareBtnAction');
+if(shareBtnAction) {
+    shareBtnAction.addEventListener('click', async () => {
+      const shareData = { title: '軌道繩儀 (散木團隊)', text: '推薦這套散木團隊專屬的「水平軌道繩模擬儀」！支援實境相機、動態拖曳張力計算與一鍵戰術截圖，快來試試！', url: window.location.href };
+      try {
+        if (navigator.share) { await navigator.share(shareData); } 
+        else {
+          const dummy = document.createElement('input'); document.body.appendChild(dummy); dummy.value = window.location.href;
+          dummy.select(); document.execCommand('copy'); document.body.removeChild(dummy);
+          alert('系統回報：網址已複製，您可以貼上分享給朋友囉！');
+        }
+      } catch (err) { console.error('分享失敗', err); }
+    });
+}
+
+const menuGroups = document.querySelectorAll('.menu-group');
+menuGroups.forEach(group => {
+  const items = group.querySelectorAll('details.menu-item');
+  items.forEach(item => {
+    item.addEventListener('toggle', function() {
+      if (this.open) {
+        group.classList.add('has-open-item');
+        items.forEach(other => { if (other !== this && other.open) other.removeAttribute('open'); });
+        setTimeout(() => { this.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }, 50);
+      } else {
+        const anyOpen = Array.from(items).some(i => i.open);
+        if (!anyOpen) group.classList.remove('has-open-item');
+      }
+    });
+  });
+});
+
+window.addEventListener('resize', updateEngine);
+setTimeout(updateEngine, 100);
+</script>
+</body>
+</html>
