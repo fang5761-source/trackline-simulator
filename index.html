@@ -8,16 +8,16 @@
 <meta http-equiv="Expires" content="0" />
 
 <!-- 散木團隊正式名稱 -->
-<title>水平軌道繩模擬儀 | 散木團隊</title>
+<title>索道繩動態張力估算儀 | 散木團隊</title>
 
 <!-- 🍎 APP 模式設定 -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="軌道繩儀">
+<meta name="apple-mobile-web-app-title" content="索道繩儀">
 <meta name="mobile-web-app-capable" content="yes">
 
 <!-- 🔗 LINE/FB 預覽卡片設定 -->
-<meta property="og:title" content="水平軌道繩模擬儀 | 散木團隊">
+<meta property="og:title" content="索道繩動態張力估算儀 | 散木團隊">
 <meta property="og:description" content="多點張力自動估算：自由拖曳、精準預測，結合實境相機，解開垂直抗重與主繩張力的物理之謎。">
 <meta property="og:image" content="https://fang5761-source.github.io/trackline-simulator/icon-512.png">
 <meta property="og:url" content="https://fang5761-source.github.io/trackline-simulator/">
@@ -40,7 +40,6 @@
     --safe: #22c55e;
     --warn: #ffd84d;
     --bad: #ef4444;
-    --base: #94a3b8;
     --tagline: #38bdf8; 
   }
 
@@ -51,9 +50,10 @@
     padding: 10px 10px 40px 10px; touch-action: manipulation;
     min-height: 100vh; overflow-x: hidden;
     -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;
+    transition: background-color 0.3s ease;
   }
+  body.camera-mode { background-color: transparent !important; }
   
-  /* 允許輸入框可以正常輸入與選取 */
   input, textarea { -webkit-user-select: auto; user-select: auto; box-sizing: border-box; }
   *{box-sizing:border-box}
 
@@ -69,7 +69,7 @@
   .app-container { max-width: 500px; width: 100%; display: flex; flex-direction: column; gap: 12px; position: relative; z-index: 1; }
   input[type="file"] { display: none; }
 
-  /* 卡片主體 (修正：支援 AR 全透視) */
+  /* 卡片主體 (支援 AR 全透視) */
   .card { 
     width:100%; background:var(--card); border:2px solid var(--line); 
     border-radius:16px; padding: 12px; box-shadow:0 10px 30px rgba(0,0,0,.5); 
@@ -77,15 +77,20 @@
     transition: border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
   }
   .card.camera-mode {
-    background: rgba(15, 22, 35, 0.2) !important;
+    background: transparent !important;
+    border-color: rgba(255,255,255,0.2) !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
     box-shadow: none !important;
   }
   
-  /* 👑 標題列排版 */
-  .topbar { display: flex; align-items: center; margin-bottom: 12px; }
-  .title-tag { font-size: 18px; font-weight: bold; display: flex; align-items: center; gap: 10px; white-space: nowrap; }
+  /* 👑 標題列排版 (左側圖示、右側LOGO) */
+  .topbar { display: flex; align-items: center; margin-bottom: 12px; width: 100%; }
+  .title-tag { 
+    font-size: 17px; font-weight: bold; display: flex; align-items: center; gap: 8px; 
+    white-space: nowrap; width: 100%; justify-content: space-between;
+  }
+  .title-left { display: flex; align-items: center; gap: 8px; }
   .title-divider { width: 3px; height: 22px; background-color: var(--warn); border-radius: 2px; }
 
   /* 🎛️ 經典戰術工具列 */
@@ -103,11 +108,11 @@
   .icon-btn:active { background: var(--line); transform: scale(0.95); }
   .icon-btn.active { background: var(--safe); color: var(--bg); border-color: var(--safe); }
 
-  /* 畫布容器 (修正：移除全局 touch-action: none 解除滑動封印) */
+  /* 畫布容器 (移除 touch-action:none，交由 JS 控制滑動) */
   .svgWrap { position:relative; width:100%; height: 500px; background: transparent; border-radius: 12px; border: 1px dashed var(--line); overflow: hidden; }
   svg { display: block; width: 100%; height: 100%; }
 
-  /* 🖱️ 拖曳游標 (僅鎖定操作點的滑動) */
+  /* 🖱️ 拖曳游標 (僅這些物件鎖定滑動) */
   .anchor-dot, .draggable-pulley { cursor: grab; touch-action: none; }
   .anchor-dot:active, .draggable-pulley:active { cursor: grabbing; }
 
@@ -115,37 +120,42 @@
   .hud-panel, .stretcher-tag, .tagline-info { transition: opacity 0.3s ease; }
   .hud-panel {
     position: absolute; background: rgba(10, 15, 25, 0.7); border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 8px; padding: 6px 10px; color: var(--text); font-size: 12px; font-weight: bold;
+    border-radius: 8px; padding: 6px 8px; color: var(--text); font-size: 11px; font-weight: bold;
     backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); pointer-events: auto;
     display: flex; flex-direction: column; gap: 4px; box-shadow: 0 4px 6px rgba(0,0,0,0.3);
     transition: border-color 0.3s ease;
   }
-  .hud-panel .val { font-size: 14px; font-family: monospace; transition: color 0.3s ease; }
+  .hud-panel .val { font-size: 13px; font-family: monospace; transition: color 0.3s ease; white-space: nowrap; }
   .hud-panel input {
     background: rgba(0,0,0,0.5); border: none; border-bottom: 1px solid var(--line); border-radius: 4px;
-    color: var(--warn); font-weight: bold; font-size: 14px; text-align: center; padding: 2px 4px; outline: none; font-family: monospace; width: 45px;
+    color: var(--warn); font-weight: bold; font-size: 14px; text-align: center; padding: 2px 4px; outline: none; font-family: monospace; width: 42px;
   }
   .hud-panel input:focus { border-color: var(--safe); background: rgba(0,0,0,0.8); }
 
-  .hud-tl { top: 10px; left: 10px; border-left: 3px solid var(--safe); } 
-  .hud-tr { top: 10px; right: 10px; border-right: 3px solid var(--safe); text-align: right; align-items: flex-end; } 
-  /* 修正：移除佔位在中間的繩長區塊，整合到右下角 */
+  /* 修正 A/B 面板過大重疊的問題：縮小 Padding 與微調位置 */
+  .hud-tl { top: 10px; left: 5px; border-left: 3px solid var(--safe); } 
+  .hud-tr { top: 10px; right: 5px; border-right: 3px solid var(--safe); text-align: right; align-items: flex-end; } 
+  
+  /* 修正：統一放在右下角面板，清空中央視野 */
   .hud-br { bottom: 10px; right: 10px; border-bottom: 3px solid var(--line); align-items: flex-end; z-index: 30; } 
+  .hud-br .input-row { display: flex; align-items: center; justify-content: flex-end; gap: 4px; margin-bottom: 2px; }
+  .hud-br .unit { font-size: 11px; color: var(--muted); }
+  
   .hud-bl { bottom: 10px; left: 10px; background: transparent; border: none; box-shadow: none; padding: 0; color: var(--warn); } 
 
-  /* 💡 縮小版的負重標籤 */
+  /* 💡 優化版的負重標籤 (移除圖示、緊湊版) */
   .stretcher-tag {
     position: absolute; background: var(--warn); border: 2px solid #ca8a04;
-    border-radius: 6px; padding: 2px 6px; color: var(--bg); font-size: 14px; font-weight: bold;
+    border-radius: 6px; padding: 2px 4px; color: var(--bg); font-size: 12px; font-weight: bold;
     transform: translateX(-50%); 
-    display: flex; align-items: center; gap: 2px; z-index: 50;
+    display: flex; align-items: center; justify-content: center; z-index: 50;
     box-shadow: 0 4px 10px rgba(0,0,0,0.6); pointer-events: auto;
   }
   .stretcher-tag input { 
-    width: 45px; background: rgba(0,0,0,0.1); border: none; border-bottom: 2px solid var(--bg); 
-    color: var(--bg); font-size: 16px; font-weight: bold; text-align: center; outline: none; font-family: monospace;
+    width: 42px; background: transparent; border: none; border-bottom: 2px solid var(--bg); 
+    color: var(--bg); font-size: 16px; font-weight: bold; text-align: center; outline: none; font-family: monospace; margin-right: 2px;
   }
-  .stretcher-tag input:focus { border-bottom-color: #000; background: rgba(255,255,255,0.5); }
+  .stretcher-tag input:focus { border-bottom-color: #000; background: rgba(255,255,255,0.4); }
 
   .tagline-info { margin-top: 10px; padding: 10px; background: rgba(56, 189, 248, 0.1); border-radius: 8px; border: 1px solid var(--tagline); text-align: center; font-size: 13px; font-weight: bold; color: var(--tagline); }
   
@@ -209,13 +219,21 @@
 <div class="app-container" id="capture-area">
 
   <div class="card" id="mainCard">
-    <!-- 👑 標題列置於第一行 -->
+    <!-- 👑 標題列置於第一行 (左側大樂圖示，右側散木LOGO) -->
     <div class="topbar">
       <div class="title-tag">
-        <!-- 散木團隊正式 LOGO -->
-        <img src="./sunmoon_logo.png" alt="散木團隊" style="width: 36px; height: 36px; border-radius: 8px; object-fit: cover; box-shadow: 0 2px 4px rgba(0,0,0,0.5);">
-        <div class="title-divider"></div>
-        <span>水平軌道繩模擬儀</span>
+        <div class="title-left">
+          <svg width="24" height="24" viewBox="0 0 100 100">
+             <rect width="100" height="100" fill="#0f1623" rx="10"/>
+             <path d="M 15 30 L 50 72 L 85 30" fill="none" stroke="#22c55e" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" />
+             <circle cx="15" cy="30" r="10" fill="#ffffff" /><circle cx="85" cy="30" r="10" fill="#ffffff" />
+             <circle cx="50" cy="72" r="16" fill="#ffd84d" />
+             <line x1="50" y1="72" x2="50" y2="58" stroke="#ef4444" stroke-width="4" stroke-linecap="round"/>
+          </svg>
+          <div class="title-divider"></div>
+          <span>索道繩動態張力估算儀</span>
+        </div>
+        <img src="./sunmoon_logo.png" alt="散木團隊" style="width: 32px; height: 32px; border-radius: 6px; object-fit: cover; box-shadow: 0 2px 4px rgba(0,0,0,0.5);">
       </div>
     </div>
 
@@ -254,14 +272,13 @@
             <line id="pulleyNeedle" stroke="#000" stroke-width="2" stroke-linecap="round" />
         </g>
 
-        <!-- 🚑 戰術擔架 (放大調整版) -->
+        <!-- 🚑 戰術擔架 (放大 30%，更具實體感) -->
         <g id="stretcherGroup" class="draggable-pulley">
-           <!-- 加長懸吊線 -->
-           <path d="M 0 -45 L -16 -18 M 0 -45 L 16 -18" stroke="var(--muted)" stroke-width="2.5" />
-           <circle cx="0" cy="-45" r="4.5" fill="var(--muted)" />
+           <path d="M 0 -45 L -20 -15 M 0 -45 L 20 -15" stroke="var(--muted)" stroke-width="2.5" />
+           <circle cx="0" cy="-45" r="4" fill="var(--muted)" />
            <!-- 放大橘色硬式救生吊籃 -->
-           <rect x="-24" y="-18" width="48" height="14" fill="#ea580c" rx="4" />
-           <text x="0" y="-7" font-size="9" fill="#ffffff" font-weight="bold" text-anchor="middle" pointer-events="none">RESCUE</text>
+           <rect x="-28" y="-15" width="56" height="16" fill="#ea580c" rx="4" />
+           <text x="0" y="-3" font-size="9" fill="#ffffff" font-weight="bold" text-anchor="middle" pointer-events="none" letter-spacing="1">RESCUE</text>
         </g>
         
         <!-- 錨點 A, B -->
@@ -278,32 +295,32 @@
         </g>
       </svg>
 
-      <!-- 🖥️ 戰術 HUD 抬頭顯示器 -->
+      <!-- 🖥️ 戰術 HUD 抬頭顯示器 (縮小寬度防重疊) -->
       <div class="hud-panel hud-tl" id="hudA">
-         <div style="color:var(--muted)">A點狀態</div>
-         <div id="txtTenA" class="val" style="color:var(--safe)">張力: -- kg</div>
-         <div id="txtVertA" class="val" style="color:var(--warn)">抗重: -- kg</div>
+         <div style="color:var(--muted); font-size:11px;">A 錨點</div>
+         <div id="txtTenA" class="val" style="color:var(--safe)">張力: --</div>
+         <div id="txtVertA" class="val" style="color:var(--warn)">抗重: --</div>
       </div>
       <div class="hud-panel hud-tr" id="hudB">
-         <div style="color:var(--muted)">B點狀態</div>
-         <div id="txtTenB" class="val" style="color:var(--safe)">張力: -- kg</div>
-         <div id="txtVertB" class="val" style="color:var(--warn)">抗重: -- kg</div>
+         <div style="color:var(--muted); font-size:11px;">B 錨點</div>
+         <div id="txtTenB" class="val" style="color:var(--safe)">張力: --</div>
+         <div id="txtVertB" class="val" style="color:var(--warn)">抗重: --</div>
       </div>
       
-      <!-- 修正：將繩長、跨距、高差統一放在右下角面板，清空中央視野 -->
+      <!-- 統一地形與繩長參數至右下角 (清空中央) -->
       <div class="hud-panel hud-br">
-         <div style="display:flex; align-items:center; gap:4px; justify-content:flex-end;">➰ 繩長 <input type="number" id="inRope" value="22" step="0.5"> m</div>
-         <div style="display:flex; align-items:center; gap:4px; justify-content:flex-end;">↔️ 跨距 <input type="number" id="inSpan" value="20" min="5" step="1"> m</div>
-         <div style="display:flex; align-items:center; gap:4px; justify-content:flex-end;">↕️ 高差 <input type="number" id="inHeight" value="0" step="0.5"> m</div>
+         <div class="input-row"><span style="color:var(--muted); font-size:12px;">➰繩長</span> <input type="number" id="inRope" value="22" step="0.5"><span class="unit">m</span></div>
+         <div class="input-row"><span style="color:var(--muted); font-size:12px;">↔️跨距</span> <input type="number" id="inSpan" value="20" min="5" step="1"><span class="unit">m</span></div>
+         <div class="input-row"><span style="color:var(--muted); font-size:12px;">↕️高差</span> <input type="number" id="inHeight" value="0" step="0.5"><span class="unit">m</span></div>
       </div>
 
       <div class="hud-panel hud-bl" id="sagText">
          下垂: -- m (--%)
       </div>
 
-      <!-- 💡 浮動擔架標籤 (修正：移除圖示，縮小輸入框) -->
+      <!-- 💡 精簡版浮動擔架標籤 (移除圖示) -->
       <div id="floatLoad" class="stretcher-tag">
-         <input type="number" id="inLoad" value="100" step="10"> kg
+         <input type="number" id="inLoad" value="100" step="10"><span>kg</span>
       </div>
     </div>
     
@@ -340,7 +357,7 @@
           </summary>
           <div class="menu-content">
             <div style="text-align: center; margin-bottom: 15px;">
-              <span style="display:inline-block; background:var(--safe); color:#0f1623; font-weight:bold; padding:4px 14px; border-radius:20px; font-size:13px; letter-spacing:0.5px; box-shadow: 0 2px 6px rgba(34,197,94,0.3);">V5.1 水平軌道繩模擬儀</span>
+              <span style="display:inline-block; background:var(--safe); color:#0f1623; font-weight:bold; padding:4px 14px; border-radius:20px; font-size:13px; letter-spacing:0.5px; box-shadow: 0 2px 6px rgba(34,197,94,0.3);">V6.0 索道繩動態張力估算儀</span>
             </div>
             <p style="margin-top: 0; margin-bottom: 6px; font-weight: bold; color: var(--text); text-align: center;">本工具由 <span style="color:var(--warn);">散木團隊</span> 開發製作</p>
             <p style="margin-top: 0; margin-bottom: 4px; font-size: 13px; text-align: center;">教學架構與工程判斷／徐世豐</p>
@@ -437,7 +454,7 @@
     </div>
   </div>
 
-  <div class="watermark">水平軌道繩模擬儀 | 散木團隊</div>
+  <div class="watermark">索道繩動態張力估算儀 | 散木團隊</div>
 </div>
 
 <script>
@@ -512,12 +529,11 @@ function updateEngine() {
   let Fx = tension * cos1 + tension * cos2; 
   let tagForce = Math.abs(Fx);
 
-  // 💡 新增：警示與危險燈號判斷 (同步二點張力儀邏輯)
+  // 💡 警示燈號判斷同步
   let isDanger = interiorAngle >= 150 || tension >= W * 4; 
   let isWarn = !isDanger && (interiorAngle >= 120 || tension >= W * 1.5);
   let color = isDanger ? "var(--bad)" : (isWarn ? "var(--warn)" : "var(--safe)");
 
-  // 實裝燈號顏色
   mainCard.style.borderColor = color;
   mainCard.style.boxShadow = `0 10px 30px ${isDanger ? 'rgba(239, 68, 68, 0.2)' : (isWarn ? 'rgba(255, 216, 77, 0.15)' : 'rgba(0,0,0,0.5)')}`;
   
@@ -555,16 +571,16 @@ function updateEngine() {
   let needleAngle = isDanger ? 45 : -45 + (tension / (W*5)) * 90; let nRad = needleAngle * Math.PI / 180;
   els.pulleyNeedle.setAttribute('x1', 0); els.pulleyNeedle.setAttribute('y1', 0); els.pulleyNeedle.setAttribute('x2', 8 * Math.sin(nRad)); els.pulleyNeedle.setAttribute('y2', -8 * Math.cos(nRad));
   
-  let loadDrop = 55; // 修正：因擔架變大，需將掛載點往下推
+  let loadDrop = 55; 
   els.stretcherGroup.setAttribute('transform', `translate(${s_px}, ${s_py + loadDrop})`);
 
-  let tText = tension > 9999 ? "死線!" : tension.toFixed(1) + " kg";
-  els.txtTenA.textContent = `張力: ${tText}`; els.txtTenA.style.color = color;
-  els.txtVertA.textContent = `抗重: ${verticalA.toFixed(1)} kg`;
+  let tText = tension > 9999 ? "死線!" : tension.toFixed(1);
+  els.txtTenA.innerHTML = `張力 <span style="font-size:14px">${tText}</span><span style="font-size:10px">kg</span>`; els.txtTenA.style.color = color;
+  els.txtVertA.innerHTML = `抗重 <span style="font-size:14px">${verticalA.toFixed(1)}</span><span style="font-size:10px">kg</span>`;
   els.hudA.style.borderLeftColor = color; 
 
-  els.txtTenB.textContent = `張力: ${tText}`; els.txtTenB.style.color = color;
-  els.txtVertB.textContent = `抗重: ${verticalB.toFixed(1)} kg`;
+  els.txtTenB.innerHTML = `張力 <span style="font-size:14px">${tText}</span><span style="font-size:10px">kg</span>`; els.txtTenB.style.color = color;
+  els.txtVertB.innerHTML = `抗重 <span style="font-size:14px">${verticalB.toFixed(1)}</span><span style="font-size:10px">kg</span>`;
   els.hudB.style.borderRightColor = color;
 
   let sagBaseY = ay + (by - ay) * currentSliderPct, actualSag = py - sagBaseY;
@@ -596,7 +612,6 @@ function startDrag(e, node) {
   isDragging = node; let pos = getSVGPos(e); 
   dragStartX = pos.x; dragStartY = pos.y; 
   startSpan = parseFloat(inSpan.value); startHeight = parseFloat(inHeight.value); 
-  e.preventDefault(); 
 }
 
 els.anchorA.onmousedown = els.anchorA.ontouchstart = (e) => startDrag(e, 'A');
@@ -606,6 +621,7 @@ els.stretcherGroup.onmousedown = els.stretcherGroup.ontouchstart = (e) => startD
 
 window.onmousemove = window.ontouchmove = (e) => {
   if(!isDragging) return;
+  if(e.cancelable) e.preventDefault(); // 💡 解除全局滑動鎖定，僅在拖曳物件時阻擋原生的螢幕捲動
   let pos = getSVGPos(e);
   if (isDragging === 'P') {
       let pct = (pos.x - offsetX) / (parseFloat(inSpan.value) * scale);
@@ -616,7 +632,7 @@ window.onmousemove = window.ontouchmove = (e) => {
       else if (isDragging === 'A') { inSpan.value = Math.max(5, (startSpan - dx)).toFixed(1); inHeight.value = (startHeight - dy).toFixed(1); }
   }
   updateEngine();
-};
+}, {passive: false};
 window.onmouseup = window.ontouchend = () => isDragging = null;
 
 // --- 戰術模組 (相機/手電筒/網格/HUD/截圖/重置) ---
@@ -630,6 +646,7 @@ async function toggleCamera() {
     video.style.opacity = "0"; btnCamera.classList.remove('active'); 
     torchOn = false; btnFlashlight.classList.remove('active');
     mainCard.classList.remove('camera-mode');
+    document.body.classList.remove('camera-mode');
   } else { 
     try { 
       image.style.opacity = "0"; 
@@ -637,6 +654,7 @@ async function toggleCamera() {
       videoTrack = stream.getVideoTracks()[0];
       video.srcObject = stream; video.style.opacity = "1"; btnCamera.classList.add('active'); 
       mainCard.classList.add('camera-mode');
+      document.body.classList.add('camera-mode'); // 💡 讓背板全透，實境毫無遮擋
     } catch (err) { alert("⚠️ 鏡頭啟動失敗：" + err.message); } 
   } 
 }
@@ -661,6 +679,7 @@ function loadImage(event) {
       image.src = e.target.result; 
       image.style.opacity = "1"; 
       mainCard.classList.add('camera-mode');
+      document.body.classList.add('camera-mode');
     }; 
     reader.readAsDataURL(file); 
   } 
@@ -688,7 +707,7 @@ async function takeScreenshot() {
     const canvas = await html2canvas(target, { backgroundColor: null, scale: 2, useCORS: true, ignoreElements: (el) => el.hasAttribute('data-html2canvas-ignore') });
     let finalCanvas = document.createElement('canvas'), finalCtx = finalCanvas.getContext('2d'); finalCanvas.width = target.offsetWidth * 2; finalCanvas.height = target.offsetHeight * 2;
     let rect = target.getBoundingClientRect(); finalCtx.drawImage(bgCanvas, rect.left, rect.top, rect.width, rect.height, 0, 0, finalCanvas.width, finalCanvas.height); finalCtx.drawImage(canvas, 0, 0);
-    const link = document.createElement('a'); link.download = `水平軌道繩戰術分析_${new Date().getTime()}.png`; link.href = finalCanvas.toDataURL('image/png'); link.click();
+    const link = document.createElement('a'); link.download = `索道繩動態戰術分析_${new Date().getTime()}.png`; link.href = finalCanvas.toDataURL('image/png'); link.click();
   } catch(e) { alert("截圖失敗：" + e); }
   target.classList.remove('capture-mode');
 }
@@ -715,7 +734,7 @@ function checkForUpdates() {
 const shareBtnAction = document.getElementById('shareBtnAction');
 if(shareBtnAction) {
     shareBtnAction.addEventListener('click', async () => {
-      const shareData = { title: '軌道繩儀 (散木團隊)', text: '推薦這套散木團隊專屬的「水平軌道繩模擬儀」！支援實境相機、動態拖曳張力計算與一鍵戰術截圖，快來試試！', url: window.location.href };
+      const shareData = { title: '索道繩動態張力估算儀 (散木團隊)', text: '推薦這套散木團隊專屬的「索道繩動態張力估算儀」！支援實境相機、動態拖曳張力計算與一鍵戰術截圖，快來試試！', url: window.location.href };
       try {
         if (navigator.share) { await navigator.share(shareData); } 
         else {
