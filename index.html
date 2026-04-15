@@ -39,6 +39,9 @@
     --tagline: #38bdf8; 
   }
 
+  /* 💡 修正 3：防止螢幕上滑出界 (禁止橡皮筋回彈效應) */
+  html, body { overscroll-behavior-y: none; }
+  
   body {
     margin: 0; background-color: var(--bg); color: var(--text); font-family: 'Noto Serif TC', serif;
     display: flex; justify-content: center; align-items: flex-start;
@@ -101,20 +104,15 @@
   .icon-btn.active-shock { background: var(--bad); color: #fff; border-color: var(--bad); animation: pulse 1.5s infinite; }
 
   @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
-  
-  /* 💡 震動動畫特效 */
-  @keyframes vibrate { 
-    0%, 100% { transform: translate(0, 0); } 
-    25% { transform: translate(-1px, 2px) rotate(-1deg); } 
-    50% { transform: translate(2px, -1px) rotate(1deg); } 
-    75% { transform: translate(-2px, -1px) rotate(0deg); } 
-  }
-  .shock-mode #stretcherVisuals { animation: vibrate 0.15s linear infinite; }
+  @keyframes glow-red { 0%, 100% { box-shadow: 0 4px 10px rgba(0,0,0,0.6); border-color: #9a3412; } 50% { box-shadow: 0 0 15px rgba(239,68,68,0.8); border-color: #ef4444; } }
 
-  .svgWrap { position:relative; width:100%; height: 500px; background: transparent; border-radius: 12px; border: 1px dashed var(--line); overflow: hidden; touch-action: none; }
+  .shock-anim { animation: glow-red 1s infinite; }
+
+  /* 💡 修正 2：移除 touch-action: none 讓畫布可以自由滑動！ */
+  .svgWrap { position:relative; width:100%; height: 500px; background: transparent; border-radius: 12px; border: 1px dashed var(--line); overflow: hidden; }
   svg { display: block; width: 100%; height: 100%; }
 
-  .anchor-dot, .draggable-pulley { cursor: grab; }
+  .anchor-dot, .draggable-pulley { cursor: grab; touch-action: none; }
   .anchor-dot:active, .draggable-pulley:active { cursor: grabbing; }
 
   .hud-panel, .stretcher-tag, .tagline-info { transition: opacity 0.3s ease; }
@@ -138,23 +136,39 @@
   .hud-br { bottom: 10px; right: 10px; border-bottom: 3px solid var(--line); align-items: flex-end; z-index: 30; } 
   .hud-br .input-row { display: flex; align-items: center; justify-content: flex-end; gap: 4px; margin-bottom: 2px; }
   .hud-br .unit { font-size: 11px; color: var(--muted); }
-  
   .hud-bl { bottom: 25px; left: 10px; background: transparent; border: none; box-shadow: none; padding: 0; color: var(--warn); } 
 
+  /* 💡 修正 4：擔架與負重完美結合，放大輸入框避免數字切斷 */
   .stretcher-tag {
     position: absolute; background: #ea580c; border: 2px solid #9a3412;
-    border-radius: 6px; padding: 4px; color: var(--bg); font-size: 12px; font-weight: bold;
+    border-radius: 8px; padding: 6px; color: var(--bg);
     transform: translateX(-50%); 
-    display: flex; align-items: center; justify-content: center; gap: 4px; z-index: 50;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 50;
     box-shadow: 0 4px 10px rgba(0,0,0,0.6); pointer-events: auto; touch-action: none; cursor: grab;
+    width: 90px;
   }
   .stretcher-tag:active { cursor: grabbing; }
-  .stretcher-handle { width: 12px; height: 6px; background: #c2410c; border-radius: 3px; border: 1px solid #7c2d12; }
+  
+  /* 兩側的把手造型 */
+  .stretcher-handles {
+    width: calc(100% + 24px); height: 8px; position: absolute; top: 12px; left: -12px;
+    display: flex; justify-content: space-between; z-index: -1;
+  }
+  .handle-block { width: 14px; height: 8px; background: #c2410c; border: 1px solid #7c2d12; border-radius: 4px; }
+  
   .stretcher-tag input { 
-    width: 65px; background: rgba(0,0,0,0.15); border: none; border-bottom: 2px solid rgba(255,255,255,0.4); 
+    width: 100%; background: rgba(0,0,0,0.15); border: none; border-bottom: 2px solid rgba(255,255,255,0.4); 
     color: #ffffff; font-size: 18px; font-weight: bold; text-align: center; outline: none; font-family: monospace;
   }
   .stretcher-tag input:focus { border-bottom-color: #ffffff; background: rgba(0,0,0,0.3); }
+  
+  /* 💡 修正 1：隱藏的震動設定，開啟時顯示 */
+  #shockInputWrap {
+    display: none; background: rgba(0,0,0,0.4); border-radius: 6px; padding: 4px; margin-top: 6px; width: 100%; text-align: center;
+  }
+  #inShock {
+    width: 32px; height: 20px; font-size: 14px; padding: 0; border: none; border-bottom: 1px solid #fca5a5; background: transparent; color: #fca5a5; font-weight: bold; text-align: center;
+  }
 
   .tagline-info { margin-top: 10px; padding: 10px; background: rgba(56, 189, 248, 0.1); border-radius: 8px; border: 1px solid var(--tagline); text-align: center; font-size: 13px; font-weight: bold; color: var(--tagline); }
   
@@ -225,7 +239,6 @@
 <div class="app-container" id="capture-area">
 
   <div class="card" id="mainCard">
-    <!-- 👑 標題列排版 -->
     <div class="topbar">
       <div class="title-tag">
         <div class="title-left">
@@ -243,7 +256,6 @@
       </div>
     </div>
 
-    <!-- 🎛️ 戰術工具列 -->
     <div class="icon-bar" data-html2canvas-ignore="true">
       <button class="icon-btn" id="btn-camera" onclick="toggleCamera()" title="實境相機">📷</button>
       <button class="icon-btn" id="btn-flashlight" onclick="toggleFlashlight()" title="手電筒">🔦</button>
@@ -271,23 +283,17 @@
         <path id="angleArc" fill="none" stroke="var(--warn)" stroke-width="2" style="transition: stroke 0.3s ease;" />
         <text id="angleText" fill="var(--warn)" font-size="15" font-weight="bold" text-anchor="middle" style="transition: fill 0.3s ease;"></text>
 
-        <!-- 🎯 儀表滑輪 -->
+        <!-- 🎯 儀表滑輪 (放大 1.5 倍) -->
         <g id="pulleyGroup" class="draggable-pulley">
-            <circle cx="0" cy="0" r="35" fill="transparent" />
-            <circle id="pulley" r="14" fill="var(--warn)" stroke="var(--bg)" stroke-width="2" />
-            <circle id="pulleyCenter" r="3" fill="var(--bg)" />
-            <line id="pulleyNeedle" stroke="#000" stroke-width="2" stroke-linecap="round" />
+            <circle cx="0" cy="0" r="40" fill="transparent" />
+            <circle id="pulley" r="20" fill="var(--warn)" stroke="var(--bg)" stroke-width="2.5" />
+            <circle id="pulleyCenter" r="4" fill="var(--bg)" />
+            <line id="pulleyNeedle" stroke="#000" stroke-width="2.5" stroke-linecap="round" />
         </g>
 
-        <!-- 懸吊線 (連接到浮動 HTML 擔架) -->
-        <g id="stretcherSuspension">
-           <!-- 💡 內層 Visual 群組：用來執行震動動畫，不影響 JS 的座標定位 -->
-           <g id="stretcherVisuals">
-               <path d="M 0 -40 L -12 -10 M 0 -40 L 12 -10" stroke="var(--muted)" stroke-width="2.5" />
-               <circle cx="0" cy="-40" r="4" fill="var(--muted)" />
-               <text id="shockLabel" x="0" y="0" font-size="10" fill="var(--bad)" font-weight="bold" text-anchor="middle" style="opacity: 0; pointer-events: none;">⚡震動 +30%</text>
-           </g>
-        </g>
+        <!-- 💡 粗壯的懸吊繩 (連接到 HTML 大擔架) -->
+        <line id="suspL" stroke="var(--muted)" stroke-width="4" stroke-linecap="round" />
+        <line id="suspR" stroke="var(--muted)" stroke-width="4" stroke-linecap="round" />
         
         <!-- 錨點 A, B -->
         <g id="anchorGroupA" class="anchor-dot">
@@ -326,11 +332,19 @@
          下垂: -- m (--%)
       </div>
 
-      <!-- 💡 擬真擔架 HTML 面板 (可拖曳) -->
+      <!-- 💡 擬真 HTML 戰術擔架 (包含隱藏的震動輸入框) -->
       <div id="floatLoad" class="stretcher-tag">
-         <div class="stretcher-handle"></div>
-         <input type="number" id="inLoad" value="100" step="10"><span>kg</span>
-         <div class="stretcher-handle"></div>
+         <div class="stretcher-handles">
+            <div class="handle-block"></div><div class="handle-block"></div>
+         </div>
+         <div style="display:flex; align-items:baseline; gap:2px; width:100%;">
+            <input type="number" id="inLoad" value="100" step="10" style="flex:1;"><span style="font-size:12px; font-weight:bold; color:#fff;">kg</span>
+         </div>
+         <div id="shockInputWrap">
+            <span style="font-size:11px; color:#fca5a5;">⚡震動+</span>
+            <input type="number" id="inShock" value="30" step="5" min="0">
+            <span style="font-size:11px; color:#fca5a5;">%</span>
+         </div>
       </div>
     </div>
     
@@ -365,9 +379,26 @@
               <li>拖曳畫布上的 <b>A點/B點</b>，可快速設定跨距與高低差。</li>
               <li>拖曳橘色 <b>大擔架</b> 或滑輪，可模擬傷患過河時的張力與牽引力。</li>
               <li>滑動下方的 <b>夾角拉桿</b>，系統會自動反推繩長並平滑變形。</li>
-              <li>點擊頂部 <b>📳震動</b> 按鈕，可模擬拖曳擔架時產生之動態衝擊 (重量放大一點三倍計算峰值)。</li>
+              <li>點擊頂部 <b>📳震動</b> 按鈕，可模擬拖曳擔架時產生之動態衝擊 (可自訂百分比計算峰值)。</li>
               <li>點擊頂部 <b>📷實境 / 🌐網格 / ☀️淨空</b> 等工具，可進行實地疊圖測量與 <b>📸截圖</b> 存檔。</li>
             </ul>
+            <button type="button" class="btn-collapse-inner" onclick="this.closest('details').removeAttribute('open')">🔼 收起說明</button>
+          </div>
+        </details>
+
+        <!-- 💡 新增 5：專業原理解析面板 -->
+        <details class="menu-item">
+          <summary>
+            <div class="menu-header-left"><span class="menu-icon">📚</span>專業名詞與原理解析</div>
+            <span class="menu-arrow">❯</span>
+          </summary>
+          <div class="menu-content">
+            <p><b>🔗 張力 (Tension)</b><br>系統內部主繩繃緊的程度。張力過大將導致主繩斷裂。</p>
+            <p><b>⚓ 抗重 (Vertical Load)</b><br>錨點（A/B點）實際承受的「垂直下拉」力量。越靠近擔架的錨點，承受的抗重越大，固定點可能被連根拔起。</p>
+            <p><b>📏 下垂 (Sag)</b><br>繩索受力後，滑輪相對於兩錨點連線的垂直下降距離。下垂量越小（繩拉越直），系統張力會呈指數飆升！</p>
+            <p><b>↔️ 牽引力 (Tagline Force)</b><br>維持滑輪在非自然平衡點（偏左或偏右）所需的水平拉力。數值越大，代表岸上救援手越需要省力滑輪組輔助。</p>
+            <p><b>🪢 摩擦力與繩索延展</b><br>實務中滑輪會產生阻力，繩索受力會延展。這會使實際牽引力增加、下垂量變大，操作時需預留安全餘裕。</p>
+            <p><b>📳 動態震動 (Shock Load)</b><br>拖拉過程中產生的頓挫與晃動，會瞬間放大系統受力。本系統提供自訂 % 數來模擬峰值衝擊。</p>
             <button type="button" class="btn-collapse-inner" onclick="this.closest('details').removeAttribute('open')">🔼 收起說明</button>
           </div>
         </details>
@@ -379,7 +410,7 @@
           </summary>
           <div class="menu-content">
             <div style="text-align: center; margin-bottom: 15px;">
-              <span style="display:inline-block; background:var(--safe); color:#0f1623; font-weight:bold; padding:4px 14px; border-radius:20px; font-size:13px; letter-spacing:0.5px; box-shadow: 0 2px 6px rgba(34,197,94,0.3);">V6.1 動態衝擊運算版</span>
+              <span style="display:inline-block; background:var(--safe); color:#0f1623; font-weight:bold; padding:4px 14px; border-radius:20px; font-size:13px; letter-spacing:0.5px; box-shadow: 0 2px 6px rgba(34,197,94,0.3);">V6.2 專業原理解析版</span>
             </div>
             <p style="margin-top: 0; margin-bottom: 6px; font-weight: bold; color: var(--text); text-align: center;">本工具由 <span style="color:var(--warn);">散木團隊</span> 開發製作</p>
             <p style="margin-top: 0; margin-bottom: 4px; font-size: 13px; text-align: center;">教學架構與工程判斷／徐世豐</p>
@@ -389,7 +420,6 @@
           </div>
         </details>
 
-        <!-- 📱 加入主畫面說明 -->
         <details class="menu-item">
           <summary>
             <div class="menu-header-left"><span class="menu-icon">📱</span>加入主畫面說明</div>
@@ -397,7 +427,6 @@
           </summary>
           <div class="menu-content">
             <p style="margin-top: 0; margin-bottom: 8px; color: var(--text);">將捷徑加至主畫面，獲得無網址列的 100% 沉浸式體驗：</p>
-            
             <div style="background: rgba(150,150,150,0.05); padding: 12px; border-radius: 8px; margin-bottom: 12px;">
               <p style="margin-top: 0; margin-bottom: 8px; font-weight: bold; color: var(--safe);">🤖 Android (安卓版)</p>
               <ol style="padding-left: 20px; margin: 0; font-size: 13px;">
@@ -409,7 +438,6 @@
                 <li style="margin-bottom: 0;">點選「安裝」，即可將捷徑加到主畫面</li>
               </ol>
             </div>
-
             <div style="background: rgba(150,150,150,0.05); padding: 12px; border-radius: 8px;">
               <p style="margin-top: 0; margin-bottom: 8px; font-weight: bold; color: var(--safe);">🍎 iOS (iPhone)</p>
               <ol style="padding-left: 20px; margin: 0; font-size: 13px;">
@@ -419,7 +447,6 @@
                 <li style="margin-bottom: 0;">點選「加入」，即可將捷徑加到主畫面</li>
               </ol>
             </div>
-
             <button type="button" class="btn-collapse-inner" onclick="this.closest('details').removeAttribute('open')">🔼 收起說明</button>
           </div>
         </details>
@@ -483,15 +510,15 @@
 // --- 核心變數與綁定 ---
 const inSpan = document.getElementById('inSpan'), inHeight = document.getElementById('inHeight'),
       inLoad = document.getElementById('inLoad'), inRope = document.getElementById('inRope'),
-      angleSlider = document.getElementById('angleSlider'), taglineInfo = document.getElementById('taglineInfo');
+      inShock = document.getElementById('inShock'), angleSlider = document.getElementById('angleSlider'), 
+      taglineInfo = document.getElementById('taglineInfo');
 
 const svgEl = document.getElementById('canvas');
 const mainCard = document.getElementById('mainCard');
 const els = {
   ropeL: document.getElementById('ropeL'), ropeR: document.getElementById('ropeR'),
   pulleyGroup: document.getElementById('pulleyGroup'), pulleyNeedle: document.getElementById('pulleyNeedle'),
-  stretcherSuspension: document.getElementById('stretcherSuspension'), 
-  stretcherVisuals: document.getElementById('stretcherVisuals'), shockLabel: document.getElementById('shockLabel'),
+  suspL: document.getElementById('suspL'), suspR: document.getElementById('suspR'),
   anchorA: document.getElementById('anchorGroupA'), anchorB: document.getElementById('anchorGroupB'), 
   dotA: document.getElementById('dotA'), dotB: document.getElementById('dotB'),
   txtTenA: document.getElementById('txtTenA'), txtVertA: document.getElementById('txtVertA'),
@@ -506,10 +533,6 @@ const els = {
 const svgW = 400, svgH = 500; 
 let scale = 10, offsetX = 50, offsetY = 120; 
 let currentSliderPct = 0.5;
-
-// 💡 震動衝擊模式變數
-let isShockOn = false;
-const SHOCK_FACTOR = 1.3; // 模擬拖曳時增加 30% 動態載荷
 
 function toX(mX) { return offsetX + mX * scale; }
 function toY(mY) { return offsetY + mY * scale; }
@@ -565,8 +588,10 @@ function updateEngine(skipSliderUpdate = false) {
   let S = parseFloat(inSpan.value) || 20, H = parseFloat(inHeight.value) || 0, baseW = parseFloat(inLoad.value) || 100;
   let L = parseFloat(inRope.value) || 22;
   
-  // 💡 動態衝擊加乘 (若開啟震動模式，重量放大 1.3 倍)
-  let W = isShockOn ? baseW * SHOCK_FACTOR : baseW;
+  let isShockOn = mainCard.classList.contains('shock-mode');
+  let shockPct = parseFloat(inShock.value) || 0;
+  let shockFactor = 1 + (shockPct / 100);
+  let W = isShockOn ? baseW * shockFactor : baseW;
   
   let minL = Math.hypot(S, H);
   let calcL = Math.max(L, minL + 0.05);
@@ -631,13 +656,14 @@ function updateEngine(skipSliderUpdate = false) {
   }
 
   els.pulleyGroup.setAttribute('transform', `translate(${s_px}, ${s_py})`);
-  let needleAngle = isDanger ? 45 : -45 + (tension / (baseW*5)) * 90; let nRad = needleAngle * Math.PI / 180;
-  els.pulleyNeedle.setAttribute('x1', 0); els.pulleyNeedle.setAttribute('y1', 0); els.pulleyNeedle.setAttribute('x2', 8 * Math.sin(nRad)); els.pulleyNeedle.setAttribute('y2', -8 * Math.cos(nRad));
+  let needleAngle = isDanger ? 50 : -50 + (tension / (baseW*5)) * 100; let nRad = needleAngle * Math.PI / 180;
+  els.pulleyNeedle.setAttribute('x1', 0); els.pulleyNeedle.setAttribute('y1', 0); els.pulleyNeedle.setAttribute('x2', 12 * Math.sin(nRad)); els.pulleyNeedle.setAttribute('y2', -12 * Math.cos(nRad));
   
-  let loadDrop = 40; 
-  els.stretcherSuspension.setAttribute('transform', `translate(${s_px}, ${s_py + loadDrop})`);
+  // 💡 修正 4：讓粗壯的 SVG 懸吊繩，完美連接到 HTML 擔架邊緣
+  let loadDrop = isShockOn ? 65 : 45; 
+  els.suspL.setAttribute('x1', s_px); els.suspL.setAttribute('y1', s_py); els.suspL.setAttribute('x2', s_px - 45); els.suspL.setAttribute('y2', s_py + loadDrop);
+  els.suspR.setAttribute('x1', s_px); els.suspR.setAttribute('y1', s_py); els.suspR.setAttribute('x2', s_px + 45); els.suspR.setAttribute('y2', s_py + loadDrop);
 
-  // 💡 HUD 加入震動峰值標籤
   let tText = tension > 9999 ? "死線!" : tension.toFixed(1);
   let shockBadge = isShockOn ? `<span style="font-size:10px; color:var(--bad); margin-left:4px;">⚡峰值</span>` : '';
   
@@ -656,9 +682,9 @@ function updateEngine(skipSliderUpdate = false) {
   let ratioX = wrapRect.width / svgW;
   let ratioY = wrapRect.height / svgH;
   let flX = s_px * ratioX; 
-  let flY = (s_py + loadDrop + 10) * ratioY;
+  let flY = (s_py + loadDrop) * ratioY;
   
-  if (flY > wrapRect.height - 38) flY = wrapRect.height - 38;
+  if (flY > wrapRect.height - 45) flY = wrapRect.height - 45;
   
   els.floatLoad.style.left = `${flX}px`;
   els.floatLoad.style.top = `${flY}px`;
@@ -672,7 +698,7 @@ inRope.addEventListener('change', () => {
    updateEngine();
 });
 
-[inSpan, inHeight, inLoad].forEach(el => el.addEventListener('input', () => updateEngine()));
+[inSpan, inHeight, inLoad, inShock].forEach(el => el.addEventListener('input', () => updateEngine()));
 inRope.addEventListener('input', () => updateEngine());
 
 angleSlider.addEventListener('input', (e) => {
@@ -701,7 +727,7 @@ els.floatLoad.onmousedown = els.floatLoad.ontouchstart = (e) => startDrag(e, 'P'
 
 window.onmousemove = window.ontouchmove = (e) => {
   if(!isDragging) return;
-  if(e.cancelable) e.preventDefault(); 
+  if(e.cancelable) e.preventDefault(); // 💡 只有拖曳操作物件時，才會阻擋螢幕捲動
   let pos = getSVGPos(e);
   if (isDragging === 'P') {
       let pct = (pos.x - offsetX) / (parseFloat(inSpan.value) * scale);
@@ -720,18 +746,19 @@ let stream = null, videoTrack = null, torchOn = false;
 const video = document.getElementById('bg-video'), image = document.getElementById('bg-image'), btnCamera = document.getElementById('btn-camera'), btnFlashlight = document.getElementById('btn-flashlight'), gridOverlay = document.getElementById('grid-overlay'); 
 let gridVisible = true, hudVisible = true;
 
-// 💡 震動模式切換邏輯
 function toggleShock() {
-  isShockOn = !isShockOn;
   const btnShock = document.getElementById('btn-shock');
-  if(isShockOn) {
-    btnShock.classList.add('active-shock');
-    mainCard.classList.add('shock-mode');
-    els.shockLabel.style.opacity = "1";
-  } else {
-    btnShock.classList.remove('active-shock');
+  const shockWrap = document.getElementById('shockInputWrap');
+  if(mainCard.classList.contains('shock-mode')) {
     mainCard.classList.remove('shock-mode');
-    els.shockLabel.style.opacity = "0";
+    btnShock.classList.remove('active-shock');
+    els.floatLoad.classList.remove('shock-anim');
+    shockWrap.style.display = 'none';
+  } else {
+    mainCard.classList.add('shock-mode');
+    btnShock.classList.add('active-shock');
+    els.floatLoad.classList.add('shock-anim');
+    shockWrap.style.display = 'block';
   }
   updateEngine();
 }
@@ -790,7 +817,7 @@ function toggleHUD() {
 
 function resetEngine() {
   inSpan.value = 20; inHeight.value = 0; inLoad.value = 100; inRope.value = 22; currentSliderPct = 0.5;
-  if(isShockOn) toggleShock(); // 關閉震動
+  if(mainCard.classList.contains('shock-mode')) toggleShock(); 
   updateEngine();
 }
 
@@ -818,7 +845,7 @@ window.copyCoffee = function() {
   else {
       let textArea = document.createElement("textarea"); textArea.value = acc; textArea.style.position = "fixed";
       document.body.appendChild(textArea); textArea.select();
-      try { document.execCommand('copy'); showMsg(); } catch (err) { alert('複製失敗，請手動選取複製'); }
+      try { document.execCommand('copy'); showMsg(); } catch (err) { alert('複製失敗，請手手選取複製'); }
       textArea.remove();
   }
 };
