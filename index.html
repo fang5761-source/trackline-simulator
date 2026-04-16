@@ -2,7 +2,7 @@
 <html lang="zh-Hant-TW">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
@@ -37,16 +37,14 @@
     --warn: #ffd84d;
     --bad: #ef4444;
     --tagline: #38bdf8; 
+    --vip: #c084fc;
   }
 
-  html, body { overscroll-behavior-y: none; }
-  
+  /* 💡 修復2：鎖死外層防彈條款，解決 iOS 滑動與彈跳問題 */
+  html { overscroll-behavior: none; background-color: var(--bg); }
   body {
     margin: 0; background-color: var(--bg); color: var(--text); font-family: 'Noto Serif TC', serif;
-    display: flex; justify-content: center; align-items: flex-start;
-    padding: 10px 10px 40px 10px; touch-action: manipulation;
-    min-height: 100vh; overflow-x: hidden;
-    -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;
+    position: fixed; inset: 0; overflow-y: auto; overscroll-behavior: none; -webkit-overflow-scrolling: touch;
     transition: background-color 0.3s ease;
   }
   body.camera-mode { background-color: transparent !important; }
@@ -62,7 +60,11 @@
     background-size: 20px 20px; opacity: 0.5; pointer-events: none; transition: opacity 0.3s;
   }
 
-  .app-container { max-width: 500px; width: 100%; display: flex; flex-direction: column; gap: 12px; position: relative; z-index: 1; }
+  /* 💡 修復3：加入蘋果底部安全距離 env(safe-area-inset-bottom) */
+  .app-container { 
+    max-width: 500px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; position: relative; z-index: 1; 
+    padding: 10px 10px calc(40px + env(safe-area-inset-bottom)) 10px;
+  }
   input[type="file"] { display: none; }
 
   .card { 
@@ -72,124 +74,125 @@
     transition: border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
   }
   .card.camera-mode {
-    background: transparent !important;
-    border-color: rgba(255,255,255,0.2) !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    box-shadow: none !important;
+    background: transparent !important; border-color: rgba(255,255,255,0.2) !important;
+    backdrop-filter: none !important; -webkit-backdrop-filter: none !important; box-shadow: none !important;
   }
   
   .topbar { display: flex; align-items: center; margin-bottom: 12px; width: 100%; }
-  .title-tag { 
-    font-size: 16px; font-weight: bold; display: flex; align-items: center; gap: 8px; 
-    white-space: nowrap; width: 100%; justify-content: space-between;
-  }
+  .title-tag { font-size: 16px; font-weight: bold; display: flex; align-items: center; gap: 8px; white-space: nowrap; width: 100%; justify-content: space-between; }
   .title-left { display: flex; align-items: center; gap: 6px; }
   .title-divider { width: 3px; height: 22px; background-color: var(--warn); border-radius: 2px; }
+  
+  .vip-badge {
+    display: none; background: var(--vip); color: #fff; font-size: 10px; font-weight: bold;
+    padding: 2px 6px; border-radius: 12px; letter-spacing: 0.5px;
+    box-shadow: 0 0 8px rgba(192, 132, 252, 0.6); margin-left: 4px;
+  }
+  .is-vip .vip-badge { display: inline-block; }
 
-  .icon-bar {
-    display: flex; justify-content: space-between; align-items: center; gap: 6px; 
-    background: rgba(0,0,0,0.4); padding: 8px; border-radius: 12px; margin-bottom: 12px;
-    border: 1px solid var(--line);
-  }
-  .icon-btn {
-    flex: 1; aspect-ratio: 1/1; max-height: 42px; border-radius: 8px; 
-    background: rgba(255,255,255,0.05); border: 1px solid transparent;
-    display: flex; justify-content: center; align-items: center; 
-    cursor: pointer; transition: all 0.2s; font-size: 18px; color: var(--text); padding: 0;
-  }
+  .icon-bar { display: flex; justify-content: space-between; align-items: center; gap: 6px; background: rgba(0,0,0,0.4); padding: 8px; border-radius: 12px; margin-bottom: 12px; border: 1px solid var(--line); }
+  .icon-btn { flex: 1; aspect-ratio: 1/1; max-height: 42px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid transparent; display: flex; justify-content: center; align-items: center; position: relative; cursor: pointer; transition: all 0.2s; font-size: 18px; color: var(--text); padding: 0; }
   .icon-btn:active { background: var(--line); transform: scale(0.95); }
   .icon-btn.active { background: var(--safe); color: var(--bg); border-color: var(--safe); }
   .icon-btn.active-shock { background: var(--bad); color: #fff; border-color: var(--bad); animation: pulse 1.5s infinite; }
+  
+  .lock-icon { position: absolute; bottom: 2px; right: 2px; font-size: 10px; background: rgba(0,0,0,0.8); border-radius: 50%; padding: 2px; }
+  .is-vip .lock-icon { display: none; }
 
   @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
   @keyframes glow-red { 0%, 100% { box-shadow: 0 4px 10px rgba(0,0,0,0.6); border-color: #9a3412; } 50% { box-shadow: 0 0 15px rgba(239,68,68,0.8); border-color: #ef4444; } }
-
   .shock-anim { animation: glow-red 1s infinite; }
 
-  .svgWrap { position:relative; width:100%; height: 500px; background: transparent; border-radius: 12px; border: 1px dashed var(--line); overflow: hidden; }
+  /* 💡 調整畫布高度，移除舊的底部干擾 */
+  .svgWrap { position:relative; width:100%; height: 460px; background: transparent; border-radius: 12px; border: 1px dashed var(--line); overflow: hidden; }
   svg { display: block; width: 100%; height: 100%; }
 
   .anchor-dot, .draggable-pulley { cursor: grab; touch-action: none; }
   .anchor-dot:active, .draggable-pulley:active { cursor: grabbing; }
 
-  .hud-panel, .stretcher-tag, .tagline-wrap { transition: opacity 0.3s ease; }
+  .hud-panel, .stretcher-tag, .tagline-wrap, .dashboard-panel { transition: opacity 0.3s ease; }
+  
   .hud-panel {
     position: absolute; background: rgba(10, 15, 25, 0.7); border: 1px solid rgba(255,255,255,0.1);
     border-radius: 8px; padding: 4px 6px; color: var(--text); font-size: 11px; font-weight: bold;
     backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); pointer-events: auto;
     display: flex; flex-direction: column; gap: 4px; box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-    transition: border-color 0.3s ease;
   }
-  .hud-panel .val { font-size: 13px; font-family: monospace; transition: color 0.3s ease; white-space: nowrap; display: flex; align-items: baseline; gap: 4px; }
-  .hud-panel input {
-    background: rgba(0,0,0,0.5); border: none; border-bottom: 1px solid var(--line); border-radius: 4px;
-    color: var(--warn); font-weight: bold; font-size: 14px; text-align: center; padding: 2px 4px; outline: none; font-family: monospace; width: 42px;
-  }
-  .hud-panel input:focus { border-color: var(--safe); background: rgba(0,0,0,0.8); }
-
+  .hud-panel .val { font-size: 13px; font-family: monospace; white-space: nowrap; display: flex; align-items: baseline; gap: 4px; }
+  
   .hud-tl { top: 10px; left: 5px; border-left: 3px solid var(--safe); max-width: 48%; overflow: hidden; } 
   .hud-tr { top: 10px; right: 5px; border-right: 3px solid var(--safe); text-align: right; align-items: flex-end; max-width: 48%; overflow: hidden; } 
-  
-  .hud-br { bottom: 10px; right: 10px; border-bottom: 3px solid var(--line); align-items: flex-end; z-index: 30; } 
-  .hud-br .input-row { display: flex; align-items: center; justify-content: flex-end; gap: 4px; margin-bottom: 2px; }
-  .hud-br .unit { font-size: 11px; color: var(--muted); }
-  
-  .hud-bl { bottom: 40px; left: 10px; background: transparent; border: none; box-shadow: none; padding: 0; color: var(--warn); font-size: 13px; } 
 
-  /* 💡 修正 1：擔架橫向自動擴充，不再限制死寬度 */
   .stretcher-tag {
     position: absolute; background: #ea580c; border: 2px solid #9a3412;
     border-radius: 8px; padding: 8px 12px; color: var(--bg);
     transform: translate(-50%, 0); 
     display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 50;
     box-shadow: 0 4px 10px rgba(0,0,0,0.6); pointer-events: auto; touch-action: none; cursor: grab;
-    min-width: 100px; width: auto; /* 讓它能夠根據內部橫向延伸 */
+    min-width: 100px; width: auto; 
   }
   .stretcher-tag:active { cursor: grabbing; }
-  
-  .stretcher-handles {
-    width: calc(100% + 24px); height: 8px; position: absolute; top: 16px; left: -12px;
-    display: flex; justify-content: space-between; z-index: -1;
-  }
+  .stretcher-handles { width: calc(100% + 24px); height: 8px; position: absolute; top: 16px; left: -12px; display: flex; justify-content: space-between; z-index: -1; }
   .handle-block { width: 14px; height: 8px; background: #c2410c; border: 1px solid #7c2d12; border-radius: 4px; }
-  
-  .stretcher-content {
-    display: flex; flex-direction: row; align-items: center; gap: 10px;
-  }
-  .stretcher-tag input { 
-    background: rgba(0,0,0,0.25); border: none; border-bottom: 2px solid rgba(255,255,255,0.6); 
-    color: #ffffff; font-size: 20px; font-weight: bold; text-align: center; outline: none; font-family: monospace;
-    padding: 2px 0; border-radius: 4px; width: 60px;
-  }
+  .stretcher-content { display: flex; flex-direction: row; align-items: center; gap: 10px; }
+  .stretcher-tag input { background: rgba(0,0,0,0.25); border: none; border-bottom: 2px solid rgba(255,255,255,0.6); color: #ffffff; font-size: 20px; font-weight: bold; text-align: center; outline: none; font-family: monospace; padding: 2px 0; border-radius: 4px; width: 60px; }
   .stretcher-tag input:focus { border-bottom-color: #ffffff; background: rgba(0,0,0,0.5); }
   
-  /* 💡 改為橫式的震動輸入框 */
-  #shockInputWrap {
-    display: none; /* 由 JS 設為 flex */
-    align-items: center; justify-content: center; gap: 2px;
-    background: rgba(0,0,0,0.4); border-radius: 6px; padding: 2px 6px;
-  }
-  #shockInputWrap input {
-    width: 32px; font-size: 16px; padding: 0; border: none; border-bottom: 1px solid #fca5a5; background: transparent; color: #fca5a5; font-weight: bold; text-align: center;
-  }
+  #shockInputWrap { display: none; align-items: center; justify-content: center; gap: 2px; background: rgba(0,0,0,0.4); border-radius: 6px; padding: 2px 6px; }
+  #shockInputWrap input { width: 32px; font-size: 16px; padding: 0; border: none; border-bottom: 1px solid #fca5a5; background: transparent; color: #fca5a5; font-weight: bold; text-align: center; }
 
-  /* 💡 修正 2：將省力比標題與按鈕分行排列 */
+  /* 💡 修復3：全新獨立的參數儀表板，脫離畫布干擾 */
+  .dashboard-panel {
+    background: rgba(0,0,0,0.3); border: 1px solid var(--line); border-radius: 8px; 
+    padding: 10px; margin-top: 10px; display: flex; flex-direction: column; gap: 12px;
+  }
+  .dash-inputs { display: flex; gap: 6px; justify-content: space-between; }
+  .dash-input-group { flex: 1; background: rgba(0,0,0,0.4); padding: 6px; border-radius: 6px; display: flex; flex-direction: column; align-items: center; border: 1px solid rgba(255,255,255,0.05); }
+  .dash-input-group span.lbl { font-size: 11px; color: var(--muted); margin-bottom: 4px; font-weight: bold; }
+  .dash-input-group div { display: flex; align-items: baseline; gap: 2px; }
+  .dash-input-group input { width: 45px; background: transparent; border: none; border-bottom: 1px solid var(--warn); color: var(--warn); font-size: 16px; font-weight: bold; text-align: center; font-family: monospace; outline: none; }
+  .dash-sag-row { display: flex; justify-content: center; padding: 4px 0; border-top: 1px dashed rgba(255,255,255,0.1); }
+
   .tagline-wrap { margin-top: 10px; padding: 10px; background: rgba(56, 189, 248, 0.1); border-radius: 8px; border: 1px solid var(--tagline); text-align: center; font-size: 13px; font-weight: bold; color: var(--tagline); }
-  .ma-control { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; margin-top: 8px; border-top: 1px dashed rgba(56, 189, 248, 0.3); padding-top: 10px; }
+  .ma-control { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; margin-top: 8px; border-top: 1px dashed rgba(56, 189, 248, 0.3); padding-top: 10px; position: relative; }
   .ma-btn-group { display: flex; gap: 6px; width: 100%; justify-content: center; }
-  .ma-btn { flex: 1; max-width: 60px; background: rgba(0,0,0,0.4); border: 1px solid var(--line); color: var(--muted); border-radius: 6px; padding: 6px 4px; font-size: 13px; font-weight: bold; cursor: pointer; transition: all 0.2s; font-family: monospace; }
+  .ma-btn { flex: 1; max-width: 60px; background: rgba(0,0,0,0.4); border: 1px solid var(--line); color: var(--muted); border-radius: 6px; padding: 6px 4px; font-size: 13px; font-weight: bold; cursor: pointer; transition: all 0.2s; font-family: monospace; position: relative;}
   .ma-btn.active { background: var(--tagline); color: var(--bg); border-color: var(--tagline); }
+  .ma-btn .lock-icon { bottom: 2px; right: 2px; font-size: 8px; }
 
   .angle-slider-container { margin-top: 10px; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 8px; border: 1px solid var(--line); }
   .angle-slider-header { display: flex; justify-content: space-between; font-size: 12px; color: var(--warn); margin-bottom: 4px; font-weight: bold; }
   input[type="range"]{ -webkit-appearance:none; width:100%; margin: 8px 0; background:transparent; cursor:pointer; }
   input[type="range"]::-webkit-slider-runnable-track{ height:8px; border-radius:999px; background:var(--line); }
-  input[type="range"]::-webkit-slider-thumb{
-    -webkit-appearance:none; width:26px; height:26px; border-radius:50%; background:var(--warn);
-    border:2px solid var(--bg); margin-top:-9px; box-shadow: 0 2px 6px rgba(0,0,0,0.5);
-  }
+  input[type="range"]::-webkit-slider-thumb{ -webkit-appearance:none; width:26px; height:26px; border-radius:50%; background:var(--warn); border:2px solid var(--bg); margin-top:-9px; box-shadow: 0 2px 6px rgba(0,0,0,0.5); }
 
+  /* 🔒 VIP 密碼鎖彈窗樣式 */
+  .modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    display: flex; justify-content: center; align-items: center; z-index: 9999;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+  }
+  .modal-overlay.show { opacity: 1; pointer-events: auto; }
+  
+  .modal-box {
+    background: var(--bg); border: 2px solid var(--vip); border-radius: 16px;
+    padding: 24px; width: 90%; max-width: 350px; text-align: center;
+    box-shadow: 0 10px 40px rgba(192, 132, 252, 0.3); transform: scale(0.9); transition: transform 0.3s ease;
+  }
+  .modal-overlay.show .modal-box { transform: scale(1); }
+  .modal-box h3 { margin: 0 0 10px 0; color: var(--text); display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .modal-box p { font-size: 14px; color: var(--muted); margin-bottom: 16px; line-height: 1.5; }
+  .modal-box .highlight { color: var(--vip); font-weight: bold; font-size: 16px; }
+  .btn-store { background: var(--vip); color: #fff; border: none; padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: bold; width: 100%; cursor: pointer; box-shadow: 0 4px 12px rgba(192, 132, 252, 0.4); margin-bottom: 10px; transition: transform 0.2s; }
+  .btn-store:active { transform: scale(0.95); }
+  .pwd-input { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--line); color: #fff; padding: 10px; border-radius: 8px; font-size: 16px; text-align: center; outline: none; margin-bottom: 12px; letter-spacing: 2px; font-family: monospace; }
+  .pwd-input:focus { border-color: var(--safe); }
+  .modal-actions { display: flex; gap: 10px; }
+  .btn-cancel { flex: 1; background: transparent; border: 1px solid var(--line); color: var(--text); padding: 10px; border-radius: 8px; cursor: pointer; }
+  .btn-unlock { flex: 1; background: var(--safe); border: none; color: #0f1623; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+
+  /* 後勤系統樣式 */
   .menu-list { display: flex; flex-direction: column; gap: 10px; margin-top: 5px; width: 100%; }
   details.main-accordion { background: var(--card); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
   details.main-accordion > summary { padding: 14px 16px; font-weight: bold; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; color: var(--warn); background: rgba(0,0,0,0.3); font-size: 15px; }
@@ -203,13 +206,11 @@
   .menu-icon { font-size: 18px; }
   .menu-arrow { color: var(--muted); font-size: 12px; transition: transform 0.3s; }
   .menu-item[open] > summary .menu-arrow { transform: rotate(90deg); }
-  .menu-content { padding: 16px; font-size: 13.5px; color: var(--muted); line-height: 1.6; background: rgba(0,0,0,0.4); text-align: justify; }
-  .menu-content ul { padding-left: 22px; margin-bottom: 0; }
-  .menu-content li { margin-bottom: 8px; }
-  .menu-action-btn { padding: 14px 16px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 14px; border-top: 1px solid var(--line); transition: background 0.2s; color: var(--text); }
-  .menu-action-btn:active { background: var(--line); }
+  
+  /* 💡 修復1：文字靠左對齊，解決字距過大問題 */
+  .menu-content { padding: 16px; font-size: 13.5px; color: var(--muted); line-height: 1.6; background: rgba(0,0,0,0.4); text-align: left; }
+  
   .btn-collapse-inner { width: 100%; padding: 10px; margin-top: 12px; background: rgba(255,255,255,0.05); border: 1px solid var(--line); border-radius: 8px; color: var(--text); cursor: pointer; font-family: inherit; font-weight: bold; }
-  .highlight-coffee summary { background: rgba(217, 119, 6, 0.1); }
   .highlight-heart { background: rgba(239, 68, 68, 0.1); }
   .footer-disclaimer { margin-top: 5px; padding: 12px; font-size: 12px; color: var(--muted); line-height: 1.5; background: rgba(0,0,0,0.3); border-radius: 8px; border-left: 4px solid var(--bad); }
 
@@ -245,6 +246,24 @@
 <div id="bg-layer"><video id="bg-video" autoplay playsinline muted></video><img id="bg-image" src="" alt="背景圖片"></div>
 <div id="grid-overlay"></div>
 
+<!-- 🔒 VIP 密碼鎖彈窗 (Paywall) -->
+<div id="vipModal" class="modal-overlay">
+  <div class="modal-box">
+    <h3>🔒 專業版功能解鎖 <span class="vip-badge" style="display:inline-block;">PRO</span></h3>
+    <p>您即將啟用「<span id="vipFeatureName" class="highlight"></span>」黑科技！</p>
+    <p style="font-size:13px;">此功能為進階專業版限定。<br>支持散木團隊研發，永久解鎖全功能！</p>
+    <button class="btn-store" onclick="window.open('https://gumroad.com', '_blank')">🛒 前往散木自動販賣機</button>
+    <hr style="border:0; border-top:1px dashed var(--line); margin: 15px 0;">
+    <p style="font-size:12px; color:var(--muted); margin-bottom:8px;">已取得密碼？請在此輸入：</p>
+    <input type="text" id="vipPwdInput" placeholder="輸入 VIP 通關密碼" class="pwd-input" autocomplete="off">
+    <div id="vipErrorMsg" style="color:var(--bad); font-size:12px; height:16px; margin-bottom:8px;"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeVipModal()">稍後再說</button>
+      <button class="btn-unlock" onclick="verifyVip()">立即解鎖 🔓</button>
+    </div>
+  </div>
+</div>
+
 <div class="app-container" id="capture-area">
 
   <div class="card" id="mainCard">
@@ -259,27 +278,27 @@
              <line x1="50" y1="72" x2="50" y2="58" stroke="#ef4444" stroke-width="4" stroke-linecap="round"/>
           </svg>
           <div class="title-divider"></div>
-          <span>索道繩動態張力估算儀</span>
+          <span>索道繩動態張力估算儀 <span class="vip-badge">PRO</span></span>
         </div>
-        <img src="./sunmoon_logo.png" alt="散木團隊" style="width: 30px; height: 30px; border-radius: 6px; object-fit: cover; box-shadow: 0 2px 4px rgba(0,0,0,0.5);">
+        <img src="./sunmoon_logo.jpg" alt="散木團隊" style="width: 30px; height: 30px; border-radius: 6px; object-fit: cover; box-shadow: 0 2px 4px rgba(0,0,0,0.5);">
       </div>
     </div>
 
     <div class="icon-bar" data-html2canvas-ignore="true">
-      <button class="icon-btn" id="btn-camera" onclick="toggleCamera()" title="實境相機">📷</button>
+      <button class="icon-btn" id="btn-camera" onclick="attemptFeature('📷 實境相機疊圖', toggleCamera)" title="實境相機">📷<span class="lock-icon">🔒</span></button>
       <button class="icon-btn" id="btn-flashlight" onclick="toggleFlashlight()" title="手電筒">🔦</button>
       <label class="icon-btn" for="upload-image" title="載入照片" style="margin:0;">📁</label>
       <input type="file" id="upload-image" accept="image/*" onchange="loadImage(event)">
       <button class="icon-btn" onclick="toggleGrid()" title="工程網格">🌐</button>
       <button class="icon-btn" onclick="toggleHUD()" title="淨空模式">☀️</button>
-      <button class="icon-btn" id="btn-shock" onclick="toggleShock()" title="動態震動衝擊">📳</button>
+      <button class="icon-btn" id="btn-shock" onclick="attemptFeature('📳 動態震動衝擊系統', toggleShock)" title="動態震動衝擊">📳<span class="lock-icon">🔒</span></button>
       <button class="icon-btn" onclick="takeScreenshot()" title="戰術截圖">📸</button>
       <button class="icon-btn" onclick="resetEngine()" title="重置沙盤">↺</button>
     </div>
 
-    <!-- 動態沙盤區 -->
+    <!-- 💡 畫布區：已將擋住畫面的數據移出 -->
     <div class="svgWrap" id="svgWrap">
-      <svg id="canvas" viewBox="0 0 400 500">
+      <svg id="canvas" viewBox="0 0 400 460">
         <line id="tagLine" stroke="var(--tagline)" stroke-width="4" stroke-dasharray="6 4" stroke-linecap="round" />
         <text id="tagLineText" fill="var(--tagline)" font-size="12" font-weight="bold"></text>
 
@@ -323,17 +342,7 @@
          <div id="txtVertB" class="val" style="color:var(--warn)">抗重: --</div>
       </div>
       
-      <div class="hud-panel hud-br">
-         <div class="input-row"><span style="color:var(--muted); font-size:12px;">➰繩長</span> <input type="number" id="inRope" value="22" step="0.5"><span class="unit">m</span></div>
-         <div class="input-row"><span style="color:var(--muted); font-size:12px;">↔️跨距</span> <input type="number" id="inSpan" value="20" min="5" step="1"><span class="unit">m</span></div>
-         <div class="input-row"><span style="color:var(--muted); font-size:12px;">↕️高差</span> <input type="number" id="inHeight" value="0" step="0.5"><span class="unit">m</span></div>
-      </div>
-
-      <div class="hud-panel hud-bl" id="sagText">
-         下垂: -- m (--%)
-      </div>
-
-      <!-- 💡 橫向排列的大擔架設計 -->
+      <!-- 大擔架 -->
       <div id="floatLoad" class="stretcher-tag">
          <div class="stretcher-handles">
             <div class="handle-block"></div><div class="handle-block"></div>
@@ -342,7 +351,6 @@
             <div style="display:flex; align-items:baseline; gap:4px;">
                <input type="number" id="inLoad" value="100" step="10"><span style="font-size:14px; font-weight:bold; color:#fff;">kg</span>
             </div>
-            <!-- 震動數值框改為橫向排列 -->
             <div id="shockInputWrap">
                <span style="font-size:12px; color:#fca5a5;">⚡+</span>
                <input type="number" id="inShock" value="30" step="5" min="0">
@@ -352,22 +360,41 @@
       </div>
     </div>
     
-    <!-- 💡 分行排列的牽引力與省力比控制面板 -->
+    <!-- 💡 修復3：全新抽離的儀表板，絕對不會被擔架擋住 -->
+    <div class="dashboard-panel" data-html2canvas-ignore="true">
+       <div class="dash-inputs">
+          <div class="dash-input-group">
+             <span class="lbl">➰ 總繩長</span>
+             <div><input type="number" id="inRope" value="22" step="0.5"><span style="color:var(--muted); font-size:11px;">m</span></div>
+          </div>
+          <div class="dash-input-group">
+             <span class="lbl">↔️ 跨距</span>
+             <div><input type="number" id="inSpan" value="20" min="5" step="1"><span style="color:var(--muted); font-size:11px;">m</span></div>
+          </div>
+          <div class="dash-input-group">
+             <span class="lbl">↕️ 高差</span>
+             <div><input type="number" id="inHeight" value="0" step="0.5"><span style="color:var(--muted); font-size:11px;">m</span></div>
+          </div>
+       </div>
+       <div class="dash-sag-row">
+          <span id="sagText" style="color:var(--tagline); font-size:13px; font-weight:bold; letter-spacing: 1px;">下垂量計算中...</span>
+       </div>
+    </div>
+    
     <div class="tagline-wrap" id="taglineWrap">
-       <div id="taglineInfo">📍 拖曳上方滑輪或大擔架進行動態模擬</div>
+       <div id="taglineInfo">📍 在沙盤中自由上下左右拖曳進行動態模擬</div>
        <div class="ma-control" id="maControl" style="display:none;">
           <span style="font-size:13px; color:var(--tagline); font-weight:bold;">⚙️ 水平牽引省力比</span>
           <div class="ma-btn-group">
             <button class="ma-btn active" data-ma="1">1:1</button>
-            <button class="ma-btn" data-ma="3">3:1</button>
-            <button class="ma-btn" data-ma="4">4:1</button>
-            <button class="ma-btn" data-ma="5">5:1</button>
-            <button class="ma-btn" data-ma="9">9:1</button>
+            <button class="ma-btn" data-ma="3">3:1<span class="lock-icon">🔒</span></button>
+            <button class="ma-btn" data-ma="4">4:1<span class="lock-icon">🔒</span></button>
+            <button class="ma-btn" data-ma="5">5:1<span class="lock-icon">🔒</span></button>
+            <button class="ma-btn" data-ma="9">9:1<span class="lock-icon">🔒</span></button>
           </div>
        </div>
     </div>
 
-    <!-- 📐 夾角自由滑動拉桿 -->
     <div class="angle-slider-container" data-html2canvas-ignore="true">
        <div class="angle-slider-header">
           <span>鬆 (夾角小)</span>
@@ -378,22 +405,15 @@
     </div>
   </div>
   
-  <!-- 🧰 後勤系統：設定選單與教學彈窗 -->
   <div class="menu-list" data-html2canvas-ignore="true">
-    
-    <details class="main-accordion" open>
+    <details class="main-accordion">
       <summary>📚 專業名詞與原理解析</summary>
       <div class="menu-group">
+        <!-- 💡 修復1：字距修正靠左對齊 -->
         <div class="menu-content">
           <p><b style="color:var(--safe)">🔗 張力 (Tension)</b><br>系統內部主繩繃緊的程度。由於滑輪會滾動平衡力量，整條主繩的張力是一樣的。張力過大將導致主繩斷裂！</p>
           <p><b style="color:var(--warn)">⚓ 抗重 (Vertical Load)</b><br>錨點（A/B點）實際承受的「垂直往下扯」的力量。擔架越靠近某一側，該錨點承受的抗重越大，固定點就有被連根拔起的危機。</p>
-          <p><b style="color:var(--warn)">📏 下垂 (Sag)</b><br>以兩錨點連線為基準，滑輪往下掉的垂直距離。下垂量越小（繩拉越直），系統張力會呈指數飆升！</p>
-          
           <p><b style="color:var(--tagline)">↔️ 水平牽引力 (Tagline Force)</b><br>擔架永遠想往最低點滑，要維持在偏離點，岸上救援手必須施加水平拉力。下方提供的 <b>⚙️省力系統 (如 3:1、5:1)</b> 專指「水平牽引繩」的換算，能大幅降低手拉力需求。</p>
-          
-          <p><b style="color:#c084fc">↕️ 垂直拖拉與下放系統 (Raising/Lowering System)</b><br>控制擔架「上下垂直」移動的獨立系統。依據各國地形與操作習慣，教官會選擇採用<b>「英式、日式、挪威式、傳統式」</b>等不同架設法。本儀表主要計算軌道繩與水平牽引，垂直下放的摩擦損耗與動態控制，由教官依流派實地判定。</p>
-          
-          <p><b style="color:var(--bad)">🪢 摩擦力與繩索延展 (環境變數)</b><br>實務中滑輪有阻力、繩索有彈性。這會使實際需要的牽引力更大、下垂更深，操作時必須在計算值上預留安全餘裕。</p>
           <p><b style="color:var(--bad)">📳 動態震動衝擊 (Shock Load)</b><br>拖拉過程中產生的頓挫與晃動，會瞬間放大系統受力。開啟系統頂端的「📳」按鈕，可自訂百分比，精準模擬最危險的峰值衝擊。</p>
           <button type="button" class="btn-collapse-inner" onclick="this.closest('details').removeAttribute('open')">🔼 收起說明</button>
         </div>
@@ -405,73 +425,17 @@
       <div class="menu-group">
         <details class="menu-item">
           <summary>
-            <div class="menu-header-left"><span class="menu-icon">📖</span>系統操作說明</div>
-            <span class="menu-arrow">❯</span>
-          </summary>
-          <div class="menu-content">
-            <ul style="margin-top: 0;">
-              <li>直接拖曳畫布上的 <b>A點/B點</b> 設定地形。</li>
-              <li>直接拖曳橘色 <b>大擔架</b> 或滑輪，可精準模擬傷患過河的張力變化。</li>
-              <li>當擔架處於偏離點時，可點選下方的 <b>⚙️水平牽引省力比</b> 換算手拉力。</li>
-              <li>滑動下方的 <b>夾角拉桿</b>，系統會自動反推繩長並平滑變形。</li>
-              <li>點擊 <b>📷實境 / 🌐網格 / ☀️淨空</b> 等工具進行實地測量與 <b>📸戰術截圖</b>。</li>
-            </ul>
-            <button type="button" class="btn-collapse-inner" onclick="this.closest('details').removeAttribute('open')">🔼 收起說明</button>
-          </div>
-        </details>
-
-        <details class="menu-item">
-          <summary>
             <div class="menu-header-left"><span class="menu-icon">ℹ️</span>版本與開發資訊</div>
             <span class="menu-arrow">❯</span>
           </summary>
           <div class="menu-content">
             <div style="text-align: center; margin-bottom: 15px;">
-              <span style="display:inline-block; background:var(--safe); color:#0f1623; font-weight:bold; padding:4px 14px; border-radius:20px; font-size:13px; letter-spacing:0.5px; box-shadow: 0 2px 6px rgba(34,197,94,0.3);">V6.6 橫向排版優化版</span>
+              <span style="display:inline-block; background:var(--safe); color:#0f1623; font-weight:bold; padding:4px 14px; border-radius:20px; font-size:13px; letter-spacing:0.5px; box-shadow: 0 2px 6px rgba(34,197,94,0.3);">V7.1 自由操縱與防彈版</span>
             </div>
             <p style="margin-top: 0; margin-bottom: 6px; font-weight: bold; color: var(--text); text-align: center;">本工具由 <span style="color:var(--warn);">散木團隊</span> 開發製作</p>
-            <p style="margin-top: 0; margin-bottom: 4px; font-size: 13px; text-align: center;">教學架構與工程判斷／徐世豐</p>
-            <p style="margin-top: 0; margin-bottom: 12px; font-size: 13px; text-align: center;">工具設計與互動介面／吳佩芳（朵朵）</p>
             <button type="button" class="btn-collapse-inner" onclick="this.closest('details').removeAttribute('open')">🔼 收起說明</button>
           </div>
         </details>
-
-        <details class="menu-item">
-          <summary>
-            <div class="menu-header-left"><span class="menu-icon">📱</span>加入主畫面說明</div>
-            <span class="menu-arrow">❯</span>
-          </summary>
-          <div class="menu-content">
-            <p style="margin-top: 0; margin-bottom: 8px; color: var(--text);">將捷徑加至主畫面，獲得無網址列的 100% 沉浸式體驗：</p>
-            <div style="background: rgba(150,150,150,0.05); padding: 12px; border-radius: 8px; margin-bottom: 12px;">
-              <p style="margin-top: 0; margin-bottom: 8px; font-weight: bold; color: var(--safe);">🤖 Android (安卓版)</p>
-              <ol style="padding-left: 20px; margin: 0; font-size: 13px;">
-                <li style="margin-bottom: 4px;">點開連結（可直接從 LINE 開啟）</li>
-                <li style="margin-bottom: 4px;">點選畫面右下角的「⋮」</li>
-                <li style="margin-bottom: 4px;">選擇「使用預設瀏覽器開啟」</li>
-                <li style="margin-bottom: 4px;">在畫面右上角點選「⋮」</li>
-                <li style="margin-bottom: 4px;">往下滑，選擇「加到主畫面」</li>
-                <li style="margin-bottom: 0;">點選「安裝」，即可將捷徑加到主畫面</li>
-              </ol>
-            </div>
-            <div style="background: rgba(150,150,150,0.05); padding: 12px; border-radius: 8px;">
-              <p style="margin-top: 0; margin-bottom: 8px; font-weight: bold; color: var(--safe);">🍎 iOS (iPhone)</p>
-              <ol style="padding-left: 20px; margin: 0; font-size: 13px;">
-                <li style="margin-bottom: 4px;">點開連結（可直接從 LINE 開啟）</li>
-                <li style="margin-bottom: 4px;">點選下方的「分享」圖示，往下滑</li>
-                <li style="margin-bottom: 4px;">選擇「加入主畫面」</li>
-                <li style="margin-bottom: 0;">點選「加入」，即可將捷徑加到主畫面</li>
-              </ol>
-            </div>
-            <button type="button" class="btn-collapse-inner" onclick="this.closest('details').removeAttribute('open')">🔼 收起說明</button>
-          </div>
-        </details>
-
-        <div class="menu-action-btn" id="shareBtnAction">
-          <div class="menu-header-left"><span class="menu-icon">🔗</span>分享此APP給好友</div>
-          <span class="menu-arrow">❯</span>
-        </div>
-
         <div class="menu-action-btn" onclick="checkForUpdates()">
           <div class="menu-header-left"><span class="menu-icon">🔄</span>檢查並下載新版</div>
           <span class="menu-arrow">❯</span>
@@ -480,34 +444,10 @@
     </details>
 
     <details class="main-accordion">
-      <summary>💖 支持與回饋</summary>
+      <summary>📞 技術支援與問題回報</summary>
       <div class="menu-group">
-        <details class="menu-item highlight-coffee">
-          <summary>
-            <div class="menu-header-left"><span class="menu-icon">☕</span>喜歡這APP嗎?歡迎請我喝咖啡</div>
-            <span class="menu-arrow">❯</span>
-          </summary>
-          <div class="menu-content">
-            <p style="margin-top: 0; text-align: justify;">若您覺得這套 APP 對您執行的任務有幫助，歡迎請我們喝咖啡，支持散木團隊持續研發！</p>
-            <div style="background: rgba(150,150,150,0.05); padding: 16px; border-radius: 12px; margin-top: 15px; border: 1px solid var(--line);">
-              <div style="text-align: center; margin-bottom: 12px;">
-                <span style="display:inline-block; background:#d97706; color:#fff; font-weight:bold; padding:4px 12px; border-radius:20px; font-size:13px; box-shadow: 0 2px 6px rgba(217, 119, 6, 0.3);">☕ 一杯咖啡 50 元 (杯數隨喜)</span>
-              </div>
-              <div style="background: var(--bg); padding: 12px; border-radius: 8px; border: 1px solid rgba(150,150,150,0.1);">
-                <div style="margin-bottom: 8px; font-size: 13px;">銀行代碼 <span style="color: var(--text); font-weight: bold; margin-left: 4px;">807 (永豐銀行)</span></div>
-                <div style="display: flex; align-items: center; justify-content: space-between;">
-                  <div style="font-size: 13px;">帳號 <span style="color: var(--warn); font-weight: bold; font-size: 16px; margin-left: 4px; letter-spacing: 1px;">20401800252531</span></div>
-                  <button type="button" onclick="copyCoffee()" style="background: var(--safe); color: #0f1623; border: none; padding: 6px 16px; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 4px rgba(34,197,94,0.3);">複製</button>
-                </div>
-              </div>
-            </div>
-            <div id="coffeeMsg" style="display:none; color: var(--safe); font-size: 13px; text-align: center; margin-top: 12px; font-weight: bold;">✓ 帳號已複製成功！</div>
-            <button type="button" class="btn-collapse-inner" onclick="this.closest('details').removeAttribute('open')">🔼 收起說明</button>
-          </div>
-        </details>
-
         <div class="menu-action-btn highlight-heart" onclick="window.open('https://forms.gle/Uykr5jeQP6fgVhxh9', '_blank')">
-          <div class="menu-header-left"><span class="menu-icon">💬</span>想跟朵朵說些什麼？</div>
+          <div class="menu-header-left"><span class="menu-icon">💬</span>系統回報與功能建議</div>
           <span class="menu-arrow">❯</span>
         </div>
       </div>
@@ -523,6 +463,52 @@
 </div>
 
 <script>
+/* =========================================
+   🔒 VIP 核心防護機制與狀態管理
+========================================= */
+const VIP_SECRET_KEY = "SM-PRO-2024";
+let isUserVip = localStorage.getItem('sunmoon_vip_status') === 'true';
+
+if (isUserVip) { document.body.classList.add('is-vip'); }
+
+let pendingFeatureCallback = null;
+
+function attemptFeature(featureName, callback) {
+    if (isUserVip) { callback(); } 
+    else {
+        pendingFeatureCallback = callback;
+        document.getElementById('vipFeatureName').textContent = featureName;
+        document.getElementById('vipErrorMsg').textContent = "";
+        document.getElementById('vipPwdInput').value = "";
+        document.getElementById('vipModal').classList.add('show');
+    }
+}
+
+function closeVipModal() {
+    document.getElementById('vipModal').classList.remove('show');
+    pendingFeatureCallback = null;
+}
+
+function verifyVip() {
+    const inputPwd = document.getElementById('vipPwdInput').value.trim();
+    const errorMsg = document.getElementById('vipErrorMsg');
+    if (inputPwd === VIP_SECRET_KEY) {
+        localStorage.setItem('sunmoon_vip_status', 'true');
+        isUserVip = true;
+        document.body.classList.add('is-vip'); 
+        closeVipModal();
+        alert("🎉 授權成功！歡迎使用散木專業版全功能！");
+        if (pendingFeatureCallback) { pendingFeatureCallback(); pendingFeatureCallback = null; }
+    } else {
+        errorMsg.textContent = "❌ 密碼錯誤，請確認輸入是否正確。";
+        document.getElementById('vipPwdInput').classList.add('shock-anim');
+        setTimeout(() => document.getElementById('vipPwdInput').classList.remove('shock-anim'), 1000);
+    }
+}
+
+/* =========================================
+   物理引擎與 UI 邏輯
+========================================= */
 const inSpan = document.getElementById('inSpan'), inHeight = document.getElementById('inHeight'),
       inLoad = document.getElementById('inLoad'), inRope = document.getElementById('inRope'),
       inShock = document.getElementById('inShock'), angleSlider = document.getElementById('angleSlider'), 
@@ -545,7 +531,7 @@ const els = {
   hudA: document.getElementById('hudA'), hudB: document.getElementById('hudB')
 };
 
-const svgW = 400, svgH = 500; 
+const svgW = 400, svgH = 460; 
 let scale = 10, offsetX = 50, offsetY = 120; 
 let currentSliderPct = 0.5;
 let currentMA = 1; 
@@ -553,12 +539,18 @@ let currentMA = 1;
 const maBtns = document.querySelectorAll('.ma-btn');
 maBtns.forEach(btn => {
   btn.addEventListener('click', (e) => {
-    maBtns.forEach(b => b.classList.remove('active'));
-    e.target.classList.add('active');
-    currentMA = parseInt(e.target.dataset.ma);
-    updateEngine();
+    let targetMA = parseInt(e.target.dataset.ma);
+    if (targetMA === 1) { setMA(e.target, targetMA); } 
+    else { attemptFeature(`牽引省力比 ${targetMA}:1`, () => { setMA(e.target, targetMA); }); }
   });
 });
+
+function setMA(btnElement, targetMA) {
+    maBtns.forEach(b => b.classList.remove('active'));
+    btnElement.classList.add('active');
+    currentMA = targetMA;
+    updateEngine();
+}
 
 function toX(mX) { return offsetX + mX * scale; }
 function toY(mY) { return offsetY + mY * scale; }
@@ -602,8 +594,7 @@ function adjustLForAngle(targetAngle) {
     for(let i=0; i<35; i++) {
         let mid = (low + high) / 2;
         let ang = getAngleFromL(S, H, currentSliderPct, mid);
-        if (ang > targetAngle) low = mid; 
-        else high = mid; 
+        if (ang > targetAngle) low = mid; else high = mid; 
         bestL = mid;
     }
     inRope.value = bestL.toFixed(1);
@@ -622,7 +613,8 @@ function updateEngine(skipSliderUpdate = false) {
   let minL = Math.hypot(S, H);
   let calcL = Math.max(L, minL + 0.05);
 
-  let maxCanvasH = svgH - 120; 
+  // 💡 修復3：預留底部充足高度 (100px) 給擔架，保證不會被畫布切斷
+  let maxCanvasH = svgH - 100; 
   scale = Math.min((svgW - 100) / Math.max(10, S), maxCanvasH / Math.max(10, Math.abs(H) + calcL*0.5));
   offsetY = 110 + (H < 0 ? Math.abs(H)*scale : 0); 
 
@@ -765,10 +757,7 @@ function startDrag(e, node) {
   isDragging = node; let pos = getSVGPos(e); 
   dragStartX = pos.x; dragStartY = pos.y; 
   startSpan = parseFloat(inSpan.value); startHeight = parseFloat(inHeight.value); 
-  
-  if(e.type === 'touchstart' && e.cancelable) {
-      e.preventDefault();
-  }
+  if(e.type === 'touchstart' && e.cancelable) { e.preventDefault(); }
 }
 
 function attachDragEvents(el, nodeType) {
@@ -780,35 +769,43 @@ attachDragEvents(els.anchorB, 'B');
 attachDragEvents(els.pulleyGroup, 'P');
 attachDragEvents(els.floatLoad, 'P'); 
 
-window.addEventListener('touchmove', (e) => {
+/* 💡 修復4：2D 自由操縱核心邏輯 (整合觸控與滑鼠事件) */
+function processDrag(e) {
   if(!isDragging) return;
   if(e.cancelable) e.preventDefault(); 
   let pos = getSVGPos(e);
+  
   if (isDragging === 'P') {
-      let pct = (pos.x - offsetX) / (parseFloat(inSpan.value) * scale);
+      let S = parseFloat(inSpan.value) || 20;
+      let H = parseFloat(inHeight.value) || 0;
+      
+      let mX = (pos.x - offsetX) / scale;
+      let mY = (pos.y - offsetY) / scale;
+
+      // 限制 X 軸範圍
+      let pct = mX / S;
       currentSliderPct = Math.max(0.01, Math.min(0.99, pct));
+      let constrainedX = S * currentSliderPct;
+
+      // 限制 Y 軸不能高於兩側錨點 (符合重力邏輯)
+      let constrainedY = Math.max(mY, Math.max(0, H) + 0.1);
+
+      // 動態反推新的總繩長 L
+      let newL = Math.hypot(constrainedX, constrainedY) + Math.hypot(S - constrainedX, H - constrainedY);
+      let minL = Math.hypot(S, H);
+      if (newL < minL + 0.1) newL = minL + 0.1;
+
+      inRope.value = newL.toFixed(1);
   } else {
       let dx = (pos.x - dragStartX) / scale, dy = (pos.y - dragStartY) / scale;
       if (isDragging === 'B') { inSpan.value = Math.max(5, (startSpan + dx)).toFixed(1); inHeight.value = (startHeight + dy).toFixed(1); }
       else if (isDragging === 'A') { inSpan.value = Math.max(5, (startSpan - dx)).toFixed(1); inHeight.value = (startHeight - dy).toFixed(1); }
   }
   updateEngine();
-}, {passive: false});
+}
 
-window.addEventListener('mousemove', (e) => {
-  if(!isDragging) return;
-  let pos = getSVGPos(e);
-  if (isDragging === 'P') {
-      let pct = (pos.x - offsetX) / (parseFloat(inSpan.value) * scale);
-      currentSliderPct = Math.max(0.01, Math.min(0.99, pct));
-  } else {
-      let dx = (pos.x - dragStartX) / scale, dy = (pos.y - dragStartY) / scale;
-      if (isDragging === 'B') { inSpan.value = Math.max(5, (startSpan + dx)).toFixed(1); inHeight.value = (startHeight + dy).toFixed(1); }
-      else if (isDragging === 'A') { inSpan.value = Math.max(5, (startSpan - dx)).toFixed(1); inHeight.value = (startHeight - dy).toFixed(1); }
-  }
-  updateEngine();
-});
-
+window.addEventListener('touchmove', processDrag, {passive: false});
+window.addEventListener('mousemove', processDrag);
 window.addEventListener('touchend', () => isDragging = null);
 window.addEventListener('mouseup', () => isDragging = null);
 
@@ -828,7 +825,7 @@ function toggleShock() {
     mainCard.classList.add('shock-mode');
     btnShock.classList.add('active-shock');
     els.floatLoad.classList.add('shock-anim');
-    shockWrap.style.display = 'flex'; // 改為橫向排列的 flex
+    shockWrap.style.display = 'flex'; 
   }
   updateEngine();
 }
@@ -881,18 +878,15 @@ function toggleGrid() { gridVisible = !gridVisible; gridOverlay.style.opacity = 
 
 function toggleHUD() {
   hudVisible = !hudVisible;
-  const huds = document.querySelectorAll('.hud-panel, .stretcher-tag, .tagline-wrap, .angle-slider-container');
+  const huds = document.querySelectorAll('.hud-panel, .stretcher-tag, .tagline-wrap, .angle-slider-container, .dashboard-panel');
   huds.forEach(el => el.style.opacity = hudVisible ? "1" : "0");
 }
 
 function resetEngine() {
   inSpan.value = 20; inHeight.value = 0; inLoad.value = 100; inRope.value = 22; currentSliderPct = 0.5;
   if(mainCard.classList.contains('shock-mode')) toggleShock(); 
-  
-  currentMA = 1;
-  maBtns.forEach(b => b.classList.remove('active'));
+  currentMA = 1; maBtns.forEach(b => b.classList.remove('active'));
   document.querySelector('.ma-btn[data-ma="1"]').classList.add('active');
-  
   updateEngine();
 }
 
@@ -913,35 +907,8 @@ async function takeScreenshot() {
 
 if ('serviceWorker' in navigator) { window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js')); }
 
-window.copyCoffee = function() {
-  const acc = '20401800252531';
-  const showMsg = () => { const msg = document.getElementById('coffeeMsg'); if(msg) { msg.style.display = 'block'; setTimeout(() => { msg.style.display = 'none'; }, 2000); } };
-  if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(acc).then(() => showMsg()); } 
-  else {
-      let textArea = document.createElement("textarea"); textArea.value = acc; textArea.style.position = "fixed";
-      document.body.appendChild(textArea); textArea.select();
-      try { document.execCommand('copy'); showMsg(); } catch (err) { alert('複製失敗，請手手選取複製'); }
-      textArea.remove();
-  }
-};
-
 function checkForUpdates() {
   if (confirm("系統回報：即將為您清除快取，並重新載入最新版本！\n\n請問是否繼續執行？")) { window.location.href = window.location.href.split('?')[0] + '?v=' + new Date().getTime(); }
-}
-
-const shareBtnAction = document.getElementById('shareBtnAction');
-if(shareBtnAction) {
-    shareBtnAction.addEventListener('click', async () => {
-      const shareData = { title: '索道繩動態張力估算儀 (散木團隊)', text: '推薦這套散木團隊專屬的「索道繩動態張力估算儀」！支援實境相機、動態拖曳張力計算與一鍵戰術截圖，快來試試！', url: window.location.href };
-      try {
-        if (navigator.share) { await navigator.share(shareData); } 
-        else {
-          const dummy = document.createElement('input'); document.body.appendChild(dummy); dummy.value = window.location.href;
-          dummy.select(); document.execCommand('copy'); document.body.removeChild(dummy);
-          alert('系統回報：網址已複製，您可以貼上分享給朋友囉！');
-        }
-      } catch (err) { console.error('分享失敗', err); }
-    });
 }
 
 const menuGroups = document.querySelectorAll('.menu-group');
