@@ -40,11 +40,14 @@
     --vip: #c084fc;
   }
 
-  /* 💡 修復2：鎖死外層防彈條款，解決 iOS 滑動與彈跳問題 */
-  html { overscroll-behavior: none; background-color: var(--bg); }
+  /* 💡 修復2：解除過度鎖死的 fixed，恢復順暢滑動並阻擋頂部橡皮筋效應 */
+  html, body { overscroll-behavior-y: none; }
   body {
     margin: 0; background-color: var(--bg); color: var(--text); font-family: 'Noto Serif TC', serif;
-    position: fixed; inset: 0; overflow-y: auto; overscroll-behavior: none; -webkit-overflow-scrolling: touch;
+    display: flex; justify-content: center; align-items: flex-start;
+    padding: 10px 10px 40px 10px; touch-action: manipulation;
+    min-height: 100vh; overflow-x: hidden;
+    -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;
     transition: background-color 0.3s ease;
   }
   body.camera-mode { background-color: transparent !important; }
