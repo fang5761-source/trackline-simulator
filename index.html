@@ -40,7 +40,6 @@
     --vip: #c084fc;
   }
 
-  /* 💡 恢復最自然的網頁滑動，不強制鎖死，保留原生滑順感 */
   html, body { overscroll-behavior: none; background-color: var(--bg); }
   
   body {
@@ -48,7 +47,6 @@
     -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;
     transition: background-color 0.3s ease;
     display: flex; flex-direction: column; align-items: center;
-    padding: 10px 10px calc(40px + env(safe-area-inset-bottom)) 10px;
   }
   body.camera-mode { background-color: transparent !important; }
 
@@ -63,9 +61,15 @@
     background-size: 20px 20px; opacity: 0.5; pointer-events: none; transition: opacity 0.3s;
   }
 
+  /* 💡 修復：動態島 (Dynamic Island) 與安全區域完美貼合 */
   .app-container { 
     max-width: 500px; width: 100%; display: flex; flex-direction: column; gap: 12px; position: relative; z-index: 1; 
+    padding-top: max(12px, env(safe-area-inset-top));
+    padding-bottom: max(40px, env(safe-area-inset-bottom));
+    padding-left: max(10px, env(safe-area-inset-left));
+    padding-right: max(10px, env(safe-area-inset-right));
   }
+  
   input[type="file"] { display: none; }
 
   .card { 
@@ -104,11 +108,10 @@
   @keyframes glow-red { 0%, 100% { box-shadow: 0 4px 10px rgba(0,0,0,0.6); border-color: #9a3412; } 50% { box-shadow: 0 0 15px rgba(239,68,68,0.8); border-color: #ef4444; } }
   .shock-anim { animation: glow-red 1s infinite; }
 
-  /* 💡 恢復黃金比例！不再壓扁！使用等比例縮放 */
   .svgWrap { 
     position:relative; width:100%; 
-    aspect-ratio: 4 / 4.6; /* 確保畫布永遠維持這比例，絕不變形 */
-    max-height: 50vh; /* 防止在超小手機上佔用太多版面 */
+    aspect-ratio: 4 / 4.6; 
+    max-height: 50vh; 
     min-height: 350px;
     background: transparent; border-radius: 12px; border: 1px dashed var(--line); overflow: hidden; 
   }
@@ -304,7 +307,6 @@
       <button class="icon-btn" onclick="resetEngine()" title="重置沙盤">↺</button>
     </div>
 
-    <!-- 💡 畫布：永遠保持完美的 viewBox="0 0 400 460"，並透過 aspect-ratio 自動縮放 -->
     <div class="svgWrap" id="svgWrap">
       <svg id="canvas" viewBox="0 0 400 460" preserveAspectRatio="xMidYMid meet">
         <line id="tagLine" stroke="var(--tagline)" stroke-width="4" stroke-dasharray="6 4" stroke-linecap="round" />
@@ -367,7 +369,6 @@
       </div>
     </div>
     
-    <!-- 💡 保留極佳的終極控制台 UI -->
     <div class="control-deck" data-html2canvas-ignore="true">
        <div class="angle-slider-header">
           <span>鬆 (夾角小)</span>
@@ -454,7 +455,8 @@
           </summary>
           <div class="menu-content">
             <div style="text-align: center; margin-bottom: 15px;">
-              <span style="display:inline-block; background:var(--safe); color:#0f1623; font-weight:bold; padding:4px 14px; border-radius:20px; font-size:13px; letter-spacing:0.5px; box-shadow: 0 2px 6px rgba(34,197,94,0.3);">V7.7 黃金比例解壓縮版</span>
+              <!-- 💡 更新版號 -->
+              <span style="display:inline-block; background:var(--safe); color:#0f1623; font-weight:bold; padding:4px 14px; border-radius:20px; font-size:13px; letter-spacing:0.5px; box-shadow: 0 2px 6px rgba(34,197,94,0.3);">V7.8 動態島與視角防護版</span>
             </div>
             <p style="margin-top: 0; margin-bottom: 6px; font-weight: bold; color: var(--text); text-align: center;">本工具由 <span style="color:var(--warn);">散木團隊</span> 開發製作</p>
             <p style="margin-top: 0; margin-bottom: 4px; font-size: 13px; text-align: center;">教學架構與工程判斷／徐世豐</p>
@@ -591,9 +593,9 @@ const els = {
   hudA: document.getElementById('hudA'), hudB: document.getElementById('hudB')
 };
 
-// 💡 恢復穩定的 460 高度，將 offsetY 推回 100 釋放上方空間
+// 💡 終極修復：將沙盤起始高度往下壓 (140px)，完全避開頂部儀表板，解決「切頭」問題！
 const svgW = 400, svgH = 460; 
-let scale = 10, offsetX = 50, offsetY = 100; 
+let scale = 10, offsetX = 50, offsetY = 140; 
 let currentSliderPct = 0.5;
 let currentMA = 1; 
 
@@ -674,10 +676,10 @@ function updateEngine(skipSliderUpdate = false) {
   let minL = Math.hypot(S, H);
   let calcL = Math.max(L, minL + 0.05);
 
-  // 💡 恢復黃金比例計算法，預留 130px 高度給擔架與上方空間
-  let maxCanvasH = 460 - 130; 
+  // 💡 安全預留 150px 給頂部儀表板與底部擔架，保證 100% 絕對不切頭！
+  let maxCanvasH = 460 - 150; 
   scale = Math.min((400 - 80) / Math.max(10, S), maxCanvasH / Math.max(10, Math.abs(H) + calcL*0.5));
-  offsetY = 100 + (H < 0 ? Math.abs(H)*scale : 0); 
+  offsetY = 140 + (H < 0 ? Math.abs(H)*scale : 0); 
 
   let ax = 0, ay = 0, bx = S, by = H, px = S * currentSliderPct, py = findPulleyY(ax, ay, bx, by, px, calcL);
   let len1 = Math.hypot(px - ax, py - ay), len2 = Math.hypot(px - bx, py - by);
