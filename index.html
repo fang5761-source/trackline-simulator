@@ -137,13 +137,14 @@
   
   .hud-bl { bottom: 40px; left: 10px; background: transparent; border: none; box-shadow: none; padding: 0; color: var(--warn); font-size: 13px; } 
 
+  /* 💡 修正 1：擔架橫向自動擴充，不再限制死寬度 */
   .stretcher-tag {
     position: absolute; background: #ea580c; border: 2px solid #9a3412;
-    border-radius: 8px; padding: 6px 12px; color: var(--bg);
+    border-radius: 8px; padding: 8px 12px; color: var(--bg);
     transform: translate(-50%, 0); 
     display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 50;
     box-shadow: 0 4px 10px rgba(0,0,0,0.6); pointer-events: auto; touch-action: none; cursor: grab;
-    width: 100px;
+    min-width: 100px; width: auto; /* 讓它能夠根據內部橫向延伸 */
   }
   .stretcher-tag:active { cursor: grabbing; }
   
@@ -153,24 +154,31 @@
   }
   .handle-block { width: 14px; height: 8px; background: #c2410c; border: 1px solid #7c2d12; border-radius: 4px; }
   
+  .stretcher-content {
+    display: flex; flex-direction: row; align-items: center; gap: 10px;
+  }
   .stretcher-tag input { 
-    width: 100%; background: rgba(0,0,0,0.25); border: none; border-bottom: 2px solid rgba(255,255,255,0.6); 
+    background: rgba(0,0,0,0.25); border: none; border-bottom: 2px solid rgba(255,255,255,0.6); 
     color: #ffffff; font-size: 20px; font-weight: bold; text-align: center; outline: none; font-family: monospace;
-    padding: 2px 0; border-radius: 4px;
+    padding: 2px 0; border-radius: 4px; width: 60px;
   }
   .stretcher-tag input:focus { border-bottom-color: #ffffff; background: rgba(0,0,0,0.5); }
   
+  /* 💡 改為橫式的震動輸入框 */
   #shockInputWrap {
-    display: none; background: rgba(0,0,0,0.4); border-radius: 6px; padding: 4px; margin-top: 6px; width: 100%; text-align: center;
+    display: none; /* 由 JS 設為 flex */
+    align-items: center; justify-content: center; gap: 2px;
+    background: rgba(0,0,0,0.4); border-radius: 6px; padding: 2px 6px;
   }
-  #inShock {
-    width: 32px; height: 20px; font-size: 14px; padding: 0; border: none; border-bottom: 1px solid #fca5a5; background: transparent; color: #fca5a5; font-weight: bold; text-align: center;
+  #shockInputWrap input {
+    width: 32px; font-size: 16px; padding: 0; border: none; border-bottom: 1px solid #fca5a5; background: transparent; color: #fca5a5; font-weight: bold; text-align: center;
   }
 
-  /* 💡 戰術牽引力與省力比控制面板 */
+  /* 💡 修正 2：將省力比標題與按鈕分行排列 */
   .tagline-wrap { margin-top: 10px; padding: 10px; background: rgba(56, 189, 248, 0.1); border-radius: 8px; border: 1px solid var(--tagline); text-align: center; font-size: 13px; font-weight: bold; color: var(--tagline); }
-  .ma-control { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 8px; border-top: 1px dashed rgba(56, 189, 248, 0.3); padding-top: 8px; }
-  .ma-btn { background: rgba(0,0,0,0.4); border: 1px solid var(--line); color: var(--muted); border-radius: 6px; padding: 4px 8px; font-size: 12px; font-weight: bold; cursor: pointer; transition: all 0.2s; font-family: monospace; }
+  .ma-control { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; margin-top: 8px; border-top: 1px dashed rgba(56, 189, 248, 0.3); padding-top: 10px; }
+  .ma-btn-group { display: flex; gap: 6px; width: 100%; justify-content: center; }
+  .ma-btn { flex: 1; max-width: 60px; background: rgba(0,0,0,0.4); border: 1px solid var(--line); color: var(--muted); border-radius: 6px; padding: 6px 4px; font-size: 13px; font-weight: bold; cursor: pointer; transition: all 0.2s; font-family: monospace; }
   .ma-btn.active { background: var(--tagline); color: var(--bg); border-color: var(--tagline); }
 
   .angle-slider-container { margin-top: 10px; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 8px; border: 1px solid var(--line); }
@@ -269,21 +277,18 @@
       <button class="icon-btn" onclick="resetEngine()" title="重置沙盤">↺</button>
     </div>
 
+    <!-- 動態沙盤區 -->
     <div class="svgWrap" id="svgWrap">
       <svg id="canvas" viewBox="0 0 400 500">
-        <!-- 動態牽引繩 -->
         <line id="tagLine" stroke="var(--tagline)" stroke-width="4" stroke-dasharray="6 4" stroke-linecap="round" />
         <text id="tagLineText" fill="var(--tagline)" font-size="12" font-weight="bold"></text>
 
-        <!-- 主繩 -->
         <line id="ropeL" stroke="var(--safe)" stroke-width="6" stroke-linecap="round" style="transition: stroke 0.3s ease;" />
         <line id="ropeR" stroke="var(--safe)" stroke-width="6" stroke-linecap="round" style="transition: stroke 0.3s ease;" />
         
-        <!-- 夾角顯示 -->
         <path id="angleArc" fill="none" stroke="var(--warn)" stroke-width="2" style="transition: stroke 0.3s ease;" />
         <text id="angleText" fill="var(--warn)" font-size="15" font-weight="bold" text-anchor="middle" style="transition: fill 0.3s ease;"></text>
 
-        <!-- 🎯 儀表滑輪 -->
         <g id="pulleyGroup" class="draggable-pulley">
             <circle cx="0" cy="0" r="50" fill="transparent" />
             <circle id="pulley" r="20" fill="var(--warn)" stroke="var(--bg)" stroke-width="2.5" />
@@ -291,11 +296,9 @@
             <line id="pulleyNeedle" stroke="#000" stroke-width="2.5" stroke-linecap="round" />
         </g>
 
-        <!-- 💡 粗壯懸吊繩 -->
         <line id="suspL" stroke="var(--muted)" stroke-width="5" stroke-linecap="round" />
         <line id="suspR" stroke="var(--muted)" stroke-width="5" stroke-linecap="round" />
         
-        <!-- 錨點 A, B -->
         <g id="anchorGroupA" class="anchor-dot">
            <circle cx="0" cy="0" r="50" fill="transparent" /> 
            <circle r="14" fill="var(--bg)" stroke="var(--safe)" stroke-width="3.5" style="transition: stroke 0.3s ease;" id="dotA" />
@@ -309,7 +312,6 @@
         </g>
       </svg>
 
-      <!-- 🖥️ 戰術 HUD 抬頭顯示器 -->
       <div class="hud-panel hud-tl" id="hudA">
          <div style="color:var(--muted); font-size:11px;">A 錨點</div>
          <div id="txtTenA" class="val" style="color:var(--safe)">張力: --</div>
@@ -321,7 +323,6 @@
          <div id="txtVertB" class="val" style="color:var(--warn)">抗重: --</div>
       </div>
       
-      <!-- 地形與繩長參數 -->
       <div class="hud-panel hud-br">
          <div class="input-row"><span style="color:var(--muted); font-size:12px;">➰繩長</span> <input type="number" id="inRope" value="22" step="0.5"><span class="unit">m</span></div>
          <div class="input-row"><span style="color:var(--muted); font-size:12px;">↔️跨距</span> <input type="number" id="inSpan" value="20" min="5" step="1"><span class="unit">m</span></div>
@@ -332,32 +333,37 @@
          下垂: -- m (--%)
       </div>
 
-      <!-- 💡 超巨大橘色救生擔架 -->
+      <!-- 💡 橫向排列的大擔架設計 -->
       <div id="floatLoad" class="stretcher-tag">
          <div class="stretcher-handles">
             <div class="handle-block"></div><div class="handle-block"></div>
          </div>
-         <div style="display:flex; align-items:baseline; gap:4px; width:100%;">
-            <input type="number" id="inLoad" value="100" step="10" style="flex:1;"><span style="font-size:14px; font-weight:bold; color:#fff;">kg</span>
-         </div>
-         <div id="shockInputWrap">
-            <span style="font-size:11px; color:#fca5a5;">⚡衝擊震動+</span>
-            <input type="number" id="inShock" value="30" step="5" min="0">
-            <span style="font-size:11px; color:#fca5a5;">%</span>
+         <div class="stretcher-content">
+            <div style="display:flex; align-items:baseline; gap:4px;">
+               <input type="number" id="inLoad" value="100" step="10"><span style="font-size:14px; font-weight:bold; color:#fff;">kg</span>
+            </div>
+            <!-- 震動數值框改為橫向排列 -->
+            <div id="shockInputWrap">
+               <span style="font-size:12px; color:#fca5a5;">⚡+</span>
+               <input type="number" id="inShock" value="30" step="5" min="0">
+               <span style="font-size:12px; color:#fca5a5;">%</span>
+            </div>
          </div>
       </div>
     </div>
     
-    <!-- 💡 牽引力與 MA 省力比控制面板 -->
+    <!-- 💡 分行排列的牽引力與省力比控制面板 -->
     <div class="tagline-wrap" id="taglineWrap">
        <div id="taglineInfo">📍 拖曳上方滑輪或大擔架進行動態模擬</div>
        <div class="ma-control" id="maControl" style="display:none;">
-          <span style="font-size:12px; color:var(--tagline);">⚙️ 牽引省力比</span>
-          <button class="ma-btn active" data-ma="1">1:1</button>
-          <button class="ma-btn" data-ma="3">3:1</button>
-          <button class="ma-btn" data-ma="4">4:1</button>
-          <button class="ma-btn" data-ma="5">5:1</button>
-          <button class="ma-btn" data-ma="9">9:1</button>
+          <span style="font-size:13px; color:var(--tagline); font-weight:bold;">⚙️ 水平牽引省力比</span>
+          <div class="ma-btn-group">
+            <button class="ma-btn active" data-ma="1">1:1</button>
+            <button class="ma-btn" data-ma="3">3:1</button>
+            <button class="ma-btn" data-ma="4">4:1</button>
+            <button class="ma-btn" data-ma="5">5:1</button>
+            <button class="ma-btn" data-ma="9">9:1</button>
+          </div>
        </div>
     </div>
 
@@ -382,7 +388,11 @@
           <p><b style="color:var(--safe)">🔗 張力 (Tension)</b><br>系統內部主繩繃緊的程度。由於滑輪會滾動平衡力量，整條主繩的張力是一樣的。張力過大將導致主繩斷裂！</p>
           <p><b style="color:var(--warn)">⚓ 抗重 (Vertical Load)</b><br>錨點（A/B點）實際承受的「垂直往下扯」的力量。擔架越靠近某一側，該錨點承受的抗重越大，固定點就有被連根拔起的危機。</p>
           <p><b style="color:var(--warn)">📏 下垂 (Sag)</b><br>以兩錨點連線為基準，滑輪往下掉的垂直距離。下垂量越小（繩拉越直），系統張力會呈指數飆升！</p>
-          <p><b style="color:var(--tagline)">↔️ 牽引力與省力比 (Tagline Force & MA)</b><br>擔架永遠想往最低點滑，要維持在偏離點，岸上救援手必須施加水平拉力。透過 <b>⚙️省力系統 (如 3:1、5:1)</b> 可大幅降低手拉力需求。（註：本計算為理論值，實務操作需額外考量滑輪摩擦損耗）</p>
+          
+          <p><b style="color:var(--tagline)">↔️ 水平牽引力 (Tagline Force)</b><br>擔架永遠想往最低點滑，要維持在偏離點，岸上救援手必須施加水平拉力。下方提供的 <b>⚙️省力系統 (如 3:1、5:1)</b> 專指「水平牽引繩」的換算，能大幅降低手拉力需求。</p>
+          
+          <p><b style="color:#c084fc">↕️ 垂直拖拉與下放系統 (Raising/Lowering System)</b><br>控制擔架「上下垂直」移動的獨立系統。依據各國地形與操作習慣，教官會選擇採用<b>「英式、日式、挪威式、傳統式」</b>等不同架設法。本儀表主要計算軌道繩與水平牽引，垂直下放的摩擦損耗與動態控制，由教官依流派實地判定。</p>
+          
           <p><b style="color:var(--bad)">🪢 摩擦力與繩索延展 (環境變數)</b><br>實務中滑輪有阻力、繩索有彈性。這會使實際需要的牽引力更大、下垂更深，操作時必須在計算值上預留安全餘裕。</p>
           <p><b style="color:var(--bad)">📳 動態震動衝擊 (Shock Load)</b><br>拖拉過程中產生的頓挫與晃動，會瞬間放大系統受力。開啟系統頂端的「📳」按鈕，可自訂百分比，精準模擬最危險的峰值衝擊。</p>
           <button type="button" class="btn-collapse-inner" onclick="this.closest('details').removeAttribute('open')">🔼 收起說明</button>
@@ -402,7 +412,7 @@
             <ul style="margin-top: 0;">
               <li>直接拖曳畫布上的 <b>A點/B點</b> 設定地形。</li>
               <li>直接拖曳橘色 <b>大擔架</b> 或滑輪，可精準模擬傷患過河的張力變化。</li>
-              <li>當擔架處於偏離點時，可點選下方的 <b>⚙️省力比</b> 換算手拉力。</li>
+              <li>當擔架處於偏離點時，可點選下方的 <b>⚙️水平牽引省力比</b> 換算手拉力。</li>
               <li>滑動下方的 <b>夾角拉桿</b>，系統會自動反推繩長並平滑變形。</li>
               <li>點擊 <b>📷實境 / 🌐網格 / ☀️淨空</b> 等工具進行實地測量與 <b>📸戰術截圖</b>。</li>
             </ul>
@@ -417,7 +427,7 @@
           </summary>
           <div class="menu-content">
             <div style="text-align: center; margin-bottom: 15px;">
-              <span style="display:inline-block; background:var(--safe); color:#0f1623; font-weight:bold; padding:4px 14px; border-radius:20px; font-size:13px; letter-spacing:0.5px; box-shadow: 0 2px 6px rgba(34,197,94,0.3);">V6.4 牽引省力模組版</span>
+              <span style="display:inline-block; background:var(--safe); color:#0f1623; font-weight:bold; padding:4px 14px; border-radius:20px; font-size:13px; letter-spacing:0.5px; box-shadow: 0 2px 6px rgba(34,197,94,0.3);">V6.6 橫向排版優化版</span>
             </div>
             <p style="margin-top: 0; margin-bottom: 6px; font-weight: bold; color: var(--text); text-align: center;">本工具由 <span style="color:var(--warn);">散木團隊</span> 開發製作</p>
             <p style="margin-top: 0; margin-bottom: 4px; font-size: 13px; text-align: center;">教學架構與工程判斷／徐世豐</p>
@@ -538,9 +548,8 @@ const els = {
 const svgW = 400, svgH = 500; 
 let scale = 10, offsetX = 50, offsetY = 120; 
 let currentSliderPct = 0.5;
-let currentMA = 1; // 💡 省力比預設為 1:1
+let currentMA = 1; 
 
-// 💡 綁定 MA 省力比按鈕事件
 const maBtns = document.querySelectorAll('.ma-btn');
 maBtns.forEach(btn => {
   btn.addEventListener('click', (e) => {
@@ -657,22 +666,20 @@ function updateEngine(skipSliderUpdate = false) {
   els.angleText.setAttribute('fill', color);
   els.angleText.setAttribute('x', s_px); els.angleText.setAttribute('y', s_py - 35);
 
-  // 💡 牽引力與省力比換算邏輯
   if (tagForce > 0.5) {
-      maControl.style.display = "flex"; // 顯示省力比按鈕
+      maControl.style.display = "flex"; 
       els.tagLine.style.display = "block"; els.tagLineText.style.display = "block";
       
       let tagEndX = Fx > 0 ? s_px + 70 : s_px - 70;
       els.tagLine.setAttribute('x1', s_px); els.tagLine.setAttribute('y1', s_py); els.tagLine.setAttribute('x2', tagEndX); els.tagLine.setAttribute('y2', s_py);
       
-      let pullForce = tagForce / currentMA; // 算出實際手拉力
+      let pullForce = tagForce / currentMA; 
       let tagLabelText = isShockOn ? `${pullForce.toFixed(1)}kg (峰值)` : `${pullForce.toFixed(1)}kg`;
       if (currentMA > 1) tagLabelText = `手拉 ` + tagLabelText;
       
       els.tagLineText.textContent = tagLabelText;
       els.tagLineText.setAttribute('x', tagEndX + (Fx>0?5:-5)); els.tagLineText.setAttribute('y', s_py + 4); els.tagLineText.setAttribute('text-anchor', Fx>0?'start':'end');
       
-      // 更新下方資訊板
       if (currentMA > 1) {
           taglineInfo.innerHTML = `系統牽引力: ${tagForce.toFixed(1)} kg (${Fx > 0 ? '往 B' : '往 A'})<br><span style="color:#fff; font-size:15px;">👉 實際手拉力: <b style="color:var(--warn);">${pullForce.toFixed(1)} kg</b></span>`;
       } else {
@@ -680,7 +687,7 @@ function updateEngine(skipSliderUpdate = false) {
       }
       taglineInfo.style.background = "rgba(56, 189, 248, 0.15)";
   } else {
-      maControl.style.display = "none"; // 隱藏省力比按鈕
+      maControl.style.display = "none"; 
       els.tagLine.style.display = "none"; els.tagLineText.style.display = "none";
       taglineInfo.textContent = `📍 滑輪處於自然平衡點 (不需牽引力)`;
       taglineInfo.style.background = "rgba(34, 197, 94, 0.1)";
@@ -690,13 +697,13 @@ function updateEngine(skipSliderUpdate = false) {
   let needleAngle = isDanger ? 50 : -50 + (tension / (baseW*5)) * 100; let nRad = needleAngle * Math.PI / 180;
   els.pulleyNeedle.setAttribute('x1', 0); els.pulleyNeedle.setAttribute('y1', 0); els.pulleyNeedle.setAttribute('x2', 12 * Math.sin(nRad)); els.pulleyNeedle.setAttribute('y2', -12 * Math.cos(nRad));
   
-  let loadDrop = isShockOn ? 65 : 55; 
+  let loadDrop = 55; 
   
   els.suspL.setAttribute('x1', s_px); els.suspL.setAttribute('y1', s_py + 5); 
-  els.suspL.setAttribute('x2', s_px - 40); els.suspL.setAttribute('y2', s_py + loadDrop - 2);
+  els.suspL.setAttribute('x2', s_px - 35); els.suspL.setAttribute('y2', s_py + loadDrop - 2);
   
   els.suspR.setAttribute('x1', s_px); els.suspR.setAttribute('y1', s_py + 5); 
-  els.suspR.setAttribute('x2', s_px + 40); els.suspR.setAttribute('y2', s_py + loadDrop - 2);
+  els.suspR.setAttribute('x2', s_px + 35); els.suspR.setAttribute('y2', s_py + loadDrop - 2);
 
   let ctm = svgEl.getScreenCTM();
   if (ctm) {
@@ -821,7 +828,7 @@ function toggleShock() {
     mainCard.classList.add('shock-mode');
     btnShock.classList.add('active-shock');
     els.floatLoad.classList.add('shock-anim');
-    shockWrap.style.display = 'block';
+    shockWrap.style.display = 'flex'; // 改為橫向排列的 flex
   }
   updateEngine();
 }
@@ -882,7 +889,6 @@ function resetEngine() {
   inSpan.value = 20; inHeight.value = 0; inLoad.value = 100; inRope.value = 22; currentSliderPct = 0.5;
   if(mainCard.classList.contains('shock-mode')) toggleShock(); 
   
-  // 💡 重置省力比
   currentMA = 1;
   maBtns.forEach(b => b.classList.remove('active'));
   document.querySelector('.ma-btn[data-ma="1"]').classList.add('active');
