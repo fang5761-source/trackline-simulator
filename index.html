@@ -75,6 +75,15 @@
   }
   input[type="file"] { display: none; }
 
+  /* 💡 革新版面核心：主面板自動填滿 100% 螢幕高度 */
+  #mainCard {
+    height: calc(100vh - 20px); /* 舊版瀏覽器備用 */
+    height: calc(100dvh - 20px - env(safe-area-inset-bottom)); /* 動態完美貼合螢幕 */
+    min-height: 550px; 
+    max-height: 850px;
+    display: flex; flex-direction: column;
+  }
+
   .card { 
     width:100%; background:var(--card); border:2px solid var(--line); 
     border-radius:16px; padding: 12px; box-shadow:0 10px 30px rgba(0,0,0,.5); 
@@ -86,7 +95,7 @@
     backdrop-filter: none !important; -webkit-backdrop-filter: none !important; box-shadow: none !important;
   }
   
-  .topbar { display: flex; align-items: center; margin-bottom: 12px; width: 100%; }
+  .topbar { display: flex; align-items: center; margin-bottom: 8px; width: 100%; }
   .title-tag { font-size: 16px; font-weight: bold; display: flex; align-items: center; gap: 8px; white-space: nowrap; width: 100%; justify-content: space-between; }
   .title-left { display: flex; align-items: center; gap: 6px; }
   .title-divider { width: 3px; height: 22px; background-color: var(--warn); border-radius: 2px; }
@@ -98,8 +107,8 @@
   }
   .is-vip .vip-badge { display: inline-block; }
 
-  .icon-bar { display: flex; justify-content: space-between; align-items: center; gap: 6px; background: rgba(0,0,0,0.4); padding: 8px; border-radius: 12px; margin-bottom: 12px; border: 1px solid var(--line); }
-  .icon-btn { flex: 1; aspect-ratio: 1/1; max-height: 42px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid transparent; display: flex; justify-content: center; align-items: center; position: relative; cursor: pointer; transition: all 0.2s; font-size: 18px; color: var(--text); padding: 0; }
+  .icon-bar { display: flex; justify-content: space-between; align-items: center; gap: 6px; background: rgba(0,0,0,0.4); padding: 6px 8px; border-radius: 12px; margin-bottom: 8px; border: 1px solid var(--line); }
+  .icon-btn { flex: 1; aspect-ratio: 1/1; max-height: 38px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid transparent; display: flex; justify-content: center; align-items: center; position: relative; cursor: pointer; transition: all 0.2s; font-size: 18px; color: var(--text); padding: 0; }
   .icon-btn:active { background: var(--line); transform: scale(0.95); }
   .icon-btn.active { background: var(--safe); color: var(--bg); border-color: var(--safe); }
   .icon-btn.active-shock { background: var(--bad); color: #fff; border-color: var(--bad); animation: pulse 1.5s infinite; }
@@ -111,13 +120,14 @@
   @keyframes glow-red { 0%, 100% { box-shadow: 0 4px 10px rgba(0,0,0,0.6); border-color: #9a3412; } 50% { box-shadow: 0 0 15px rgba(239,68,68,0.8); border-color: #ef4444; } }
   .shock-anim { animation: glow-red 1s infinite; }
 
-  .svgWrap { position:relative; width:100%; height: 460px; background: transparent; border-radius: 12px; border: 1px dashed var(--line); overflow: hidden; }
+  /* 💡 動態沙盤：吸收剩餘的所有空間 */
+  .svgWrap { flex: 1 1 0%; height: auto; min-height: 200px; position:relative; width:100%; background: transparent; border-radius: 12px; border: 1px dashed var(--line); overflow: hidden; }
   svg { display: block; width: 100%; height: 100%; }
 
   .anchor-dot, .draggable-pulley { cursor: grab; touch-action: none; }
   .anchor-dot:active, .draggable-pulley:active { cursor: grabbing; }
 
-  .hud-panel, .stretcher-tag, .tagline-wrap, .dashboard-panel, .angle-slider-container { transition: opacity 0.3s ease; }
+  .hud-panel, .stretcher-tag, .tagline-wrap, .control-deck { transition: opacity 0.3s ease; }
   
   .hud-panel {
     position: absolute; background: rgba(10, 15, 25, 0.7); border: 1px solid rgba(255,255,255,0.1);
@@ -148,25 +158,25 @@
   #shockInputWrap { display: none; align-items: center; justify-content: center; gap: 2px; background: rgba(0,0,0,0.4); border-radius: 6px; padding: 2px 6px; }
   #shockInputWrap input { width: 32px; font-size: 16px; padding: 0; border: none; border-bottom: 1px solid #fca5a5; background: transparent; color: #fca5a5; font-weight: bold; text-align: center; }
 
-  .angle-slider-container { padding: 10px 10px 5px 10px; background: rgba(0,0,0,0.3); border-radius: 8px; border: 1px solid var(--line); margin-top: 10px; }
-  .angle-slider-header { display: flex; justify-content: space-between; font-size: 12px; color: var(--warn); margin-bottom: 4px; font-weight: bold; }
-  input[type="range"]{ -webkit-appearance:none; width:100%; margin: 8px 0; background:transparent; cursor:pointer; }
-  input[type="range"]::-webkit-slider-runnable-track{ height:8px; border-radius:999px; background:var(--line); }
-  input[type="range"]::-webkit-slider-thumb{ -webkit-appearance:none; width:26px; height:26px; border-radius:50%; background:var(--warn); border:2px solid var(--bg); margin-top:-9px; box-shadow: 0 2px 6px rgba(0,0,0,0.5); }
-
-  .dashboard-panel {
+  /* 💡 全新：終極控制台 (合併滑桿與參數) */
+  .control-deck {
     background: rgba(0,0,0,0.3); border: 1px solid var(--line); border-radius: 8px; 
-    padding: 10px; margin-top: 10px; display: flex; flex-direction: column; gap: 12px;
+    padding: 8px 10px; margin-top: 8px; display: flex; flex-direction: column; gap: 8px;
   }
+  .angle-slider-header { display: flex; justify-content: space-between; font-size: 12px; color: var(--warn); font-weight: bold; }
+  input[type="range"]{ -webkit-appearance:none; width:100%; margin: 4px 0; background:transparent; cursor:pointer; }
+  input[type="range"]::-webkit-slider-runnable-track{ height:8px; border-radius:999px; background:var(--line); }
+  input[type="range"]::-webkit-slider-thumb{ -webkit-appearance:none; width:24px; height:24px; border-radius:50%; background:var(--warn); border:2px solid var(--bg); margin-top:-8px; box-shadow: 0 2px 6px rgba(0,0,0,0.5); }
+
   .dash-inputs { display: flex; gap: 6px; justify-content: space-between; }
-  .dash-input-group { flex: 1; background: rgba(0,0,0,0.4); padding: 6px; border-radius: 6px; display: flex; flex-direction: column; align-items: center; border: 1px solid rgba(255,255,255,0.05); }
-  .dash-input-group span.lbl { font-size: 11px; color: var(--muted); margin-bottom: 4px; font-weight: bold; }
+  .dash-input-group { flex: 1; background: rgba(0,0,0,0.4); padding: 4px; border-radius: 6px; display: flex; flex-direction: column; align-items: center; border: 1px solid rgba(255,255,255,0.05); }
+  .dash-input-group span.lbl { font-size: 11px; color: var(--muted); margin-bottom: 2px; font-weight: bold; }
   .dash-input-group div { display: flex; align-items: baseline; gap: 2px; }
   .dash-input-group input { width: 45px; background: transparent; border: none; border-bottom: 1px solid var(--warn); color: var(--warn); font-size: 16px; font-weight: bold; text-align: center; font-family: monospace; outline: none; }
-  .dash-sag-row { display: flex; justify-content: center; padding: 4px 0; border-top: 1px dashed rgba(255,255,255,0.1); }
+  .dash-sag-row { display: flex; justify-content: center; padding-top: 4px; }
 
-  .tagline-wrap { margin-top: 10px; padding: 10px; background: rgba(56, 189, 248, 0.1); border-radius: 8px; border: 1px solid var(--tagline); text-align: center; font-size: 13px; font-weight: bold; color: var(--tagline); }
-  .ma-control { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; margin-top: 8px; border-top: 1px dashed rgba(56, 189, 248, 0.3); padding-top: 10px; position: relative; }
+  .tagline-wrap { margin-top: 8px; padding: 8px; background: rgba(56, 189, 248, 0.1); border-radius: 8px; border: 1px solid var(--tagline); text-align: center; font-size: 13px; font-weight: bold; color: var(--tagline); }
+  .ma-control { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; margin-top: 8px; border-top: 1px dashed rgba(56, 189, 248, 0.3); padding-top: 8px; position: relative; }
   .ma-btn-group { display: flex; gap: 6px; width: 100%; justify-content: center; }
   .ma-btn { flex: 1; max-width: 60px; background: rgba(0,0,0,0.4); border: 1px solid var(--line); color: var(--muted); border-radius: 6px; padding: 6px 4px; font-size: 13px; font-weight: bold; cursor: pointer; transition: all 0.2s; font-family: monospace; position: relative;}
   .ma-btn.active { background: var(--tagline); color: var(--bg); border-color: var(--tagline); }
@@ -212,11 +222,10 @@
   .menu-icon { font-size: 18px; }
   .menu-arrow { color: var(--muted); font-size: 12px; transition: transform 0.3s; }
   .menu-item[open] > summary .menu-arrow { transform: rotate(90deg); }
-  .menu-content { padding: 16px; font-size: 13.5px; color: var(--muted); line-height: 1.6; background: rgba(0,0,0,0.4); text-align: left; }
+  .menu-content { padding: 16px; font-size: 13.5px; color: var(--muted); line-height: 1.6; background: rgba(0,0,0,0.4); text-align: justify; }
   
   .btn-collapse-inner { width: 100%; padding: 10px; margin-top: 12px; background: rgba(255,255,255,0.05); border: 1px solid var(--line); border-radius: 8px; color: var(--text); cursor: pointer; font-family: inherit; font-weight: bold; }
   
-  /* 獨立快捷面板專用 */
   .menu-action-btn { padding: 14px 16px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 14px; transition: background 0.2s; color: var(--text); }
   .menu-action-btn:active { background: var(--line); }
   .highlight-heart { background: rgba(239, 68, 68, 0.1); }
@@ -276,6 +285,7 @@
 <div id="scroll-wrapper">
   <div class="app-container" id="capture-area">
 
+    <!-- 💡 滿版主面板：完美塞滿一個手機螢幕，不需捲動 -->
     <div class="card" id="mainCard">
       <div class="topbar">
         <div class="title-tag">
@@ -306,6 +316,7 @@
         <button class="icon-btn" onclick="resetEngine()" title="重置沙盤">↺</button>
       </div>
 
+      <!-- 💡 動態沙盤：會根據手機大小自動改變高度，完美填滿螢幕空隙 -->
       <div class="svgWrap" id="svgWrap">
         <svg id="canvas" viewBox="0 0 400 460">
           <line id="tagLine" stroke="var(--tagline)" stroke-width="4" stroke-dasharray="6 4" stroke-linecap="round" />
@@ -368,16 +379,17 @@
         </div>
       </div>
       
-      <div class="angle-slider-container" data-html2canvas-ignore="true">
+      <!-- 💡 終極控制台：滑桿與所有參數完美結合 -->
+      <div class="control-deck" data-html2canvas-ignore="true">
          <div class="angle-slider-header">
             <span>鬆 (夾角小)</span>
             <span style="color:var(--text);">📐 滑動調整主繩夾角</span>
             <span>緊 (夾角大)</span>
          </div>
          <input type="range" id="angleSlider" min="20" max="179" step="0.5" value="120">
-      </div>
+         
+         <hr style="border:0; border-top:1px dashed rgba(255,255,255,0.1); margin: 2px 0;">
 
-      <div class="dashboard-panel" data-html2canvas-ignore="true">
          <div class="dash-inputs">
             <div class="dash-input-group">
                <span class="lbl">➰ 總繩長</span>
@@ -410,11 +422,10 @@
             </div>
          </div>
       </div>
-    </div>
+    </div> <!-- 滿版主面板結束 -->
     
+    <!-- 📚 說明書：乖乖待在視窗下方，需要看時再捲動 -->
     <div class="menu-list" data-html2canvas-ignore="true">
-      
-      <!-- 📚 原理說明 (預設收起) -->
       <details class="main-accordion">
         <summary>📚 專業名詞與原理解析</summary>
         <div class="menu-group">
@@ -428,7 +439,6 @@
         </div>
       </details>
 
-      <!-- ⚙️ 系統工具與說明書 (完整回歸) -->
       <details class="main-accordion">
         <summary>⚙️ 系統工具與說明書</summary>
         <div class="menu-group">
@@ -457,7 +467,7 @@
             </summary>
             <div class="menu-content">
               <div style="text-align: center; margin-bottom: 15px;">
-                <span style="display:inline-block; background:var(--safe); color:#0f1623; font-weight:bold; padding:4px 14px; border-radius:20px; font-size:13px; letter-spacing:0.5px; box-shadow: 0 2px 6px rgba(34,197,94,0.3);">V7.5 說明書與選單淨化版</span>
+                <span style="display:inline-block; background:var(--safe); color:#0f1623; font-weight:bold; padding:4px 14px; border-radius:20px; font-size:13px; letter-spacing:0.5px; box-shadow: 0 2px 6px rgba(34,197,94,0.3);">V7.6 全視角儀表板版</span>
               </div>
               <p style="margin-top: 0; margin-bottom: 6px; font-weight: bold; color: var(--text); text-align: center;">本工具由 <span style="color:var(--warn);">散木團隊</span> 開發製作</p>
               <p style="margin-top: 0; margin-bottom: 4px; font-size: 13px; text-align: center;">教學架構與工程判斷／徐世豐</p>
@@ -499,7 +509,6 @@
         </div>
       </details>
 
-      <!-- 💡 獨立快捷鍵面板 (UX淨化：分享、更新、技術支援) -->
       <div class="main-accordion" style="display: flex; flex-direction: column;">
         <div class="menu-action-btn" id="shareBtnAction" style="border-bottom: 1px solid var(--line);">
           <div class="menu-header-left"><span class="menu-icon">🔗</span>分享此裝備給友軍</div>
@@ -517,7 +526,6 @@
         </div>
       </div>
 
-      <!-- ⚖️ 免責聲明 -->
       <div class="footer-disclaimer">
         <strong style="color: var(--bad); font-size: 14px;">⚖️ 軟體免責聲明：</strong><br>
         本軟體為理論物理運算輔助工具，不包含繩索材質疲勞、極端摩擦力等環境變數。實際救援操作之系統架設與安全確保，均須由專業教官與指揮官實地判定，開發團隊不負任何實地操作之法律與賠償責任。
@@ -597,8 +605,8 @@ const els = {
   hudA: document.getElementById('hudA'), hudB: document.getElementById('hudB')
 };
 
-const svgW = 400, svgH = 460; 
-let scale = 10, offsetX = 50, offsetY = 120; 
+const svgW = 400; // 動態引擎只需要寬度
+let scale = 10, offsetX = 50, offsetY = 50; // 💡 起始座標上移，節省空間
 let currentSliderPct = 0.5;
 let currentMA = 1; 
 
@@ -679,9 +687,14 @@ function updateEngine(skipSliderUpdate = false) {
   let minL = Math.hypot(S, H);
   let calcL = Math.max(L, minL + 0.05);
 
-  let maxCanvasH = svgH - 100; 
-  scale = Math.min((svgW - 100) / Math.max(10, S), maxCanvasH / Math.max(10, Math.abs(H) + calcL*0.5));
-  offsetY = 110 + (H < 0 ? Math.abs(H)*scale : 0); 
+  /* 💡 終極自適應黑科技：讀取動態畫布高度，算出完美比例 */
+  let wrapRect = els.svgWrap.getBoundingClientRect();
+  let dynamicSvgH = wrapRect.height > 50 ? wrapRect.height : 460;
+  svgEl.setAttribute('viewBox', `0 0 400 ${dynamicSvgH}`);
+
+  let maxCanvasH = dynamicSvgH - 95; /* 確保擔架絕對不會被裁切 */
+  scale = Math.min((400 - 80) / Math.max(10, S), maxCanvasH / Math.max(10, Math.abs(H) + calcL*0.5));
+  offsetY = 50 + (H < 0 ? Math.abs(H)*scale : 0); 
 
   let ax = 0, ay = 0, bx = S, by = H, px = S * currentSliderPct, py = findPulleyY(ax, ay, bx, by, px, calcL);
   let len1 = Math.hypot(px - ax, py - ay), len2 = Math.hypot(px - bx, py - by);
@@ -768,12 +781,11 @@ function updateEngine(skipSliderUpdate = false) {
       pt2.x = s_px;
       pt2.y = s_py + loadDrop;
       let screenPt = pt2.matrixTransform(ctm);
-      let wrapRect = els.svgWrap.getBoundingClientRect();
       
       let flX = screenPt.x - wrapRect.left; 
       let flY = screenPt.y - wrapRect.top;
       
-      if (flY > wrapRect.height - 40) flY = wrapRect.height - 40;
+      if (flY > wrapRect.height - 45) flY = wrapRect.height - 45;
       
       els.floatLoad.style.left = `${flX}px`;
       els.floatLoad.style.top = `${flY}px`;
@@ -959,7 +971,7 @@ function toggleGrid() { gridVisible = !gridVisible; gridOverlay.style.opacity = 
 
 function toggleHUD() {
   hudVisible = !hudVisible;
-  const huds = document.querySelectorAll('.hud-panel, .stretcher-tag, .tagline-wrap, .angle-slider-container, .dashboard-panel');
+  const huds = document.querySelectorAll('.hud-panel, .stretcher-tag, .tagline-wrap, .control-deck');
   huds.forEach(el => el.style.opacity = hudVisible ? "1" : "0");
 }
 
@@ -986,7 +998,6 @@ async function takeScreenshot() {
   target.classList.remove('capture-mode');
 }
 
-/* 💡 原生分享功能修復 */
 const shareBtnAction = document.getElementById('shareBtnAction');
 if(shareBtnAction) {
     shareBtnAction.addEventListener('click', async () => {
