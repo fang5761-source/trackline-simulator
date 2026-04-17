@@ -130,6 +130,9 @@
   
   .lock-icon { position: absolute; bottom: 2px; right: 2px; font-size: 10px; background: rgba(0,0,0,0.8); border-radius: 50%; padding: 2px; }
   .is-vip .lock-icon { display: none; }
+  
+  .lock-icon-inline { font-size: 10px; margin-left: 4px; color: var(--vip); }
+  .is-vip .lock-icon-inline { display: none; }
 
   @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
   @keyframes glow-red { 0%, 100% { box-shadow: 0 4px 10px rgba(0,0,0,0.6); border-color: #9a3412; } 50% { box-shadow: 0 0 15px rgba(239,68,68,0.8); border-color: #ef4444; } }
@@ -158,7 +161,6 @@
   .hud-tl { top: 10px; left: 5px; border-left: 3px solid var(--safe); max-width: 48%; overflow: hidden; } 
   .hud-tr { top: 10px; right: 5px; border-right: 3px solid var(--safe); text-align: right; align-items: flex-end; max-width: 48%; overflow: hidden; } 
 
-  /* 💡 V10.2: 裝甲置頂！將 z-index 提升至 90，保證漂浮在大擔架之上 */
   .tag-badge {
     position: absolute;
     padding: 6px 12px;
@@ -170,7 +172,7 @@
     transform: translate(-50%, -50%);
     box-shadow: 0 4px 12px rgba(0,0,0,0.6);
     transition: left 0.15s ease-out, top 0.15s ease-out, background 0.2s, border 0.2s;
-    z-index: 90; /* 💡 關鍵修復：大於 stretcher-tag 的 50 */
+    z-index: 90; 
     display: none;
   }
   .tag-badge.active {
@@ -188,7 +190,7 @@
     position: absolute; background: #ea580c; border: 2px solid #9a3412;
     border-radius: 8px; padding: 8px 12px; color: var(--bg);
     transform: translate(-50%, 0); 
-    display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 50; /* 擔架的層級 */
+    display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 50; 
     box-shadow: 0 4px 10px rgba(0,0,0,0.6); pointer-events: auto; touch-action: none; cursor: grab;
     min-width: 100px; width: auto; 
   }
@@ -215,7 +217,8 @@
   .dash-input-group { flex: 1; background: rgba(0,0,0,0.4); padding: 4px; border-radius: 6px; display: flex; flex-direction: column; align-items: center; border: 1px solid rgba(255,255,255,0.05); }
   .dash-input-group span.lbl { font-size: 11px; color: var(--muted); margin-bottom: 2px; font-weight: bold; }
   .dash-input-group div { display: flex; align-items: baseline; gap: 2px; }
-  .dash-input-group input { width: 48px; background: transparent; border: none; border-bottom: 1px solid var(--warn); color: var(--warn); font-size: 16px; font-weight: bold; text-align: center; font-family: monospace; outline: none; }
+  .dash-input-group input { width: 48px; background: transparent; border: none; border-bottom: 1px solid var(--warn); color: var(--warn); font-size: 16px; font-weight: bold; text-align: center; font-family: monospace; outline: none; transition: opacity 0.3s; }
+  .dash-input-group input[readonly] { opacity: 0.6; cursor: not-allowed; }
   .dash-sag-row { display: flex; justify-content: center; padding-top: 4px; }
 
   .tagline-wrap { margin-top: 8px; padding: 8px; background: rgba(56, 189, 248, 0.1); border-radius: 8px; border: 1px solid var(--tagline); text-align: center; font-size: 13px; font-weight: bold; color: var(--tagline); }
@@ -269,7 +272,6 @@
   
   .menu-action-btn { padding: 14px 16px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 14px; transition: background 0.2s; color: var(--text); }
   .menu-action-btn:active { background: var(--line); }
-  .highlight-heart { background: rgba(239, 68, 68, 0.1); }
 
   .footer-disclaimer { margin-top: 5px; padding: 12px; font-size: 12px; color: var(--muted); line-height: 1.6; background: rgba(0,0,0,0.3); border-radius: 8px; border-left: 4px solid var(--bad); text-align: justify; }
 
@@ -280,26 +282,7 @@
 <body>
 
 <script>
-(function protectOurApp() {
-  if (window.self !== window.top) { window.top.location = window.self.location; }
-  document.addEventListener('contextmenu', event => event.preventDefault());
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i')) || (e.ctrlKey && (e.key === 'U' || e.key === 'u')) || (e.metaKey && e.altKey && (e.key === 'I' || e.key === 'i')) || (e.metaKey && e.altKey && (e.key === 'U' || e.key === 'u'))) {
-      e.preventDefault();
-    }
-  });
-  const myDomain = "fang5761-source.github.io"; 
-  const currentDomain = window.location.hostname;
-  if (currentDomain !== "" && currentDomain !== "localhost" && currentDomain !== "127.0.0.1") {
-    if (!currentDomain.includes(myDomain)) {
-      alert("⚠️ 系統安全警告：偵測到非官方網域！\n\n本工具為【散木團隊】專屬研發，未經授權禁止盜用。\n系統防護機制啟動，即將強制鎖定。");
-      document.addEventListener("DOMContentLoaded", () => {
-          document.body.innerHTML = "<div style='display:flex; flex-direction:column; height:100vh; width:100vw; background:#0f1623; color:#ef4444; justify-content:center; align-items:center; font-size:24px; font-weight:bold; text-align:center; padding:20px;'><span style='font-size:60px; margin-bottom:20px;'>💀</span><br>未經授權的盜用版本<br>系統已鎖定</div>";
-      });
-      throw new Error("Security Breach: Unauthorized Domain. System Terminated.");
-    }
-  }
-})();
+// 💡 V10.7: 將防盜機制與嚴格環境檢查徹底移除或封裝，確保任何預覽環境都不會白畫面當機！
 </script>
 
 <div id="status-bar-protector" data-html2canvas-ignore="true"></div>
@@ -309,9 +292,10 @@
 <div id="vipModal" class="modal-overlay">
   <div class="modal-box">
     <h3>🔒 專業版功能解鎖 <span class="vip-badge" style="display:inline-block;">PRO</span></h3>
-    <p>您即將啟用「<span id="vipFeatureName" class="highlight"></span>」黑科技！</p>
+    <p>您即將啟用「<span id="vipFeatureName" class="highlight"></span>」！</p>
+    <p id="vipFeatureDesc" style="font-size:14px; color:var(--safe); font-weight:bold; margin-bottom: 12px;"></p>
     <p style="font-size:13px;">此功能為進階專業版限定。<br>支持散木團隊研發，永久解鎖全功能！</p>
-    <button class="btn-store" onclick="window.open('https://gumroad.com', '_blank')">🛒 前往散木自動販賣機</button>
+    <button class="btn-store" onclick="window.open('https://gumroad.com', '_blank')">🛒 前往專業版自動販賣機</button>
     <hr style="border:0; border-top:1px dashed var(--line); margin: 15px 0;">
     <p style="font-size:12px; color:var(--muted); margin-bottom:8px;">已取得密碼？請在此輸入：</p>
     <input type="text" id="vipPwdInput" placeholder="輸入 VIP 通關密碼" class="pwd-input" autocomplete="off">
@@ -347,12 +331,12 @@
       <div class="icon-bar" data-html2canvas-ignore="true">
         <button class="icon-btn" id="btn-camera" onclick="attemptFeature('📷 實境相機疊圖', toggleCamera)" title="實境相機">📷<span class="lock-icon">🔒</span></button>
         <button class="icon-btn" id="btn-flashlight" onclick="toggleFlashlight()" title="手電筒">🔦</button>
-        <label class="icon-btn" for="upload-image" title="載入照片" style="margin:0;">📁</label>
+        <label class="icon-btn" onclick="handleImageUploadClick(event)" title="載入照片" style="margin:0;">📁<span class="lock-icon">🔒</span></label>
         <input type="file" id="upload-image" accept="image/*" onchange="loadImage(event)">
         <button class="icon-btn" onclick="toggleGrid()" title="工程網格">🌐</button>
-        <button class="icon-btn" onclick="toggleHUD()" title="淨空模式">☀️</button>
+        <button class="icon-btn" onclick="toggleHUD()" title="專注/淨空模式">👁️</button>
         <button class="icon-btn" id="btn-shock" onclick="attemptFeature('📳 動態震動衝擊系統', toggleShock)" title="動態震動衝擊">📳<span class="lock-icon">🔒</span></button>
-        <button class="icon-btn" onclick="takeScreenshot()" title="戰術截圖">📸</button>
+        <button class="icon-btn" onclick="attemptFeature('📸 戰術純淨截圖', takeScreenshot)" title="戰術截圖">📸<span class="lock-icon">🔒</span></button>
         <button class="icon-btn" onclick="resetEngine()" title="重置沙盤">↺</button>
       </div>
 
@@ -440,9 +424,9 @@
                <span class="lbl">↔️ 跨距</span>
                <div><input type="number" id="inSpan" value="20" min="5" step="1"><span style="color:var(--muted); font-size:11px;">m</span></div>
             </div>
-            <div class="dash-input-group">
-               <span class="lbl">↕️ 高差</span>
-               <div><input type="number" id="inHeight" value="0" step="1"><span style="color:var(--muted); font-size:11px;">m</span></div>
+            <div class="dash-input-group" onclick="handleHeightClick(event)" style="cursor: pointer;">
+               <span class="lbl">↕️ 高差 <span class="lock-icon-inline">🔒</span></span>
+               <div><input type="number" id="inHeight" value="0" step="1" readonly><span style="color:var(--muted); font-size:11px;">m</span></div>
             </div>
          </div>
          <div class="dash-sag-row">
@@ -472,7 +456,7 @@
           <div class="menu-content">
             <p><b style="color:var(--safe)">🔗 張力 (Tension)</b><br>系統內部主繩繃緊的程度。由於滑輪會滾動平衡力量，整條主繩的張力是一樣的。張力過大將導致主繩斷裂！</p>
             <p><b style="color:var(--warn)">⚓ 抗重 (Vertical Load)</b><br>錨點（A/B點）實際承受的「垂直往下扯」的力量。擔架越靠近某一側，該錨點承受的抗重越大，固定點就有被連根拔起的危機。</p>
-            <p><b style="color:var(--tagline)">↔️ 水平牽引力 (Tagline Force)</b><br>當傷患在低點(如河床)，要往高點(如公路) <b>上拉 (Haul)</b>，或由高點 <b>下放 (Lower)</b> 時，高處的救援手必須施加力量對抗重力。此數值即為上拉所需的牽引力，或是下放時所需的煞車力。搭配下方 <b>⚙️省力系統</b> 按鈕，能大幅降低手拉力需求。</p>
+            <p><b style="color:var(--tagline)">↔️ 水平牽引力 (Tagline Force)</b><br>控制擔架橫向移動的力量。系統中<b style="color:var(--tagline)">藍色徽章</b>代表當前需要<b>「上拉 / 煞車」</b>的受力端；灰色徽章則代表<b>「鬆弛 / 收繩」</b>的無受力端。教官可依此判斷兩岸的任務分配，並搭配下方 <b>⚙️省力系統</b> 換算實際所需拉力。</p>
             <p><b style="color:var(--bad)">📳 動態震動衝擊 (Shock Load)</b><br>拖拉過程中產生的頓挫與晃動，會瞬間放大系統受力。開啟系統頂端的「📳」按鈕，可自訂百分比，精準模擬最危險的峰值衝擊。</p>
             <button type="button" class="btn-collapse-inner" onclick="this.closest('details').removeAttribute('open')">🔼 收起說明</button>
           </div>
@@ -494,7 +478,7 @@
                 <li>直接拖曳橘色 <b>大擔架</b> 或滑輪，可精準模擬傷患過河的張力變化。</li>
                 <li>當擔架處於偏離點時，可點選下方的 <b>⚙️水平牽引省力比</b> 換算手拉力。</li>
                 <li>滑動下方的 <b>夾角拉桿</b>，系統會自動反推繩長並平滑變形。</li>
-                <li>點擊 <b>📷實境 / 🌐網格 / ☀️淨空</b> 等工具進行實地測量與 <b>📸戰術截圖</b>。</li>
+                <li>點擊 <b>📷實境 / 🌐網格 / 👁️淨空</b> 等工具進行實地測量與 <b>📸戰術截圖</b>。</li>
               </ul>
               <button type="button" class="btn-collapse-inner" onclick="this.closest('details').removeAttribute('open')">🔼 收起說明</button>
             </div>
@@ -507,7 +491,7 @@
             </summary>
             <div class="menu-content">
               <div style="text-align: center; margin-bottom: 15px;">
-                <span style="display:inline-block; background:var(--safe); color:#0f1623; font-weight:bold; padding:4px 14px; border-radius:20px; font-size:13px; letter-spacing:0.5px; box-shadow: 0 2px 6px rgba(34,197,94,0.3);">V10.2 完美120度與裝甲置頂版</span>
+                <span style="display:inline-block; background:var(--safe); color:#0f1623; font-weight:bold; padding:4px 14px; border-radius:20px; font-size:13px; letter-spacing:0.5px; box-shadow: 0 2px 6px rgba(34,197,94,0.3);">散木索道儀 專業正式版</span>
               </div>
               <p style="margin-top: 0; margin-bottom: 6px; font-weight: bold; color: var(--text); text-align: center;">本工具由 <span style="color:var(--warn);">散木團隊</span> 開發製作</p>
               <p style="margin-top: 0; margin-bottom: 4px; font-size: 13px; text-align: center;">教學架構與工程判斷／徐世豐</p>
@@ -551,16 +535,16 @@
 
       <div class="main-accordion" style="display: flex; flex-direction: column;">
         <div class="menu-action-btn" id="shareBtnAction" style="border-bottom: 1px solid var(--line);">
-          <div class="menu-header-left"><span class="menu-icon">🔗</span>分享此裝備給友軍</div>
+          <div class="menu-header-left"><span class="menu-icon">🔗</span>分享系統連結</div>
           <span class="menu-arrow">❯</span>
         </div>
 
         <div class="menu-action-btn" onclick="checkForUpdates()" style="border-bottom: 1px solid var(--line);">
-          <div class="menu-header-left"><span class="menu-icon">🔄</span>強制清除舊版記憶</div>
+          <div class="menu-header-left"><span class="menu-icon">🔄</span>檢查並載入最新版本</div>
           <span class="menu-arrow">❯</span>
         </div>
 
-        <div class="menu-action-btn highlight-heart" onclick="window.open('https://forms.gle/Uykr5jeQP6fgVhxh9', '_blank')">
+        <div class="menu-action-btn" onclick="window.open('https://forms.gle/Uykr5jeQP6fgVhxh9', '_blank')">
           <div class="menu-header-left"><span class="menu-icon">💬</span>技術支援與問題回報</div>
           <span class="menu-arrow">❯</span>
         </div>
@@ -571,16 +555,33 @@
         本軟體為理論物理運算輔助工具，不包含繩索材質疲勞、極端摩擦力等環境變數。實際救援操作之系統架設與安全確保，均須由專業教官與指揮官實地判定，開發團隊不負任何實地操作之法律與賠償責任。
       </div>
     </div>
-
     <div class="watermark">索道繩動態張力估算儀 | 散木團隊</div>
   </div>
 </div>
 
 <script>
-const VIP_SECRET_KEY = "SM-PRO-2024";
-let isUserVip = localStorage.getItem('sunmoon_vip_status') === 'true';
+// 💡 V10.7：為預覽環境加上安全氣囊，將 localStorage 妥善包裹避免沙盒崩潰！
+const VIP_SECRET_KEYS = ["SM-PRO-2024", "SUNMOON-V10", "RESCUE-VIP"];
+let isUserVip = false;
 
-if (isUserVip) { document.body.classList.add('is-vip'); }
+try {
+    isUserVip = localStorage.getItem('sunmoon_vip_status') === 'true';
+} catch (e) {
+    console.warn("系統提示：當前預覽環境沙盒已限制記憶體存取。");
+}
+
+if (isUserVip) { 
+    document.body.classList.add('is-vip'); 
+    document.getElementById('inHeight').removeAttribute('readonly'); 
+}
+
+const featureDescriptions = {
+    '📷 實境相機疊圖': '開啟鏡頭將沙盤完美重疊於真實救援現場，實地精準推演！',
+    '📁 場勘照片疊圖': '匯入現場環境照片，即使在指揮所也能進行最真實的地形沙盤兵推！',
+    '📳 動態震動衝擊系統': '自訂拖拉過程中的頓挫與晃動百分比，精準預測最危險的峰值受力！',
+    '📸 戰術純淨截圖': '自動濾除雜訊，一鍵匯出無浮水印、最高解析度的專業戰術報告圖紙！',
+    '↕️ 峽谷高低差模擬': '解鎖高低差限制，真實模擬深谷上拉與下放的極端物理張力變化！'
+};
 
 let pendingFeatureCallback = null;
 
@@ -589,6 +590,15 @@ function attemptFeature(featureName, callback) {
     else {
         pendingFeatureCallback = callback;
         document.getElementById('vipFeatureName').textContent = featureName;
+        
+        let desc = "";
+        if (featureName.includes("牽引省力比")) {
+            desc = "解鎖進階機械利益換算，精準評估岸上救援手所需的真實拉力！";
+        } else {
+            desc = featureDescriptions[featureName] || "解鎖進階專業參數，獲得最完整的特戰物理運算能力！";
+        }
+        document.getElementById('vipFeatureDesc').textContent = desc;
+
         document.getElementById('vipErrorMsg').textContent = "";
         document.getElementById('vipPwdInput').value = "";
         document.getElementById('vipModal').classList.add('show');
@@ -603,17 +613,38 @@ function closeVipModal() {
 function verifyVip() {
     const inputPwd = document.getElementById('vipPwdInput').value.trim();
     const errorMsg = document.getElementById('vipErrorMsg');
-    if (inputPwd === VIP_SECRET_KEY) {
-        localStorage.setItem('sunmoon_vip_status', 'true');
+    
+    if (VIP_SECRET_KEYS.includes(inputPwd)) {
+        try { localStorage.setItem('sunmoon_vip_status', 'true'); } catch(e){}
         isUserVip = true;
         document.body.classList.add('is-vip'); 
+        document.getElementById('inHeight').removeAttribute('readonly'); 
         closeVipModal();
-        alert("🎉 授權成功！歡迎使用散木專業版全功能！");
+        try { alert("🎉 授權成功！歡迎使用散木專業版全功能！"); } catch(e) {}
         if (pendingFeatureCallback) { pendingFeatureCallback(); pendingFeatureCallback = null; }
     } else {
         errorMsg.textContent = "❌ 密碼錯誤，請確認輸入是否正確。";
         document.getElementById('vipPwdInput').classList.add('shock-anim');
         setTimeout(() => document.getElementById('vipPwdInput').classList.remove('shock-anim'), 1000);
+    }
+}
+
+function handleImageUploadClick(e) {
+    if (!isUserVip) {
+        e.preventDefault(); 
+        attemptFeature('📁 場勘照片疊圖', () => {
+            document.getElementById('upload-image').click();
+        });
+    }
+}
+
+function handleHeightClick(e) {
+    if (!isUserVip) {
+        e.preventDefault();
+        attemptFeature('↕️ 峽谷高低差模擬', () => {
+            document.getElementById('inHeight').removeAttribute('readonly');
+            document.getElementById('inHeight').focus();
+        });
     }
 }
 
@@ -824,7 +855,6 @@ function updateEngine(skipSliderUpdate = false) {
       els.dotA.setAttribute('stroke', color);
       els.dotB.setAttribute('stroke', color);
 
-      /* 💡 修復：完美將右邊主繩接回 s_by */
       els.ropeL.setAttribute('x1', s_ax); els.ropeL.setAttribute('y1', s_ay); els.ropeL.setAttribute('x2', s_px); els.ropeL.setAttribute('y2', s_py); els.ropeL.setAttribute('stroke', color);
       els.ropeR.setAttribute('x1', s_px); els.ropeR.setAttribute('y1', s_py); els.ropeR.setAttribute('x2', s_bx); els.ropeR.setAttribute('y2', s_by); els.ropeR.setAttribute('stroke', color);
 
@@ -851,7 +881,6 @@ function updateEngine(skipSliderUpdate = false) {
           
           let pullA = forceA / currentMA;
           let pullB = forceB / currentMA;
-          let systemPull = Math.max(pullA, pullB);
           
           let txtA = pullA > 0.05 ? `${pullA.toFixed(1)} kg` + (isShockOn ? '(峰值)' : '') : '0 kg';
           let txtB = pullB > 0.05 ? `${pullB.toFixed(1)} kg` + (isShockOn ? '(峰值)' : '') : '0 kg';
@@ -1049,6 +1078,10 @@ function processDrag(e) {
       let dxMeters = dxScreen / pixelsPerMeter;
       let dyMeters = dyScreen / pixelsPerMeter;
 
+      if (!isUserVip && (isDragging === 'A' || isDragging === 'B')) {
+          dyMeters = 0;
+      }
+
       if (isDragging === 'B') { 
           inSpan.value = Math.max(5, Math.min(200, Math.round(startSpan + dxMeters))); 
           inHeight.value = Math.max(-100, Math.min(100, Math.round(startHeight + dyMeters))); 
@@ -1102,19 +1135,29 @@ async function toggleCamera() {
       video.srcObject = stream; video.style.opacity = "1"; btnCamera.classList.add('active'); 
       mainCard.classList.add('camera-mode');
       document.body.classList.add('camera-mode');
-    } catch (err) { alert("⚠️ 鏡頭啟動失敗：" + err.message); } 
+    } catch (err) { 
+      try { alert("⚠️ 鏡頭啟動失敗：" + err.message); } catch(e){} 
+    } 
   } 
 }
 
 async function toggleFlashlight() {
-  if (!videoTrack) { alert("⚠️ 請先開啟 📷 實境鏡頭！"); return; }
+  if (!videoTrack) { 
+    try { alert("⚠️ 請先開啟 📷 實境鏡頭！"); } catch(e){} 
+    return; 
+  }
   try {
     const capabilities = videoTrack.getCapabilities();
-    if (!capabilities.torch) { alert("⚠️ 您的裝置或瀏覽器不支援手電筒功能！"); return; }
+    if (!capabilities.torch) { 
+        try { alert("⚠️ 您的裝置或瀏覽器不支援手電筒功能！"); } catch(e){} 
+        return; 
+    }
     torchOn = !torchOn;
     await videoTrack.applyConstraints({ advanced: [{ torch: torchOn }] });
     if(torchOn) btnFlashlight.classList.add('active'); else btnFlashlight.classList.remove('active');
-  } catch(e) { alert("⚠️ 手電筒切換失敗：" + e.message); }
+  } catch(e) { 
+      try { alert("⚠️ 手電筒切換失敗：" + e.message); } catch(err){} 
+  }
 }
 
 function loadImage(event) { 
@@ -1139,14 +1182,12 @@ function toggleHUD() {
   huds.forEach(el => el.style.opacity = hudVisible ? "1" : "0");
 }
 
-/* 💡 V10.2: 加入黃金開局，自動對齊 120 度並反推繩長 */
 function resetEngine() {
   inSpan.value = 20; inHeight.value = 0; inLoad.value = 100; currentSliderPct = 0.5;
   if(mainCard.classList.contains('shock-mode')) toggleShock(); 
   currentMA = 1; maBtns.forEach(b => b.classList.remove('active'));
   document.querySelector('.ma-btn[data-ma="1"]').classList.add('active');
   
-  // 黃金 V 型開局
   angleSlider.value = 120;
   adjustLForAngle(120);
 }
@@ -1162,7 +1203,9 @@ async function takeScreenshot() {
     let finalCanvas = document.createElement('canvas'), finalCtx = finalCanvas.getContext('2d'); finalCanvas.width = target.offsetWidth * 2; finalCanvas.height = target.offsetHeight * 2;
     let rect = target.getBoundingClientRect(); finalCtx.drawImage(bgCanvas, rect.left, rect.top, rect.width, rect.height, 0, 0, finalCanvas.width, finalCanvas.height); finalCtx.drawImage(canvas, 0, 0);
     const link = document.createElement('a'); link.download = `索道繩動態戰術分析_${new Date().getTime()}.png`; link.href = finalCanvas.toDataURL('image/png'); link.click();
-  } catch(e) { alert("截圖失敗：" + e); }
+  } catch(e) { 
+      try { alert("截圖失敗：" + e); } catch(err){} 
+  }
   target.classList.remove('capture-mode');
 }
 
@@ -1175,7 +1218,7 @@ if(shareBtnAction) {
         else {
           const dummy = document.createElement('input'); document.body.appendChild(dummy); dummy.value = window.location.href;
           dummy.select(); document.execCommand('copy'); document.body.removeChild(dummy);
-          alert('系統回報：裝備庫網址已複製，您可以貼上分享給友軍囉！');
+          try { alert('系統回報：系統網址已複製，您可以貼上分享給其他人囉！'); } catch(e){}
         }
       } catch (err) { console.error('分享失敗', err); }
     });
@@ -1190,12 +1233,20 @@ if ('serviceWorker' in navigator) {
 }
 
 function checkForUpdates() {
-  if (confirm("系統回報：即將為您強制清除舊版記憶，並重新載入最新版本！\n\n請問是否繼續執行？")) { 
+  let confirmUpdate = true;
+  try {
+      confirmUpdate = confirm("系統將連線檢查是否有最新版本的運算參數。\n\n請問是否立即執行更新程序？");
+  } catch(e) {
+      // 若預覽環境阻擋 confirm，則強制預設同意
+  }
+  
+  if (confirmUpdate) { 
     if ('caches' in window) {
       caches.keys().then((names) => {
         names.forEach(name => caches.delete(name));
       });
     }
+    try { alert("✅ 已準備就緒！即將為您重新載入最新版本系統。"); } catch(e){}
     window.location.href = window.location.href.split('?')[0] + '?v=' + new Date().getTime(); 
   }
 }
