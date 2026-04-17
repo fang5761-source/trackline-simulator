@@ -158,7 +158,6 @@
   .hud-tl { top: 10px; left: 5px; border-left: 3px solid var(--safe); max-width: 48%; overflow: hidden; } 
   .hud-tr { top: 10px; right: 5px; border-right: 3px solid var(--safe); text-align: right; align-items: flex-end; max-width: 48%; overflow: hidden; } 
 
-  /* 💡 浮動裝甲：加粗加大，絕對不變形 */
   .tag-badge {
     position: absolute;
     padding: 6px 12px;
@@ -280,7 +279,26 @@
 <body>
 
 <script>
-// (測試環境暫時解鎖防盜機制)
+(function protectOurApp() {
+  if (window.self !== window.top) { window.top.location = window.self.location; }
+  document.addEventListener('contextmenu', event => event.preventDefault());
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i')) || (e.ctrlKey && (e.key === 'U' || e.key === 'u')) || (e.metaKey && e.altKey && (e.key === 'I' || e.key === 'i')) || (e.metaKey && e.altKey && (e.key === 'U' || e.key === 'u'))) {
+      e.preventDefault();
+    }
+  });
+  const myDomain = "fang5761-source.github.io"; 
+  const currentDomain = window.location.hostname;
+  if (currentDomain !== "" && currentDomain !== "localhost" && currentDomain !== "127.0.0.1") {
+    if (!currentDomain.includes(myDomain)) {
+      alert("⚠️ 系統安全警告：偵測到非官方網域！\n\n本工具為【散木團隊】專屬研發，未經授權禁止盜用。\n系統防護機制啟動，即將強制鎖定。");
+      document.addEventListener("DOMContentLoaded", () => {
+          document.body.innerHTML = "<div style='display:flex; flex-direction:column; height:100vh; width:100vw; background:#0f1623; color:#ef4444; justify-content:center; align-items:center; font-size:24px; font-weight:bold; text-align:center; padding:20px;'><span style='font-size:60px; margin-bottom:20px;'>💀</span><br>未經授權的盜用版本<br>系統已鎖定</div>";
+      });
+      throw new Error("Security Breach: Unauthorized Domain. System Terminated.");
+    }
+  }
+})();
 </script>
 
 <div id="status-bar-protector" data-html2canvas-ignore="true"></div>
@@ -339,7 +357,6 @@
 
       <div class="svgWrap" id="svgWrap">
         <svg id="canvas" viewBox="0 0 400 460" preserveAspectRatio="xMidYMid meet">
-          <!-- 💡 V9.8 徹底移除舊有的 SVG 幽靈文字，只保留無限延伸的牽引線 -->
           <line id="tagLineA" stroke="var(--tagline)" stroke-width="4" stroke-dasharray="6 4" stroke-linecap="round" />
           <line id="tagLineB" stroke="var(--tagline)" stroke-width="4" stroke-dasharray="6 4" stroke-linecap="round" />
 
@@ -372,7 +389,6 @@
           </g>
         </svg>
 
-        <!-- 💡 V9.8 唯一存在的 HTML 浮動裝甲 -->
         <div id="tagBadgeA" class="tag-badge">--</div>
         <div id="tagBadgeB" class="tag-badge">--</div>
 
@@ -490,7 +506,7 @@
             </summary>
             <div class="menu-content">
               <div style="text-align: center; margin-bottom: 15px;">
-                <span style="display:inline-block; background:var(--safe); color:#0f1623; font-weight:bold; padding:4px 14px; border-radius:20px; font-size:13px; letter-spacing:0.5px; box-shadow: 0 2px 6px rgba(34,197,94,0.3);">V9.8 絕對淨空防撞版</span>
+                <span style="display:inline-block; background:var(--safe); color:#0f1623; font-weight:bold; padding:4px 14px; border-radius:20px; font-size:13px; letter-spacing:0.5px; box-shadow: 0 2px 6px rgba(34,197,94,0.3);">V10.1 完美連線版</span>
               </div>
               <p style="margin-top: 0; margin-bottom: 6px; font-weight: bold; color: var(--text); text-align: center;">本工具由 <span style="color:var(--warn);">散木團隊</span> 開發製作</p>
               <p style="margin-top: 0; margin-bottom: 4px; font-size: 13px; text-align: center;">教學架構與工程判斷／徐世豐</p>
@@ -816,7 +832,6 @@ function updateEngine(skipSliderUpdate = false) {
       els.angleText.setAttribute('fill', color);
       els.angleText.setAttribute('x', s_px); els.angleText.setAttribute('y', s_py - 35);
 
-      /* 💡 V9.8 終極排雷：徹底刪除舊版 SVG 幽靈文字，只用 HTML 浮動裝甲 */
       if (isStraight) {
           maControl.style.display = "none"; 
           els.tagLineA.style.display = "none"; els.tagLineB.style.display = "none";
@@ -836,11 +851,9 @@ function updateEngine(skipSliderUpdate = false) {
           let pullB = forceB / currentMA;
           let systemPull = Math.max(pullA, pullB);
           
-          // 💡 極淨化文案：只保留 0 kg，不再有冗長字眼干擾
           let txtA = pullA > 0.05 ? `${pullA.toFixed(1)} kg` + (isShockOn ? '(峰值)' : '') : '0 kg';
           let txtB = pullB > 0.05 ? `${pullB.toFixed(1)} kg` + (isShockOn ? '(峰值)' : '') : '0 kg';
 
-          // 💡 SVG 牽引線無限向外延伸，模擬真實戰術牽引拉向遠方
           els.tagLineA.setAttribute('x1', s_px); els.tagLineA.setAttribute('y1', s_py);
           els.tagLineA.setAttribute('x2', -100); els.tagLineA.setAttribute('y2', s_py);
 
@@ -861,8 +874,9 @@ function updateEngine(skipSliderUpdate = false) {
               let pulleyHtmlX = (s_px * ctm.a + ctm.e) - wrapRect.left;
               let pulleyHtmlY = (s_py * ctm.d + ctm.f) - wrapRect.top;
 
-              // 💡 完美的防撞雷達，確保標籤絕對不會遮到上方角度與滑輪
+              // 💡 V10.0：加入底部防墜毀雷達
               let safeMarginX = 55; // 左右牆壁防撞區
+              let safeMarginYBottom = wrapRect.height - 25; // 底部極限安全紅線
               
               // 🅰️ A 側標籤定位
               let badgeXA = pulleyHtmlX - 65; 
@@ -871,8 +885,15 @@ function updateEngine(skipSliderUpdate = false) {
               // 智慧下潛：如果滑輪太靠近左邊邊緣
               if (pulleyHtmlX < 110) {
                   badgeXA = safeMarginX; // 鎖死在螢幕邊緣
-                  badgeYA = pulleyHtmlY + 95; // 瞬間下潛，躲進大擔架底下的安全空間！
+                  badgeYA = pulleyHtmlY + 95; // 嘗試下潛躲進大擔架底下的安全空間
+                  
+                  // 🚨 底部防墜雷達觸發：如果下潛會掉出螢幕外（例如角度極低時）
+                  if (badgeYA > safeMarginYBottom) {
+                      badgeYA = pulleyHtmlY - 35; // 緊急爬升，改躲到水平線的上方！
+                  }
               }
+              // 終極 Y 軸底線鎖定（確保平時也不會掉出去）
+              if (badgeYA > safeMarginYBottom) badgeYA = safeMarginYBottom;
               
               els.tagBadgeA.style.left = `${badgeXA}px`;
               els.tagBadgeA.style.top = `${badgeYA}px`;
@@ -884,8 +905,15 @@ function updateEngine(skipSliderUpdate = false) {
               // 智慧下潛：如果滑輪太靠近右邊邊緣
               if (pulleyHtmlX > wrapRect.width - 110) {
                   badgeXB = wrapRect.width - safeMarginX; // 鎖死在螢幕邊緣
-                  badgeYB = pulleyHtmlY + 95; // 瞬間下潛，躲進大擔架底下的安全空間！
+                  badgeYB = pulleyHtmlY + 95; // 嘗試下潛
+                  
+                  // 🚨 底部防墜雷達觸發
+                  if (badgeYB > safeMarginYBottom) {
+                      badgeYB = pulleyHtmlY - 35; // 緊急爬升
+                  }
               }
+              // 終極 Y 軸底線鎖定
+              if (badgeYB > safeMarginYBottom) badgeYB = safeMarginYBottom;
               
               els.tagBadgeB.style.left = `${badgeXB}px`;
               els.tagBadgeB.style.top = `${badgeYB}px`;
@@ -1172,7 +1200,7 @@ function checkForUpdates() {
         names.forEach(name => caches.delete(name));
       });
     }
-    // 💡 透過時間戳強制擊碎暫存，確保讀到 V9.8 乾淨版
+    // 💡 透過時間戳強制擊碎暫存，確保讀到 V10.0 乾淨版
     window.location.href = window.location.href.split('?')[0] + '?v=' + new Date().getTime(); 
   }
 }
@@ -1196,7 +1224,6 @@ menuGroups.forEach(group => {
 
 window.addEventListener('resize', updateEngine);
 document.addEventListener('DOMContentLoaded', () => {
-    // 💡 確保所有節點載入後再繪製，並以完美的 120 度開局
     setTimeout(resetEngine, 150);
 });
 </script>
