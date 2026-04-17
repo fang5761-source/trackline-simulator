@@ -158,6 +158,7 @@
   .hud-tl { top: 10px; left: 5px; border-left: 3px solid var(--safe); max-width: 48%; overflow: hidden; } 
   .hud-tr { top: 10px; right: 5px; border-right: 3px solid var(--safe); text-align: right; align-items: flex-end; max-width: 48%; overflow: hidden; } 
 
+  /* 💡 V10.2: 裝甲置頂！將 z-index 提升至 90，保證漂浮在大擔架之上 */
   .tag-badge {
     position: absolute;
     padding: 6px 12px;
@@ -169,7 +170,7 @@
     transform: translate(-50%, -50%);
     box-shadow: 0 4px 12px rgba(0,0,0,0.6);
     transition: left 0.15s ease-out, top 0.15s ease-out, background 0.2s, border 0.2s;
-    z-index: 10;
+    z-index: 90; /* 💡 關鍵修復：大於 stretcher-tag 的 50 */
     display: none;
   }
   .tag-badge.active {
@@ -187,7 +188,7 @@
     position: absolute; background: #ea580c; border: 2px solid #9a3412;
     border-radius: 8px; padding: 8px 12px; color: var(--bg);
     transform: translate(-50%, 0); 
-    display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 50;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 50; /* 擔架的層級 */
     box-shadow: 0 4px 10px rgba(0,0,0,0.6); pointer-events: auto; touch-action: none; cursor: grab;
     min-width: 100px; width: auto; 
   }
@@ -506,7 +507,7 @@
             </summary>
             <div class="menu-content">
               <div style="text-align: center; margin-bottom: 15px;">
-                <span style="display:inline-block; background:var(--safe); color:#0f1623; font-weight:bold; padding:4px 14px; border-radius:20px; font-size:13px; letter-spacing:0.5px; box-shadow: 0 2px 6px rgba(34,197,94,0.3);">V10.1 完美連線版</span>
+                <span style="display:inline-block; background:var(--safe); color:#0f1623; font-weight:bold; padding:4px 14px; border-radius:20px; font-size:13px; letter-spacing:0.5px; box-shadow: 0 2px 6px rgba(34,197,94,0.3);">V10.2 完美120度與裝甲置頂版</span>
               </div>
               <p style="margin-top: 0; margin-bottom: 6px; font-weight: bold; color: var(--text); text-align: center;">本工具由 <span style="color:var(--warn);">散木團隊</span> 開發製作</p>
               <p style="margin-top: 0; margin-bottom: 4px; font-size: 13px; text-align: center;">教學架構與工程判斷／徐世豐</p>
@@ -823,6 +824,7 @@ function updateEngine(skipSliderUpdate = false) {
       els.dotA.setAttribute('stroke', color);
       els.dotB.setAttribute('stroke', color);
 
+      /* 💡 修復：完美將右邊主繩接回 s_by */
       els.ropeL.setAttribute('x1', s_ax); els.ropeL.setAttribute('y1', s_ay); els.ropeL.setAttribute('x2', s_px); els.ropeL.setAttribute('y2', s_py); els.ropeL.setAttribute('stroke', color);
       els.ropeR.setAttribute('x1', s_px); els.ropeR.setAttribute('y1', s_py); els.ropeR.setAttribute('x2', s_bx); els.ropeR.setAttribute('y2', s_by); els.ropeR.setAttribute('stroke', color);
 
@@ -874,45 +876,36 @@ function updateEngine(skipSliderUpdate = false) {
               let pulleyHtmlX = (s_px * ctm.a + ctm.e) - wrapRect.left;
               let pulleyHtmlY = (s_py * ctm.d + ctm.f) - wrapRect.top;
 
-              // 💡 V10.0：加入底部防墜毀雷達
-              let safeMarginX = 55; // 左右牆壁防撞區
-              let safeMarginYBottom = wrapRect.height - 25; // 底部極限安全紅線
+              let safeMarginX = 55; 
+              let safeMarginYBottom = wrapRect.height - 25; 
               
-              // 🅰️ A 側標籤定位
               let badgeXA = pulleyHtmlX - 65; 
-              let badgeYA = pulleyHtmlY + 18; // 預設：乖乖懸浮在水平線的正下方
+              let badgeYA = pulleyHtmlY + 18; 
 
-              // 智慧下潛：如果滑輪太靠近左邊邊緣
               if (pulleyHtmlX < 110) {
-                  badgeXA = safeMarginX; // 鎖死在螢幕邊緣
-                  badgeYA = pulleyHtmlY + 95; // 嘗試下潛躲進大擔架底下的安全空間
+                  badgeXA = safeMarginX; 
+                  badgeYA = pulleyHtmlY + 95; 
                   
-                  // 🚨 底部防墜雷達觸發：如果下潛會掉出螢幕外（例如角度極低時）
                   if (badgeYA > safeMarginYBottom) {
-                      badgeYA = pulleyHtmlY - 35; // 緊急爬升，改躲到水平線的上方！
+                      badgeYA = pulleyHtmlY - 35; 
                   }
               }
-              // 終極 Y 軸底線鎖定（確保平時也不會掉出去）
               if (badgeYA > safeMarginYBottom) badgeYA = safeMarginYBottom;
               
               els.tagBadgeA.style.left = `${badgeXA}px`;
               els.tagBadgeA.style.top = `${badgeYA}px`;
 
-              // 🅱️ B 側標籤定位
               let badgeXB = pulleyHtmlX + 65;
               let badgeYB = pulleyHtmlY + 18;
 
-              // 智慧下潛：如果滑輪太靠近右邊邊緣
               if (pulleyHtmlX > wrapRect.width - 110) {
-                  badgeXB = wrapRect.width - safeMarginX; // 鎖死在螢幕邊緣
-                  badgeYB = pulleyHtmlY + 95; // 嘗試下潛
+                  badgeXB = wrapRect.width - safeMarginX; 
+                  badgeYB = pulleyHtmlY + 95; 
                   
-                  // 🚨 底部防墜雷達觸發
                   if (badgeYB > safeMarginYBottom) {
-                      badgeYB = pulleyHtmlY - 35; // 緊急爬升
+                      badgeYB = pulleyHtmlY - 35; 
                   }
               }
-              // 終極 Y 軸底線鎖定
               if (badgeYB > safeMarginYBottom) badgeYB = safeMarginYBottom;
               
               els.tagBadgeB.style.left = `${badgeXB}px`;
@@ -1146,11 +1139,14 @@ function toggleHUD() {
   huds.forEach(el => el.style.opacity = hudVisible ? "1" : "0");
 }
 
+/* 💡 V10.2: 加入黃金開局，自動對齊 120 度並反推繩長 */
 function resetEngine() {
   inSpan.value = 20; inHeight.value = 0; inLoad.value = 100; currentSliderPct = 0.5;
   if(mainCard.classList.contains('shock-mode')) toggleShock(); 
   currentMA = 1; maBtns.forEach(b => b.classList.remove('active'));
   document.querySelector('.ma-btn[data-ma="1"]').classList.add('active');
+  
+  // 黃金 V 型開局
   angleSlider.value = 120;
   adjustLForAngle(120);
 }
@@ -1200,7 +1196,6 @@ function checkForUpdates() {
         names.forEach(name => caches.delete(name));
       });
     }
-    // 💡 透過時間戳強制擊碎暫存，確保讀到 V10.0 乾淨版
     window.location.href = window.location.href.split('?')[0] + '?v=' + new Date().getTime(); 
   }
 }
