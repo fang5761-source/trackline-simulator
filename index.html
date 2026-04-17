@@ -2,7 +2,8 @@
 <html lang="zh-Hant-TW">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<!-- 💡 戰術更新：移除 viewport-fit=cover，將動態島的防護權交還給蘋果 iOS 原生系統 -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
@@ -40,7 +41,7 @@
     --vip: #c084fc;
   }
 
-  html, body { overscroll-behavior: none; background-color: var(--bg); }
+  html, body { overscroll-behavior-y: none; background-color: var(--bg); }
   
   body {
     margin: 0; color: var(--text); font-family: 'Noto Serif TC', serif;
@@ -61,13 +62,10 @@
     background-size: 20px 20px; opacity: 0.5; pointer-events: none; transition: opacity 0.3s;
   }
 
-  /* 💡 修復：動態島 (Dynamic Island) 與安全區域完美貼合 */
+  /* 💡 戰術更新：恢復標準 Padding，依靠蘋果原生系統避開動態島 */
   .app-container { 
     max-width: 500px; width: 100%; display: flex; flex-direction: column; gap: 12px; position: relative; z-index: 1; 
-    padding-top: max(12px, env(safe-area-inset-top));
-    padding-bottom: max(40px, env(safe-area-inset-bottom));
-    padding-left: max(10px, env(safe-area-inset-left));
-    padding-right: max(10px, env(safe-area-inset-right));
+    padding: 10px 10px 40px 10px;
   }
   
   input[type="file"] { display: none; }
@@ -455,8 +453,7 @@
           </summary>
           <div class="menu-content">
             <div style="text-align: center; margin-bottom: 15px;">
-              <!-- 💡 更新版號 -->
-              <span style="display:inline-block; background:var(--safe); color:#0f1623; font-weight:bold; padding:4px 14px; border-radius:20px; font-size:13px; letter-spacing:0.5px; box-shadow: 0 2px 6px rgba(34,197,94,0.3);">V7.8 動態島與視角防護版</span>
+              <span style="display:inline-block; background:var(--safe); color:#0f1623; font-weight:bold; padding:4px 14px; border-radius:20px; font-size:13px; letter-spacing:0.5px; box-shadow: 0 2px 6px rgba(34,197,94,0.3);">V7.9 動態島原生退讓版</span>
             </div>
             <p style="margin-top: 0; margin-bottom: 6px; font-weight: bold; color: var(--text); text-align: center;">本工具由 <span style="color:var(--warn);">散木團隊</span> 開發製作</p>
             <p style="margin-top: 0; margin-bottom: 4px; font-size: 13px; text-align: center;">教學架構與工程判斷／徐世豐</p>
@@ -593,7 +590,7 @@ const els = {
   hudA: document.getElementById('hudA'), hudB: document.getElementById('hudB')
 };
 
-// 💡 終極修復：將沙盤起始高度往下壓 (140px)，完全避開頂部儀表板，解決「切頭」問題！
+// 💡 保持完美的 140 下壓起點，確保 A/B 不被切頭
 const svgW = 400, svgH = 460; 
 let scale = 10, offsetX = 50, offsetY = 140; 
 let currentSliderPct = 0.5;
@@ -676,7 +673,6 @@ function updateEngine(skipSliderUpdate = false) {
   let minL = Math.hypot(S, H);
   let calcL = Math.max(L, minL + 0.05);
 
-  // 💡 安全預留 150px 給頂部儀表板與底部擔架，保證 100% 絕對不切頭！
   let maxCanvasH = 460 - 150; 
   scale = Math.min((400 - 80) / Math.max(10, S), maxCanvasH / Math.max(10, Math.abs(H) + calcL*0.5));
   offsetY = 140 + (H < 0 ? Math.abs(H)*scale : 0); 
