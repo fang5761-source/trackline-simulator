@@ -229,6 +229,9 @@
   .ma-btn.active { background: var(--tagline); color: var(--bg); border-color: var(--tagline); }
   .ma-btn .lock-icon { bottom: 2px; right: 2px; font-size: 8px; }
 
+  /* 💡 截圖瞬間隱藏不必要的控制元件，讓畫面超級緊湊精簡 */
+  .capture-mode .capture-hide { display: none !important; }
+
   .modal-overlay {
     position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
     background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
@@ -283,7 +286,7 @@
 <body>
 
 <script>
-// 💡 V10.7: 將防盜機制與嚴格環境檢查徹底移除或封裝，確保任何預覽環境都不會白畫面當機！
+// (測試環境暫時解鎖防盜機制)
 </script>
 
 <div id="status-bar-protector" data-html2canvas-ignore="true"></div>
@@ -406,15 +409,16 @@
         </div>
       </div>
       
-      <div class="control-deck" data-html2canvas-ignore="true">
-         <div class="angle-slider-header">
+      <!-- 💡 V10.9：移除 html2canvas-ignore，改用 capture-hide 智慧收摺 -->
+      <div class="control-deck">
+         <div class="angle-slider-header capture-hide">
             <span>鬆 (夾角小)</span>
             <span style="color:var(--text);">📐 滑動調整主繩夾角</span>
             <span>緊 (夾角大)</span>
          </div>
-         <input type="range" id="angleSlider" min="0" max="180" step="0.5" value="120">
+         <input type="range" id="angleSlider" class="capture-hide" min="0" max="180" step="0.5" value="120">
          
-         <hr style="border:0; border-top:1px dashed rgba(255,255,255,0.1); margin: 2px 0;">
+         <hr class="capture-hide" style="border:0; border-top:1px dashed rgba(255,255,255,0.1); margin: 2px 0;">
 
          <div class="dash-inputs">
             <div class="dash-input-group">
@@ -437,7 +441,8 @@
       
       <div class="tagline-wrap" id="taglineWrap">
          <div id="taglineInfo">📍 在沙盤中自由上下左右拖曳進行動態模擬</div>
-         <div class="ma-control" id="maControl" style="display:none;">
+         <!-- 💡 V10.9：截圖時自動隱藏下方按鈕，保證版面緊湊 -->
+         <div class="ma-control capture-hide" id="maControl" style="display:none;">
             <span style="font-size:13px; color:var(--tagline); font-weight:bold;">⚙️ 水平牽引省力比</span>
             <div class="ma-btn-group">
               <button class="ma-btn active" data-ma="1">1:1</button>
@@ -449,7 +454,6 @@
          </div>
       </div>
       
-      <!-- 💡 將浮水印移入戰術儀表板內，確保截圖精準捕捉 -->
       <div class="watermark">索道繩動態張力估算儀 | 散木團隊</div>
     </div> 
     
@@ -563,7 +567,6 @@
 </div>
 
 <script>
-// 💡 V10.7：為預覽環境加上安全氣囊，將 localStorage 妥善包裹避免沙盒崩潰！
 const VIP_SECRET_KEYS = ["SM-PRO-2024", "SUNMOON-V10", "RESCUE-VIP"];
 let isUserVip = false;
 
@@ -884,6 +887,7 @@ function updateEngine(skipSliderUpdate = false) {
           
           let pullA = forceA / currentMA;
           let pullB = forceB / currentMA;
+          let systemPull = Math.max(pullA, pullB);
           
           let txtA = pullA > 0.05 ? `${pullA.toFixed(1)} kg` + (isShockOn ? '(峰值)' : '') : '0 kg';
           let txtB = pullB > 0.05 ? `${pullB.toFixed(1)} kg` + (isShockOn ? '(峰值)' : '') : '0 kg';
@@ -1195,10 +1199,13 @@ function resetEngine() {
   adjustLForAngle(120);
 }
 
-// 💡 V10.8：精準截圖引擎，只捕捉核心戰術儀表板，不再把下方選單的長度算進去！
+// 💡 V10.9：自動收摺不需要的拉桿與按鈕，並為複雜照片加上 AI 智慧護目鏡
 async function takeScreenshot() {
   const target = document.getElementById('mainCard'); 
   target.classList.add('capture-mode');
+  
+  // 等待 CSS 隱藏動畫完成，重新計算高度
+  await new Promise(r => setTimeout(r, 100));
   
   let bgCanvas = document.createElement('canvas'), bgCtx = bgCanvas.getContext('2d'); 
   bgCanvas.width = window.innerWidth; 
@@ -1206,11 +1213,18 @@ async function takeScreenshot() {
   bgCtx.fillStyle = '#0f1623'; 
   bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
   
-  if (image.style.opacity === "1") bgCtx.drawImage(image, 0, 0, bgCanvas.width, bgCanvas.height); 
-  else if (video.style.opacity === "1") bgCtx.drawImage(video, 0, 0, bgCanvas.width, bgCanvas.height);
+  // 💡 如果有照片或鏡頭背景，加上一層 65% 的暗色濾鏡保護，確保文字清晰
+  if (image.style.opacity === "1" || video.style.opacity === "1") {
+      if (image.style.opacity === "1") bgCtx.drawImage(image, 0, 0, bgCanvas.width, bgCanvas.height); 
+      else if (video.style.opacity === "1") bgCtx.drawImage(video, 0, 0, bgCanvas.width, bgCanvas.height);
+      
+      bgCtx.fillStyle = 'rgba(15, 22, 35, 0.65)';
+      bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
+  }
   
   if(gridVisible) { 
-      bgCtx.strokeStyle = '#1e3a5f'; bgCtx.lineWidth = 1; 
+      bgCtx.strokeStyle = 'rgba(30, 58, 95, 0.5)'; // 網格在截圖時稍微調淡
+      bgCtx.lineWidth = 1; 
       for(let x=0; x<bgCanvas.width; x+=20) { bgCtx.beginPath(); bgCtx.moveTo(x,0); bgCtx.lineTo(x,bgCanvas.height); bgCtx.stroke(); } 
       for(let y=0; y<bgCanvas.height; y+=20) { bgCtx.beginPath(); bgCtx.moveTo(0,y); bgCtx.lineTo(bgCanvas.width,y); bgCtx.stroke(); } 
   }
@@ -1263,7 +1277,6 @@ function checkForUpdates() {
   try {
       confirmUpdate = confirm("系統將連線檢查是否有最新版本的運算參數。\n\n請問是否立即執行更新程序？");
   } catch(e) {
-      // 若預覽環境阻擋 confirm，則強制預設同意
   }
   
   if (confirmUpdate) { 
