@@ -104,6 +104,7 @@
     border-radius:16px; padding: 12px; box-shadow:0 10px 30px rgba(0,0,0,.5); 
     backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); 
     transition: border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+    position: relative; 
   }
   .card.camera-mode {
     background: transparent !important; border-color: rgba(255,255,255,0.2) !important;
@@ -275,7 +276,7 @@
 
   .footer-disclaimer { margin-top: 5px; padding: 12px; font-size: 12px; color: var(--muted); line-height: 1.6; background: rgba(0,0,0,0.3); border-radius: 8px; border-left: 4px solid var(--bad); text-align: justify; }
 
-  .watermark { display: none; position: absolute; bottom: 10px; right: 10px; font-size: 10px; color: rgba(255,255,255,0.5); pointer-events: none; }
+  .watermark { display: none; position: absolute; bottom: 12px; right: 16px; font-size: 11px; font-weight: bold; color: rgba(255,255,255,0.6); pointer-events: none; z-index: 100; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
   .capture-mode .watermark { display: block; }
 </style>
 </head>
@@ -447,6 +448,9 @@
             </div>
          </div>
       </div>
+      
+      <!-- 💡 將浮水印移入戰術儀表板內，確保截圖精準捕捉 -->
+      <div class="watermark">索道繩動態張力估算儀 | 散木團隊</div>
     </div> 
     
     <div class="menu-list" data-html2canvas-ignore="true">
@@ -555,7 +559,6 @@
         本軟體為理論物理運算輔助工具，不包含繩索材質疲勞、極端摩擦力等環境變數。實際救援操作之系統架設與安全確保，均須由專業教官與指揮官實地判定，開發團隊不負任何實地操作之法律與賠償責任。
       </div>
     </div>
-    <div class="watermark">索道繩動態張力估算儀 | 散木團隊</div>
   </div>
 </div>
 
@@ -1192,17 +1195,40 @@ function resetEngine() {
   adjustLForAngle(120);
 }
 
+// 💡 V10.8：精準截圖引擎，只捕捉核心戰術儀表板，不再把下方選單的長度算進去！
 async function takeScreenshot() {
-  const target = document.getElementById('capture-area'); target.classList.add('capture-mode');
-  let bgCanvas = document.createElement('canvas'), bgCtx = bgCanvas.getContext('2d'); bgCanvas.width = window.innerWidth; bgCanvas.height = window.innerHeight;
-  bgCtx.fillStyle = '#0f1623'; bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
-  if (image.style.opacity === "1") bgCtx.drawImage(image, 0, 0, bgCanvas.width, bgCanvas.height); else if (video.style.opacity === "1") bgCtx.drawImage(video, 0, 0, bgCanvas.width, bgCanvas.height);
-  if(gridVisible) { bgCtx.strokeStyle = '#1e3a5f'; bgCtx.lineWidth = 1; for(let x=0; x<bgCanvas.width; x+=20) { bgCtx.beginPath(); bgCtx.moveTo(x,0); bgCtx.lineTo(x,bgCanvas.height); bgCtx.stroke(); } for(let y=0; y<bgCanvas.height; y+=20) { bgCtx.beginPath(); bgCtx.moveTo(0,y); bgCtx.lineTo(bgCanvas.width,y); bgCtx.stroke(); } }
+  const target = document.getElementById('mainCard'); 
+  target.classList.add('capture-mode');
+  
+  let bgCanvas = document.createElement('canvas'), bgCtx = bgCanvas.getContext('2d'); 
+  bgCanvas.width = window.innerWidth; 
+  bgCanvas.height = window.innerHeight;
+  bgCtx.fillStyle = '#0f1623'; 
+  bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
+  
+  if (image.style.opacity === "1") bgCtx.drawImage(image, 0, 0, bgCanvas.width, bgCanvas.height); 
+  else if (video.style.opacity === "1") bgCtx.drawImage(video, 0, 0, bgCanvas.width, bgCanvas.height);
+  
+  if(gridVisible) { 
+      bgCtx.strokeStyle = '#1e3a5f'; bgCtx.lineWidth = 1; 
+      for(let x=0; x<bgCanvas.width; x+=20) { bgCtx.beginPath(); bgCtx.moveTo(x,0); bgCtx.lineTo(x,bgCanvas.height); bgCtx.stroke(); } 
+      for(let y=0; y<bgCanvas.height; y+=20) { bgCtx.beginPath(); bgCtx.moveTo(0,y); bgCtx.lineTo(bgCanvas.width,y); bgCtx.stroke(); } 
+  }
+  
   try {
     const canvas = await html2canvas(target, { backgroundColor: null, scale: 2, useCORS: true, ignoreElements: (el) => el.hasAttribute('data-html2canvas-ignore') });
-    let finalCanvas = document.createElement('canvas'), finalCtx = finalCanvas.getContext('2d'); finalCanvas.width = target.offsetWidth * 2; finalCanvas.height = target.offsetHeight * 2;
-    let rect = target.getBoundingClientRect(); finalCtx.drawImage(bgCanvas, rect.left, rect.top, rect.width, rect.height, 0, 0, finalCanvas.width, finalCanvas.height); finalCtx.drawImage(canvas, 0, 0);
-    const link = document.createElement('a'); link.download = `索道繩動態戰術分析_${new Date().getTime()}.png`; link.href = finalCanvas.toDataURL('image/png'); link.click();
+    let finalCanvas = document.createElement('canvas'), finalCtx = finalCanvas.getContext('2d'); 
+    finalCanvas.width = target.offsetWidth * 2; 
+    finalCanvas.height = target.offsetHeight * 2;
+    
+    let rect = target.getBoundingClientRect(); 
+    finalCtx.drawImage(bgCanvas, rect.left, rect.top, rect.width, rect.height, 0, 0, finalCanvas.width, finalCanvas.height); 
+    finalCtx.drawImage(canvas, 0, 0);
+    
+    const link = document.createElement('a'); 
+    link.download = `索道繩動態戰術分析_${new Date().getTime()}.png`; 
+    link.href = finalCanvas.toDataURL('image/png'); 
+    link.click();
   } catch(e) { 
       try { alert("截圖失敗：" + e); } catch(err){} 
   }
