@@ -229,7 +229,7 @@
   .ma-btn.active { background: var(--tagline); color: var(--bg); border-color: var(--tagline); }
   .ma-btn .lock-icon { bottom: 2px; right: 2px; font-size: 8px; }
 
-  /* 💡 截圖瞬間隱藏不必要的控制元件，讓畫面超級緊湊精簡 */
+  /* 💡 V10.10: 修正截圖隱藏邏輯，保留 MA 省力比面板 */
   .capture-mode .capture-hide { display: none !important; }
 
   .modal-overlay {
@@ -279,8 +279,7 @@
 
   .footer-disclaimer { margin-top: 5px; padding: 12px; font-size: 12px; color: var(--muted); line-height: 1.6; background: rgba(0,0,0,0.3); border-radius: 8px; border-left: 4px solid var(--bad); text-align: justify; }
 
-  .watermark { display: none; position: absolute; bottom: 12px; right: 16px; font-size: 11px; font-weight: bold; color: rgba(255,255,255,0.6); pointer-events: none; z-index: 100; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
-  .capture-mode .watermark { display: block; }
+  /* 💡 V10.10: 徹底刪除礙眼的浮水印 css */
 </style>
 </head>
 <body>
@@ -409,7 +408,6 @@
         </div>
       </div>
       
-      <!-- 💡 V10.9：移除 html2canvas-ignore，改用 capture-hide 智慧收摺 -->
       <div class="control-deck">
          <div class="angle-slider-header capture-hide">
             <span>鬆 (夾角小)</span>
@@ -441,8 +439,8 @@
       
       <div class="tagline-wrap" id="taglineWrap">
          <div id="taglineInfo">📍 在沙盤中自由上下左右拖曳進行動態模擬</div>
-         <!-- 💡 V10.9：截圖時自動隱藏下方按鈕，保證版面緊湊 -->
-         <div class="ma-control capture-hide" id="maControl" style="display:none;">
+         <!-- 💡 V10.10：拔除隱形膠帶 (capture-hide)，讓省力比完整保留在戰術圖紙上 -->
+         <div class="ma-control" id="maControl" style="display:none;">
             <span style="font-size:13px; color:var(--tagline); font-weight:bold;">⚙️ 水平牽引省力比</span>
             <div class="ma-btn-group">
               <button class="ma-btn active" data-ma="1">1:1</button>
@@ -454,7 +452,7 @@
          </div>
       </div>
       
-      <div class="watermark">索道繩動態張力估算儀 | 散木團隊</div>
+      <!-- 💡 V10.10: 徹底刪除礙眼的浮水印標籤 -->
     </div> 
     
     <div class="menu-list" data-html2canvas-ignore="true">
@@ -1199,13 +1197,38 @@ function resetEngine() {
   adjustLForAngle(120);
 }
 
-// 💡 V10.9：自動收摺不需要的拉桿與按鈕，並為複雜照片加上 AI 智慧護目鏡
+// 💡 V10.10：數字瞬間拓印黑科技，保證截圖數字100%不變形、不位移
 async function takeScreenshot() {
   const target = document.getElementById('mainCard'); 
   target.classList.add('capture-mode');
   
-  // 等待 CSS 隱藏動畫完成，重新計算高度
-  await new Promise(r => setTimeout(r, 100));
+  // 將 input 瞬間轉換為純文字 span，避免 html2canvas 渲染 input 產生破版偏移
+  const inputs = target.querySelectorAll('input[type="number"]');
+  const placeholders = [];
+  
+  inputs.forEach(inp => {
+      const span = document.createElement('div');
+      span.textContent = inp.value;
+      span.style.width = inp.offsetWidth + 'px';
+      span.style.height = inp.offsetHeight + 'px';
+      span.style.lineHeight = inp.offsetHeight + 'px';
+      span.style.color = window.getComputedStyle(inp).color;
+      span.style.fontSize = window.getComputedStyle(inp).fontSize;
+      span.style.fontWeight = window.getComputedStyle(inp).fontWeight;
+      span.style.fontFamily = window.getComputedStyle(inp).fontFamily;
+      span.style.textAlign = 'center';
+      span.style.borderBottom = window.getComputedStyle(inp).borderBottom;
+      span.style.display = 'inline-block';
+      span.style.boxSizing = 'border-box';
+      
+      inp.style.display = 'none';
+      inp.parentNode.insertBefore(span, inp);
+      placeholders.push({ span, inp });
+  });
+
+  // 強制回到最上方，避免截圖引擎因頁面捲動而錯亂裁切
+  window.scrollTo(0, 0);
+  await new Promise(r => setTimeout(r, 150));
   
   let bgCanvas = document.createElement('canvas'), bgCtx = bgCanvas.getContext('2d'); 
   bgCanvas.width = window.innerWidth; 
@@ -1213,7 +1236,6 @@ async function takeScreenshot() {
   bgCtx.fillStyle = '#0f1623'; 
   bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
   
-  // 💡 如果有照片或鏡頭背景，加上一層 65% 的暗色濾鏡保護，確保文字清晰
   if (image.style.opacity === "1" || video.style.opacity === "1") {
       if (image.style.opacity === "1") bgCtx.drawImage(image, 0, 0, bgCanvas.width, bgCanvas.height); 
       else if (video.style.opacity === "1") bgCtx.drawImage(video, 0, 0, bgCanvas.width, bgCanvas.height);
@@ -1223,7 +1245,7 @@ async function takeScreenshot() {
   }
   
   if(gridVisible) { 
-      bgCtx.strokeStyle = 'rgba(30, 58, 95, 0.5)'; // 網格在截圖時稍微調淡
+      bgCtx.strokeStyle = 'rgba(30, 58, 95, 0.5)';
       bgCtx.lineWidth = 1; 
       for(let x=0; x<bgCanvas.width; x+=20) { bgCtx.beginPath(); bgCtx.moveTo(x,0); bgCtx.lineTo(x,bgCanvas.height); bgCtx.stroke(); } 
       for(let y=0; y<bgCanvas.height; y+=20) { bgCtx.beginPath(); bgCtx.moveTo(0,y); bgCtx.lineTo(bgCanvas.width,y); bgCtx.stroke(); } 
@@ -1232,8 +1254,8 @@ async function takeScreenshot() {
   try {
     const canvas = await html2canvas(target, { backgroundColor: null, scale: 2, useCORS: true, ignoreElements: (el) => el.hasAttribute('data-html2canvas-ignore') });
     let finalCanvas = document.createElement('canvas'), finalCtx = finalCanvas.getContext('2d'); 
-    finalCanvas.width = target.offsetWidth * 2; 
-    finalCanvas.height = target.offsetHeight * 2;
+    finalCanvas.width = canvas.width; 
+    finalCanvas.height = canvas.height;
     
     let rect = target.getBoundingClientRect(); 
     finalCtx.drawImage(bgCanvas, rect.left, rect.top, rect.width, rect.height, 0, 0, finalCanvas.width, finalCanvas.height); 
@@ -1246,6 +1268,13 @@ async function takeScreenshot() {
   } catch(e) { 
       try { alert("截圖失敗：" + e); } catch(err){} 
   }
+  
+  // 截圖完畢，把純文字銷毀，喚回原始的輸入框
+  placeholders.forEach(p => {
+      p.inp.style.display = '';
+      p.span.remove();
+  });
+  
   target.classList.remove('capture-mode');
 }
 
