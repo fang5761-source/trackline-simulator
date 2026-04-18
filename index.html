@@ -8,14 +8,15 @@
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
 
-<title>索道繩動態張力估算儀 | 散木團隊</title>
+<!-- 💡 V11.0 全新命名系統 -->
+<title>索道張力儀 (動態滑行版) | 散木團隊</title>
 
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="索道繩儀">
+<meta name="apple-mobile-web-app-title" content="索道張力儀">
 <meta name="mobile-web-app-capable" content="yes">
 
-<meta property="og:title" content="索道繩動態張力估算儀 | 散木團隊">
+<meta property="og:title" content="索道張力儀 (動態滑行版) | 散木團隊">
 <meta property="og:description" content="多點張力自動估算：自由拖曳、精準預測，結合實境相機，解開垂直抗重與主繩張力的物理之謎。">
 <meta property="og:image" content="https://fang5761-source.github.io/trackline-simulator/icon-512.png">
 <meta property="og:url" content="https://fang5761-source.github.io/trackline-simulator/">
@@ -110,6 +111,19 @@
     background: transparent !important; border-color: rgba(255,255,255,0.2) !important;
     backdrop-filter: none !important; -webkit-backdrop-filter: none !important; box-shadow: none !important;
   }
+
+  /* 💡 V11.0 截圖專屬裝甲：強制化為實心深藍色，內建網格，杜絕外部照片干擾 */
+  .card.capture-mode {
+    background-color: var(--bg) !important;
+    background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px) !important;
+    background-size: 20px 20px !important;
+    border-color: var(--line) !important;
+    box-shadow: none !important;
+    border-radius: 0 !important; 
+    backdrop-filter: none !important; 
+    -webkit-backdrop-filter: none !important;
+  }
+  .capture-mode .capture-hide { display: none !important; }
   
   .topbar { display: flex; align-items: center; margin-bottom: 8px; width: 100%; }
   .title-tag { font-size: 16px; font-weight: bold; display: flex; align-items: center; gap: 8px; white-space: nowrap; width: 100%; justify-content: space-between; }
@@ -229,9 +243,6 @@
   .ma-btn.active { background: var(--tagline); color: var(--bg); border-color: var(--tagline); }
   .ma-btn .lock-icon { bottom: 2px; right: 2px; font-size: 8px; }
 
-  /* 💡 V10.10: 修正截圖隱藏邏輯，保留 MA 省力比面板 */
-  .capture-mode .capture-hide { display: none !important; }
-
   .modal-overlay {
     position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
     background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
@@ -278,8 +289,6 @@
   .menu-action-btn:active { background: var(--line); }
 
   .footer-disclaimer { margin-top: 5px; padding: 12px; font-size: 12px; color: var(--muted); line-height: 1.6; background: rgba(0,0,0,0.3); border-radius: 8px; border-left: 4px solid var(--bad); text-align: justify; }
-
-  /* 💡 V10.10: 徹底刪除礙眼的浮水印 css */
 </style>
 </head>
 <body>
@@ -325,7 +334,8 @@
                <line x1="50" y1="72" x2="50" y2="58" stroke="#ef4444" stroke-width="4" stroke-linecap="round"/>
             </svg>
             <div class="title-divider"></div>
-            <span>索道繩動態張力估算儀 <span class="vip-badge">PRO</span></span>
+            <!-- 💡 V11.0 煥然一新的超強戰鬥代號 -->
+            <span>索道張力儀 (動態滑行版) <span class="vip-badge">PRO</span></span>
           </div>
           <img src="./sunmoon_logo.png" alt="散木團隊" style="width: 30px; height: 30px; border-radius: 6px; object-fit: cover; box-shadow: 0 2px 4px rgba(0,0,0,0.5);">
         </div>
@@ -439,7 +449,6 @@
       
       <div class="tagline-wrap" id="taglineWrap">
          <div id="taglineInfo">📍 在沙盤中自由上下左右拖曳進行動態模擬</div>
-         <!-- 💡 V10.10：拔除隱形膠帶 (capture-hide)，讓省力比完整保留在戰術圖紙上 -->
          <div class="ma-control" id="maControl" style="display:none;">
             <span style="font-size:13px; color:var(--tagline); font-weight:bold;">⚙️ 水平牽引省力比</span>
             <div class="ma-btn-group">
@@ -451,8 +460,6 @@
             </div>
          </div>
       </div>
-      
-      <!-- 💡 V10.10: 徹底刪除礙眼的浮水印標籤 -->
     </div> 
     
     <div class="menu-list" data-html2canvas-ignore="true">
@@ -1197,79 +1204,53 @@ function resetEngine() {
   adjustLForAngle(120);
 }
 
-// 💡 V10.10：數字瞬間拓印黑科技，保證截圖數字100%不變形、不位移
+// 💡 V11.0：戰術黑屏報告引擎 (純文字拓印 + 強制實心防護罩)
 async function takeScreenshot() {
   const target = document.getElementById('mainCard'); 
   target.classList.add('capture-mode');
   
-  // 將 input 瞬間轉換為純文字 span，避免 html2canvas 渲染 input 產生破版偏移
+  // 將 input 瞬間轉換為純文字 span，解決數字切邊或漂移的 Bug
   const inputs = target.querySelectorAll('input[type="number"]');
   const placeholders = [];
   
   inputs.forEach(inp => {
-      const span = document.createElement('div');
+      if(inp.closest('.capture-hide')) return;
+
+      const span = document.createElement('span');
       span.textContent = inp.value;
-      span.style.width = inp.offsetWidth + 'px';
-      span.style.height = inp.offsetHeight + 'px';
-      span.style.lineHeight = inp.offsetHeight + 'px';
-      span.style.color = window.getComputedStyle(inp).color;
-      span.style.fontSize = window.getComputedStyle(inp).fontSize;
-      span.style.fontWeight = window.getComputedStyle(inp).fontWeight;
-      span.style.fontFamily = window.getComputedStyle(inp).fontFamily;
-      span.style.textAlign = 'center';
-      span.style.borderBottom = window.getComputedStyle(inp).borderBottom;
-      span.style.display = 'inline-block';
-      span.style.boxSizing = 'border-box';
+      span.style.color = 'var(--warn)';
+      span.style.fontSize = '18px';
+      span.style.fontWeight = 'bold';
+      span.style.fontFamily = 'monospace';
+      span.style.margin = '0 2px';
       
       inp.style.display = 'none';
       inp.parentNode.insertBefore(span, inp);
       placeholders.push({ span, inp });
   });
 
-  // 強制回到最上方，避免截圖引擎因頁面捲動而錯亂裁切
+  // 強制捲動回頂部，避免截圖引擎錯亂
   window.scrollTo(0, 0);
-  await new Promise(r => setTimeout(r, 150));
-  
-  let bgCanvas = document.createElement('canvas'), bgCtx = bgCanvas.getContext('2d'); 
-  bgCanvas.width = window.innerWidth; 
-  bgCanvas.height = window.innerHeight;
-  bgCtx.fillStyle = '#0f1623'; 
-  bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
-  
-  if (image.style.opacity === "1" || video.style.opacity === "1") {
-      if (image.style.opacity === "1") bgCtx.drawImage(image, 0, 0, bgCanvas.width, bgCanvas.height); 
-      else if (video.style.opacity === "1") bgCtx.drawImage(video, 0, 0, bgCanvas.width, bgCanvas.height);
-      
-      bgCtx.fillStyle = 'rgba(15, 22, 35, 0.65)';
-      bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
-  }
-  
-  if(gridVisible) { 
-      bgCtx.strokeStyle = 'rgba(30, 58, 95, 0.5)';
-      bgCtx.lineWidth = 1; 
-      for(let x=0; x<bgCanvas.width; x+=20) { bgCtx.beginPath(); bgCtx.moveTo(x,0); bgCtx.lineTo(x,bgCanvas.height); bgCtx.stroke(); } 
-      for(let y=0; y<bgCanvas.height; y+=20) { bgCtx.beginPath(); bgCtx.moveTo(0,y); bgCtx.lineTo(bgCanvas.width,y); bgCtx.stroke(); } 
-  }
+  await new Promise(r => setTimeout(r, 100));
   
   try {
-    const canvas = await html2canvas(target, { backgroundColor: null, scale: 2, useCORS: true, ignoreElements: (el) => el.hasAttribute('data-html2canvas-ignore') });
-    let finalCanvas = document.createElement('canvas'), finalCtx = finalCanvas.getContext('2d'); 
-    finalCanvas.width = canvas.width; 
-    finalCanvas.height = canvas.height;
-    
-    let rect = target.getBoundingClientRect(); 
-    finalCtx.drawImage(bgCanvas, rect.left, rect.top, rect.width, rect.height, 0, 0, finalCanvas.width, finalCanvas.height); 
-    finalCtx.drawImage(canvas, 0, 0);
+    // 💡 捨棄複雜背景，強制給定最純淨的戰術黑底
+    const canvas = await html2canvas(target, { 
+        backgroundColor: '#0f1623', 
+        scale: 2, 
+        useCORS: true, 
+        ignoreElements: (el) => el.hasAttribute('data-html2canvas-ignore') || el.classList.contains('capture-hide') 
+    });
     
     const link = document.createElement('a'); 
-    link.download = `索道繩動態戰術分析_${new Date().getTime()}.png`; 
-    link.href = finalCanvas.toDataURL('image/png'); 
+    link.download = `散木索道儀_戰術報告_${new Date().getTime()}.png`; 
+    link.href = canvas.toDataURL('image/png'); 
     link.click();
   } catch(e) { 
       try { alert("截圖失敗：" + e); } catch(err){} 
   }
   
-  // 截圖完畢，把純文字銷毀，喚回原始的輸入框
+  // 復原 input
   placeholders.forEach(p => {
       p.inp.style.display = '';
       p.span.remove();
@@ -1281,7 +1262,7 @@ async function takeScreenshot() {
 const shareBtnAction = document.getElementById('shareBtnAction');
 if(shareBtnAction) {
     shareBtnAction.addEventListener('click', async () => {
-      const shareData = { title: '索道繩動態張力估算儀 (散木團隊)', text: '推薦這套散木團隊專屬的「索道繩動態張力估算儀」！支援實境相機、動態拖曳張力計算與一鍵戰術截圖，快來試試！', url: window.location.href };
+      const shareData = { title: '索道張力儀 (散木團隊)', text: '推薦這套散木團隊專屬的「索道張力儀」！支援實境相機、動態拖曳張力計算與一鍵戰術截圖，快來試試！', url: window.location.href };
       try {
         if (navigator.share) { await navigator.share(shareData); } 
         else {
