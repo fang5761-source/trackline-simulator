@@ -854,8 +854,9 @@ function updateEngine(skipSliderUpdate = false) {
           Fx = tension * cos1 + tension * cos2; 
       }
 
-      let isDanger = interiorAngle >= 160 || tension >= baseW * 4 || isStraight; 
-      let isWarn = !isDanger && (interiorAngle >= 120 || tension >= baseW * 1.5);
+      // 💡 依據國際索道規範更新警戒線：150°(2倍)黃燈，160°(3倍)紅燈
+      let isDanger = interiorAngle >= 160 || tension >= baseW * 3 || isStraight; 
+      let isWarn = !isDanger && (interiorAngle >= 150 || tension >= baseW * 2);
       let color = isDanger ? "var(--bad)" : (isWarn ? "var(--warn)" : "var(--safe)");
 
       mainCard.style.borderColor = color;
