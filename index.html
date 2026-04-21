@@ -296,6 +296,7 @@
 
   .footer-disclaimer { margin-top: 5px; padding: 12px; font-size: 12px; color: var(--muted); line-height: 1.6; background: rgba(0,0,0,0.3); border-radius: 8px; border-left: 4px solid var(--bad); text-align: justify; }
 
+  /* 散木專屬浮動提示框 (Toast) 樣式 */
   #toastMessage {
     display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
     background: var(--card); color: var(--text); padding: 14px 24px; border-radius: 10px;
@@ -303,8 +304,10 @@
     z-index: 10000; font-weight: bold; text-align: center; font-size: 14px; width: 85%; max-width: 320px;
     animation: toast-slide-down 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   }
-  @keyframes toast-slide-down { from { top: -50px; opacity: 0; } to { top: 20px; opacity: 1; } }
-
+  @keyframes toast-slide-down {
+    from { top: -50px; opacity: 0; }
+    to { top: 20px; opacity: 1; }
+  }
 </style>
 </head>
 <body>
@@ -340,6 +343,7 @@
 
 <script>
 // 💡 V5.0 無資料庫多語系字典引擎 (i18n Engine)
+// 修正：精簡語言按鈕文字，移除「語言、Lang、言語」等贅字
 const i18n = {
   zh: {
     appTitle: "索道張力儀 (動態滑行版)",
@@ -364,12 +368,13 @@ const i18n = {
     pullAction: "上拉/煞車",
     slackAction: "鬆弛/收繩",
     peak: "峰值",
-    langBtn: "🌐 語言：繁中",
-    menu1: "📚 專業名詞與原理解析",
-    menu2: "⚙️ 系統工具與說明書",
-    menu3: "🔗 分享系統連結",
-    menu4: "🔄 檢查並載入最新版本",
-    menu5: "💬 技術支援與問題回報"
+    langBtn: "🌐 繁中",
+    menu1: "專業名詞與原理解析",
+    menu2: "系統工具與說明書",
+    menu3: "分享系統連結",
+    menu4: "檢查並載入最新版本",
+    menu5: "技術支援與問題回報",
+    deadLineShort: "死線!"
   },
   en: {
     appTitle: "Trackline Tension Simulator",
@@ -394,12 +399,13 @@ const i18n = {
     pullAction: "Haul/Brake",
     slackAction: "Slack",
     peak: "Peak",
-    langBtn: "🌐 Lang: EN",
-    menu1: "📚 Terminology & Principles",
-    menu2: "⚙️ Tools & Manual",
-    menu3: "🔗 Share Link",
-    menu4: "🔄 Check for Updates",
-    menu5: "💬 Support & Feedback"
+    langBtn: "🌐 EN",
+    menu1: "Terminology & Principles",
+    menu2: "Tools & Manual",
+    menu3: "Share Link",
+    menu4: "Check for Updates",
+    menu5: "Support & Feedback",
+    deadLineShort: "FAIL!"
   },
   ja: {
     appTitle: "トラックライン張力計 (動的版)",
@@ -424,12 +430,13 @@ const i18n = {
     pullAction: "引く/ブレーキ",
     slackAction: "緩める",
     peak: "最大",
-    langBtn: "🌐 言語: 日本語",
-    menu1: "📚 専門用語と原理",
-    menu2: "⚙️ ツールとマニュアル",
-    menu3: "🔗 リンクを共有",
-    menu4: "🔄 更新の確認",
-    menu5: "💬 サポート/フィードバック"
+    langBtn: "🌐 日本語",
+    menu1: "専門用語と原理",
+    menu2: "ツールとマニュアル",
+    menu3: "リンクを共有",
+    menu4: "更新の確認",
+    menu5: "サポート/フィードバック",
+    deadLineShort: "破断!"
   }
 };
 
@@ -501,8 +508,8 @@ function toggleLang() {
             <div class="title-divider"></div>
             <span><span data-i18n="appTitle">索道張力儀 (動態滑行版)</span> <span class="vip-badge">PRO</span></span>
           </div>
-          <!-- 💡 多語系切換按鈕 -->
-          <button id="langToggleBtn" onclick="toggleLang()">🌐 語言：繁中</button>
+          <!-- 💡 修正：預設文字與字典同步 -->
+          <button id="langToggleBtn" onclick="toggleLang()">🌐 繁中</button>
         </div>
       </div>
 
@@ -628,8 +635,8 @@ function toggleLang() {
     </div> 
     
     <div class="menu-list" data-html2canvas-ignore="true">
-      <details class="main-accordion">
-        <summary><span data-i18n="menu1">📚 專業名詞與原理解析</span></summary>
+      <details class="main-accordion" id="theoryAccordion">
+        <summary><div style="display:flex; align-items:center; gap:8px;"><span class="menu-icon">📚</span> <span data-i18n="menu1">專業名詞與原理解析</span></div></summary>
         <div class="menu-group">
           <div class="menu-content">
             <p><b style="color:var(--safe)">🔗 張力 (Tension)</b><br>系統內部主繩繃緊的程度。由於滑輪會滾動平衡力量，整條主繩的張力是一樣的。張力過大將導致主繩斷裂！</p>
@@ -642,7 +649,7 @@ function toggleLang() {
       </details>
 
       <details class="main-accordion">
-        <summary><span data-i18n="menu2">⚙️ 系統工具與說明書</span></summary>
+        <summary><div style="display:flex; align-items:center; gap:8px;"><span class="menu-icon">⚙️</span> <span data-i18n="menu2">系統工具與說明書</span></div></summary>
         <div class="menu-group">
           
           <details class="menu-item">
@@ -1251,9 +1258,10 @@ function updateEngine(skipSliderUpdate = false) {
           els.floatLoad.style.top = `${flY}px`;
       }
 
-      let tText = (isStraight || tension > 9999) ? "死線!" : tension.toFixed(1);
-      let vAText = (isStraight || verticalA > 9999) ? "死線!" : verticalA.toFixed(1);
-      let vBText = (isStraight || verticalB > 9999) ? "死線!" : verticalB.toFixed(1);
+      // 💡 修正：將所有 "死線!" 改用 t('deadLineShort')，達成多國語言無縫切換
+      let tText = (isStraight || tension > 9999) ? t('deadLineShort') : tension.toFixed(1);
+      let vAText = (isStraight || verticalA > 9999) ? t('deadLineShort') : verticalA.toFixed(1);
+      let vBText = (isStraight || verticalB > 9999) ? t('deadLineShort') : verticalB.toFixed(1);
       
       let shockBadge = isShockOn ? `<span style="font-size:10px; color:var(--bad); margin-left:4px;">⚡${t('peak')}</span>` : '';
       let unitText = isStraight ? '' : 'kg';
