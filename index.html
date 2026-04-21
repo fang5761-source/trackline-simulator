@@ -47,7 +47,7 @@
   }
   
   body {
-    margin: 0; color: var(--text); font-family: 'Noto Serif TC', serif;
+    margin: 0; color: var(--text); font-family: 'Noto Serif TC', sans-serif;
     -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;
     transition: background-color 0.3s ease;
     display: flex; flex-direction: column; align-items: center;
@@ -124,8 +124,8 @@
   .capture-mode .capture-hide { display: none !important; }
   
   .topbar { display: flex; align-items: center; margin-bottom: 8px; width: 100%; }
-  .title-tag { font-size: 16px; font-weight: bold; display: flex; align-items: center; gap: 8px; white-space: nowrap; width: 100%; justify-content: space-between; cursor: pointer; user-select: none; }
-  .title-left { display: flex; align-items: center; gap: 6px; }
+  .title-tag { font-size: 16px; font-weight: bold; display: flex; align-items: center; gap: 8px; white-space: nowrap; width: 100%; justify-content: space-between; }
+  .title-left { display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; }
   .title-divider { width: 3px; height: 22px; background-color: var(--warn); border-radius: 2px; }
   
   .vip-badge {
@@ -134,6 +134,14 @@
     box-shadow: 0 0 8px rgba(192, 132, 252, 0.6); margin-left: 4px;
   }
   .is-vip .vip-badge { display: inline-block; }
+
+  /* 語言切換按鈕 */
+  #langToggleBtn {
+    background: rgba(255,255,255,0.05); border: 1px solid var(--line); color: var(--muted);
+    border-radius: 8px; padding: 4px 10px; font-size: 12px; font-weight: bold; cursor: pointer;
+    transition: all 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.3); margin-left: auto;
+  }
+  #langToggleBtn:active { transform: scale(0.95); background: var(--line); color: var(--text); }
 
   .icon-bar { display: flex; justify-content: space-between; align-items: center; gap: 6px; background: rgba(0,0,0,0.4); padding: 6px 8px; border-radius: 12px; margin-bottom: 8px; border: 1px solid var(--line); }
   .icon-btn { flex: 1; aspect-ratio: 1/1; max-height: 38px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid transparent; display: flex; justify-content: center; align-items: center; position: relative; cursor: pointer; transition: all 0.2s; font-size: 18px; color: var(--text); padding: 0; }
@@ -288,7 +296,6 @@
 
   .footer-disclaimer { margin-top: 5px; padding: 12px; font-size: 12px; color: var(--muted); line-height: 1.6; background: rgba(0,0,0,0.3); border-radius: 8px; border-left: 4px solid var(--bad); text-align: justify; }
 
-  /* 💡 新增：散木專屬浮動提示框 (Toast) 樣式 */
   #toastMessage {
     display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
     background: var(--card); color: var(--text); padding: 14px 24px; border-radius: 10px;
@@ -331,6 +338,129 @@
 })();
 </script>
 
+<script>
+// 💡 V5.0 無資料庫多語系字典引擎 (i18n Engine)
+const i18n = {
+  zh: {
+    appTitle: "索道張力儀 (動態滑行版)",
+    anchorA: "A 錨點",
+    anchorB: "B 錨點",
+    tension: "張力:",
+    vertical: "抗重:",
+    ropeLen: "➰ 總繩長",
+    span: "↔️ 跨距",
+    height: "↕️ 高差",
+    angleLoose: "鬆 (夾角小)",
+    angleDrag: "📐 滑動調整主繩夾角",
+    angleTight: "緊 (夾角大)",
+    sagLabel: "下垂量計算中...",
+    sagCalc: "下垂",
+    sagFail: "無法架設",
+    maTitle: "⚙️ 水平牽引省力比",
+    dragTip: "📍 在沙盤中自由上下左右拖曳進行動態模擬",
+    warnSpan: "🚨 跨距過大！超出繩索3%延展極限，無法架設",
+    warnDeath: "🚨 警告：系統已逼近3%延展極限，呈現死亡直線！",
+    balSafe: "📍 系統處於自然平衡點，兩側牽引繩皆不需發力",
+    pullAction: "上拉/煞車",
+    slackAction: "鬆弛/收繩",
+    peak: "峰值",
+    langBtn: "🌐 語言：繁中",
+    menu1: "📚 專業名詞與原理解析",
+    menu2: "⚙️ 系統工具與說明書",
+    menu3: "🔗 分享系統連結",
+    menu4: "🔄 檢查並載入最新版本",
+    menu5: "💬 技術支援與問題回報"
+  },
+  en: {
+    appTitle: "Trackline Tension Simulator",
+    anchorA: "Anchor A",
+    anchorB: "Anchor B",
+    tension: "Tension:",
+    vertical: "Vertical:",
+    ropeLen: "➰ Rope Length",
+    span: "↔️ Span",
+    height: "↕️ Height Diff",
+    angleLoose: "Slack (Small Ang)",
+    angleDrag: "📐 Slide to adjust Angle",
+    angleTight: "Tight (Large Ang)",
+    sagLabel: "Calculating Sag...",
+    sagCalc: "Sag",
+    sagFail: "Cannot Rig",
+    maTitle: "⚙️ Horizontal MA",
+    dragTip: "📍 Drag freely in the sandbox for dynamic simulation",
+    warnSpan: "🚨 Span too large! Exceeds 3% stretch limit.",
+    warnDeath: "🚨 Warning: Approaching 3% stretch limit (Death Line)!",
+    balSafe: "📍 Natural equilibrium. No tagline force needed.",
+    pullAction: "Haul/Brake",
+    slackAction: "Slack",
+    peak: "Peak",
+    langBtn: "🌐 Lang: EN",
+    menu1: "📚 Terminology & Principles",
+    menu2: "⚙️ Tools & Manual",
+    menu3: "🔗 Share Link",
+    menu4: "🔄 Check for Updates",
+    menu5: "💬 Support & Feedback"
+  },
+  ja: {
+    appTitle: "トラックライン張力計 (動的版)",
+    anchorA: "支点 A",
+    anchorB: "支点 B",
+    tension: "張力:",
+    vertical: "垂直:",
+    ropeLen: "➰ ロープ長",
+    span: "↔️ スパン",
+    height: "↕️ 高低差",
+    angleLoose: "緩い (小角度)",
+    angleDrag: "📐 スライドして角度調整",
+    angleTight: "張る (大角度)",
+    sagLabel: "サグ計算中...",
+    sagCalc: "サグ",
+    sagFail: "架設不可",
+    maTitle: "⚙️ 水平倍力比 (MA)",
+    dragTip: "📍 サンドボックス内で自由にドラッグしてシミュレーション",
+    warnSpan: "🚨 スパン過大！3%伸び限界を超過",
+    warnDeath: "🚨 警告：3%限界接近 (デッドライン)！",
+    balSafe: "📍 自然な釣り合い。水平牽引は不要です。",
+    pullAction: "引く/ブレーキ",
+    slackAction: "緩める",
+    peak: "最大",
+    langBtn: "🌐 言語: 日本語",
+    menu1: "📚 専門用語と原理",
+    menu2: "⚙️ ツールとマニュアル",
+    menu3: "🔗 リンクを共有",
+    menu4: "🔄 更新の確認",
+    menu5: "💬 サポート/フィードバック"
+  }
+};
+
+const availableLangs = ['zh', 'en', 'ja'];
+let currentLang = localStorage.getItem('sunmoon_lang') || 'zh';
+if (!availableLangs.includes(currentLang)) currentLang = 'zh';
+
+function t(key) {
+    return i18n[currentLang][key] || i18n['zh'][key] || key;
+}
+
+function applyTranslations() {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (i18n[currentLang][key]) {
+            el.innerHTML = i18n[currentLang][key];
+        }
+    });
+    const langBtn = document.getElementById('langToggleBtn');
+    if (langBtn) langBtn.innerHTML = t('langBtn');
+    if (typeof updateEngine === 'function') updateEngine(true);
+}
+
+function toggleLang() {
+    let idx = availableLangs.indexOf(currentLang);
+    currentLang = availableLangs[(idx + 1) % availableLangs.length];
+    localStorage.setItem('sunmoon_lang', currentLang);
+    applyTranslations();
+}
+</script>
+
 <div id="toastMessage"></div>
 <div id="status-bar-protector" data-html2canvas-ignore="true"></div>
 <div id="bg-layer"><video id="bg-video" autoplay playsinline muted></video><img id="bg-image" src="" alt="背景圖片"></div>
@@ -359,8 +489,8 @@
 
     <div class="card" id="mainCard">
       <div class="topbar">
-        <div class="title-tag" id="mainTitleText">
-          <div class="title-left">
+        <div class="title-tag">
+          <div class="title-left" id="mainTitleText">
             <svg width="24" height="24" viewBox="0 0 100 100">
                <rect width="100" height="100" fill="#0f1623" rx="10"/>
                <path d="M 15 30 L 50 72 L 85 30" fill="none" stroke="#22c55e" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" />
@@ -369,9 +499,10 @@
                <line x1="50" y1="72" x2="50" y2="58" stroke="#ef4444" stroke-width="4" stroke-linecap="round"/>
             </svg>
             <div class="title-divider"></div>
-            <span>索道張力儀 (動態滑行版) <span class="vip-badge">PRO</span></span>
+            <span><span data-i18n="appTitle">索道張力儀 (動態滑行版)</span> <span class="vip-badge">PRO</span></span>
           </div>
-          <img src="./sunmoon_logo.png" alt="散木團隊" style="width: 30px; height: 30px; border-radius: 6px; object-fit: cover; box-shadow: 0 2px 4px rgba(0,0,0,0.5);">
+          <!-- 💡 多語系切換按鈕 -->
+          <button id="langToggleBtn" onclick="toggleLang()">🌐 語言：繁中</button>
         </div>
       </div>
 
@@ -425,12 +556,12 @@
         <div id="tagBadgeB" class="tag-badge">--</div>
 
         <div class="hud-panel hud-tl" id="hudA">
-           <div style="color:var(--muted); font-size:11px;">A 錨點</div>
+           <div style="color:var(--muted); font-size:11px;" data-i18n="anchorA">A 錨點</div>
            <div id="txtTenA" class="val" style="color:var(--safe)">張力: --</div>
            <div id="txtVertA" class="val" style="color:var(--warn)">抗重: --</div>
         </div>
         <div class="hud-panel hud-tr" id="hudB">
-           <div style="color:var(--muted); font-size:11px;">B 錨點</div>
+           <div style="color:var(--muted); font-size:11px;" data-i18n="anchorB">B 錨點</div>
            <div id="txtTenB" class="val" style="color:var(--safe)">張力: --</div>
            <div id="txtVertB" class="val" style="color:var(--warn)">抗重: --</div>
         </div>
@@ -454,9 +585,9 @@
       
       <div class="control-deck">
          <div class="angle-slider-header capture-hide">
-            <span>鬆 (夾角小)</span>
-            <span style="color:var(--text);">📐 滑動調整主繩夾角</span>
-            <span>緊 (夾角大)</span>
+            <span data-i18n="angleLoose">鬆 (夾角小)</span>
+            <span style="color:var(--text);" data-i18n="angleDrag">📐 滑動調整主繩夾角</span>
+            <span data-i18n="angleTight">緊 (夾角大)</span>
          </div>
          <input type="range" id="angleSlider" class="capture-hide" min="0" max="180" step="0.5" value="120">
          
@@ -464,27 +595,27 @@
 
          <div class="dash-inputs">
             <div class="dash-input-group">
-               <span class="lbl">➰ 總繩長</span>
+               <span class="lbl" data-i18n="ropeLen">➰ 總繩長</span>
                <div><input type="number" id="inRope" value="23.1" step="0.1"><span style="color:var(--muted); font-size:11px;">m</span></div>
             </div>
             <div class="dash-input-group">
-               <span class="lbl">↔️ 跨距</span>
+               <span class="lbl" data-i18n="span">↔️ 跨距</span>
                <div><input type="number" id="inSpan" value="20" min="5" step="1"><span style="color:var(--muted); font-size:11px;">m</span></div>
             </div>
             <div class="dash-input-group" onclick="handleHeightClick(event)" style="cursor: pointer;">
-               <span class="lbl">↕️ 高差 <span class="lock-icon-inline">🔒</span></span>
+               <span class="lbl"><span data-i18n="height">↕️ 高差</span> <span class="lock-icon-inline">🔒</span></span>
                <div><input type="number" id="inHeight" value="0" step="1" readonly><span style="color:var(--muted); font-size:11px;">m</span></div>
             </div>
          </div>
          <div class="dash-sag-row">
-            <span id="sagText" style="color:var(--tagline); font-size:13px; font-weight:bold; letter-spacing: 1px;">下垂量計算中...</span>
+            <span id="sagText" style="color:var(--tagline); font-size:13px; font-weight:bold; letter-spacing: 1px;" data-i18n="sagLabel">下垂量計算中...</span>
          </div>
       </div>
       
       <div class="tagline-wrap" id="taglineWrap">
          <div id="taglineInfo">📍 在沙盤中自由上下左右拖曳進行動態模擬</div>
          <div class="ma-control" id="maControl" style="display:none;">
-            <span style="font-size:13px; color:var(--tagline); font-weight:bold;">⚙️ 水平牽引省力比</span>
+            <span style="font-size:13px; color:var(--tagline); font-weight:bold;" data-i18n="maTitle">⚙️ 水平牽引省力比</span>
             <div class="ma-btn-group">
               <button class="ma-btn active" data-ma="1">1:1</button>
               <button class="ma-btn" data-ma="3">3:1<span class="lock-icon">🔒</span></button>
@@ -498,7 +629,7 @@
     
     <div class="menu-list" data-html2canvas-ignore="true">
       <details class="main-accordion">
-        <summary>📚 專業名詞與原理解析</summary>
+        <summary><span data-i18n="menu1">📚 專業名詞與原理解析</span></summary>
         <div class="menu-group">
           <div class="menu-content">
             <p><b style="color:var(--safe)">🔗 張力 (Tension)</b><br>系統內部主繩繃緊的程度。由於滑輪會滾動平衡力量，整條主繩的張力是一樣的。張力過大將導致主繩斷裂！</p>
@@ -511,7 +642,7 @@
       </details>
 
       <details class="main-accordion">
-        <summary>⚙️ 系統工具與說明書</summary>
+        <summary><span data-i18n="menu2">⚙️ 系統工具與說明書</span></summary>
         <div class="menu-group">
           
           <details class="menu-item">
@@ -582,17 +713,17 @@
 
       <div class="main-accordion" style="display: flex; flex-direction: column;">
         <div class="menu-action-btn" id="shareBtnAction" style="border-bottom: 1px solid var(--line);">
-          <div class="menu-header-left"><span class="menu-icon">🔗</span>分享系統連結</div>
+          <div class="menu-header-left"><span class="menu-icon">🔗</span><span data-i18n="menu3">分享系統連結</span></div>
           <span class="menu-arrow">❯</span>
         </div>
 
         <div class="menu-action-btn" onclick="checkForUpdates()" style="border-bottom: 1px solid var(--line);">
-          <div class="menu-header-left"><span class="menu-icon">🔄</span>檢查並載入最新版本</div>
+          <div class="menu-header-left"><span class="menu-icon">🔄</span><span data-i18n="menu4">檢查並載入最新版本</span></div>
           <span class="menu-arrow">❯</span>
         </div>
 
         <div class="menu-action-btn" onclick="window.open('https://forms.gle/Uykr5jeQP6fgVhxh9', '_blank')">
-          <div class="menu-header-left"><span class="menu-icon">💬</span>技術支援與問題回報</div>
+          <div class="menu-header-left"><span class="menu-icon">💬</span><span data-i18n="menu5">技術支援與問題回報</span></div>
           <span class="menu-arrow">❯</span>
         </div>
       </div>
@@ -606,6 +737,9 @@
 </div>
 
 <script>
+// 💡 初始化語系面板
+applyTranslations();
+
 // 💡 散木專屬浮動提示框 (取代容易被封鎖的原生 alert)
 function showToast(msg, type = 'safe') {
     const toast = document.getElementById('toastMessage');
@@ -938,17 +1072,18 @@ function updateEngine(skipSliderUpdate = false) {
           
           maControl.style.display = 'none';
 
-          taglineInfo.innerHTML = `🚨 <b style="color:var(--bad);">跨距過大！超出繩索3%延展極限，無法架設</b>`;
+          // 💡 i18n 翻譯對應
+          taglineInfo.innerHTML = `🚨 <b style="color:var(--bad);">${t('warnSpan')}</b>`;
           taglineInfo.style.background = "rgba(239, 68, 68, 0.15)";
 
-          els.txtTenA.innerHTML = `張力 <span style="font-size:15px">---</span>`;
-          els.txtVertA.innerHTML = `抗重 <span style="font-size:15px">---</span>`;
-          els.txtTenB.innerHTML = `張力 <span style="font-size:15px">---</span>`;
-          els.txtVertB.innerHTML = `抗重 <span style="font-size:15px">---</span>`;
+          els.txtTenA.innerHTML = `${t('tension')} <span style="font-size:15px">---</span>`;
+          els.txtVertA.innerHTML = `${t('vertical')} <span style="font-size:15px">---</span>`;
+          els.txtTenB.innerHTML = `${t('tension')} <span style="font-size:15px">---</span>`;
+          els.txtVertB.innerHTML = `${t('vertical')} <span style="font-size:15px">---</span>`;
           els.hudA.style.borderLeftColor = 'var(--bad)';
           els.hudB.style.borderRightColor = 'var(--bad)';
 
-          els.sagText.textContent = `下垂: 無法架設`;
+          els.sagText.textContent = `${t('sagCalc')}: ${t('sagFail')}`;
 
           if(!skipSliderUpdate) angleSlider.value = 180;
           return; 
@@ -1008,7 +1143,8 @@ function updateEngine(skipSliderUpdate = false) {
           els.tagLineA.style.display = "none"; els.tagLineB.style.display = "none";
           els.tagBadgeA.style.display = 'none'; els.tagBadgeB.style.display = 'none';
           
-          taglineInfo.innerHTML = `🚨 <b style="color:var(--bad);">警告：系統已逼近3%延展極限，呈現死亡直線！</b>`;
+          // 💡 i18n 翻譯對應
+          taglineInfo.innerHTML = `🚨 <b style="color:var(--bad);">${t('warnDeath')}</b>`;
           taglineInfo.style.background = "rgba(239, 68, 68, 0.15)";
       } else {
           els.tagLineA.style.display = "block"; els.tagLineB.style.display = "block";
@@ -1021,8 +1157,8 @@ function updateEngine(skipSliderUpdate = false) {
           let pullA = forceA / currentMA;
           let pullB = forceB / currentMA;
           
-          let txtA = pullA > 0.05 ? `${pullA.toFixed(1)} kg` + (isShockOn ? '(峰值)' : '') : '0 kg';
-          let txtB = pullB > 0.05 ? `${pullB.toFixed(1)} kg` + (isShockOn ? '(峰值)' : '') : '0 kg';
+          let txtA = pullA > 0.05 ? `${pullA.toFixed(1)} kg` + (isShockOn ? `(${t('peak')})` : '') : '0 kg';
+          let txtB = pullB > 0.05 ? `${pullB.toFixed(1)} kg` + (isShockOn ? `(${t('peak')})` : '') : '0 kg';
 
           els.tagLineA.setAttribute('x1', s_px); els.tagLineA.setAttribute('y1', s_py);
           els.tagLineA.setAttribute('x2', -100); els.tagLineA.setAttribute('y2', s_py);
@@ -1053,10 +1189,7 @@ function updateEngine(skipSliderUpdate = false) {
               if (pulleyHtmlX < 110) {
                   badgeXA = safeMarginX; 
                   badgeYA = pulleyHtmlY + 95; 
-                  
-                  if (badgeYA > safeMarginYBottom) {
-                      badgeYA = pulleyHtmlY - 35; 
-                  }
+                  if (badgeYA > safeMarginYBottom) badgeYA = pulleyHtmlY - 35; 
               }
               if (badgeYA > safeMarginYBottom) badgeYA = safeMarginYBottom;
               
@@ -1069,10 +1202,7 @@ function updateEngine(skipSliderUpdate = false) {
               if (pulleyHtmlX > wrapRect.width - 110) {
                   badgeXB = wrapRect.width - safeMarginX; 
                   badgeYB = pulleyHtmlY + 95; 
-                  
-                  if (badgeYB > safeMarginYBottom) {
-                      badgeYB = pulleyHtmlY - 35; 
-                  }
+                  if (badgeYB > safeMarginYBottom) badgeYB = pulleyHtmlY - 35; 
               }
               if (badgeYB > safeMarginYBottom) badgeYB = safeMarginYBottom;
               
@@ -1081,11 +1211,11 @@ function updateEngine(skipSliderUpdate = false) {
           }
 
           if (pullA < 0.05 && pullB < 0.05) {
-              taglineInfo.innerHTML = `📍 系統處於自然平衡點，兩側牽引繩皆不需發力`;
+              taglineInfo.innerHTML = `${t('balSafe')}`;
               taglineInfo.style.background = "rgba(34, 197, 94, 0.1)";
           } else {
-              let labelA = pullA > 0.05 ? '上拉/煞車' : '鬆弛/收繩';
-              let labelB = pullB > 0.05 ? '上拉/煞車' : '鬆弛/收繩';
+              let labelA = pullA > 0.05 ? t('pullAction') : t('slackAction');
+              let labelB = pullB > 0.05 ? t('pullAction') : t('slackAction');
               let valA = pullA > 0.05 ? txtA : '0 kg';
               let valB = pullB > 0.05 ? txtB : '0 kg';
               taglineInfo.innerHTML = `
@@ -1125,20 +1255,20 @@ function updateEngine(skipSliderUpdate = false) {
       let vAText = (isStraight || verticalA > 9999) ? "死線!" : verticalA.toFixed(1);
       let vBText = (isStraight || verticalB > 9999) ? "死線!" : verticalB.toFixed(1);
       
-      let shockBadge = isShockOn ? `<span style="font-size:10px; color:var(--bad); margin-left:4px;">⚡峰值</span>` : '';
+      let shockBadge = isShockOn ? `<span style="font-size:10px; color:var(--bad); margin-left:4px;">⚡${t('peak')}</span>` : '';
       let unitText = isStraight ? '' : 'kg';
       
-      els.txtTenA.innerHTML = `張力 <span style="font-size:15px">${tText}</span><span style="font-size:11px">${unitText}</span>${shockBadge}`; els.txtTenA.style.color = color;
-      els.txtVertA.innerHTML = `抗重 <span style="font-size:15px">${vAText}</span><span style="font-size:11px">${unitText}</span>${shockBadge}`;
+      els.txtTenA.innerHTML = `${t('tension')} <span style="font-size:15px">${tText}</span><span style="font-size:11px">${unitText}</span>${shockBadge}`; els.txtTenA.style.color = color;
+      els.txtVertA.innerHTML = `${t('vertical')} <span style="font-size:15px">${vAText}</span><span style="font-size:11px">${unitText}</span>${shockBadge}`;
       els.hudA.style.borderLeftColor = color; 
 
-      els.txtTenB.innerHTML = `張力 <span style="font-size:15px">${tText}</span><span style="font-size:11px">${unitText}</span>${shockBadge}`; els.txtTenB.style.color = color;
-      els.txtVertB.innerHTML = `抗重 <span style="font-size:15px">${vBText}</span><span style="font-size:11px">${unitText}</span>${shockBadge}`;
+      els.txtTenB.innerHTML = `${t('tension')} <span style="font-size:15px">${tText}</span><span style="font-size:11px">${unitText}</span>${shockBadge}`; els.txtTenB.style.color = color;
+      els.txtVertB.innerHTML = `${t('vertical')} <span style="font-size:15px">${vBText}</span><span style="font-size:11px">${unitText}</span>${shockBadge}`;
       els.hudB.style.borderRightColor = color;
 
       let sagBaseY = ay + (by - ay) * currentSliderPct;
       let actualSag = isStraight ? 0 : py - sagBaseY; 
-      els.sagText.textContent = `下垂: ${actualSag.toFixed(2)}m (${(actualSag/S*100).toFixed(1)}%)`;
+      els.sagText.textContent = `${t('sagCalc')}: ${actualSag.toFixed(2)}m (${(actualSag/S*100).toFixed(1)}%)`;
   } catch (err) {
       console.error("引擎運算錯誤:", err);
   }
