@@ -8,7 +8,6 @@
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
 
-<!-- 💡 V11.0 全新命名系統 -->
 <title>索道張力儀 (動態滑行版) | 散木團隊</title>
 
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -112,7 +111,6 @@
     backdrop-filter: none !important; -webkit-backdrop-filter: none !important; box-shadow: none !important;
   }
 
-  /* 💡 V11.0 截圖專屬裝甲：強制化為實心深藍色，內建網格，杜絕外部照片干擾 */
   .card.capture-mode {
     background-color: var(--bg) !important;
     background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px) !important;
@@ -126,7 +124,7 @@
   .capture-mode .capture-hide { display: none !important; }
   
   .topbar { display: flex; align-items: center; margin-bottom: 8px; width: 100%; }
-  .title-tag { font-size: 16px; font-weight: bold; display: flex; align-items: center; gap: 8px; white-space: nowrap; width: 100%; justify-content: space-between; }
+  .title-tag { font-size: 16px; font-weight: bold; display: flex; align-items: center; gap: 8px; white-space: nowrap; width: 100%; justify-content: space-between; cursor: pointer; user-select: none; }
   .title-left { display: flex; align-items: center; gap: 6px; }
   .title-divider { width: 3px; height: 22px; background-color: var(--warn); border-radius: 2px; }
   
@@ -289,20 +287,57 @@
   .menu-action-btn:active { background: var(--line); }
 
   .footer-disclaimer { margin-top: 5px; padding: 12px; font-size: 12px; color: var(--muted); line-height: 1.6; background: rgba(0,0,0,0.3); border-radius: 8px; border-left: 4px solid var(--bad); text-align: justify; }
+
+  /* 💡 新增：散木專屬浮動提示框 (Toast) 樣式 */
+  #toastMessage {
+    display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+    background: var(--card); color: var(--text); padding: 14px 24px; border-radius: 10px;
+    border-left: 4px solid var(--safe); box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+    z-index: 10000; font-weight: bold; text-align: center; font-size: 14px; width: 85%; max-width: 320px;
+    animation: toast-slide-down 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  @keyframes toast-slide-down { from { top: -50px; opacity: 0; } to { top: 20px; opacity: 1; } }
+
 </style>
 </head>
 <body>
 
 <script>
-// (測試環境暫時解鎖防盜機制)
+// 散木團隊 · 多層次防盜保護系統 v4.0
+(function(){
+  const _0xd = atob('ZmFuZzU3NjEtc291cmNlLmdpdGh1Yi5pbw=='); 
+  const _0xh = window[atob('bG9jYXRpb24=')][atob('aG9zdG5hbWU=')]; 
+  window['_unlockApp']   = function(){ _0xKill(); };
+  window['_bypassCheck'] = function(){ _0xKill(); };
+  window['_disableLock'] = function(){ _0xKill(); };
+
+  function _0xKill(msg) {
+    const _m = msg || atob('5pyq57aT5o6l5qC85qih6Iiq5ZCn77yc5bey57O757uf5bim5Yqo5aSx5pWX');
+    try {
+      document.open();
+      document.write('<html><body style="margin:0;height:100vh;display:flex;flex-direction:column;background:#0f1623;color:#ef4444;justify-content:center;align-items:center;text-align:center;font-family:monospace;padding:20px;"><span style="font-size:72px;margin-bottom:16px;">&#x1F480;</span><div style="font-size:22px;font-weight:bold;margin-bottom:8px;">' + _m + '</div><div style="font-size:13px;color:#94a3b8;margin-top:12px;">' + atob('5pys5bel5YW36aSa5qih6Iiq55qE5q2k5bqT77yM5Lul56aB5q2k5q+P5qih6IiqICsgU2NhdHRlck1hcA==') + '</div></body></html>');
+      document.close();
+    } catch(e) {
+      document.body.innerHTML = '<span style="font-size:72px">&#x1F480;</span><br>' + _m;
+    }
+    throw new Error('[SM-SHIELD] Unauthorized access terminated.');
+  }
+
+  (function _0xVerify(){
+    const _whitelist = [_0xd, 'localhost', '127.0.0.1', ''];
+    const _isOk = _whitelist.some(function(w){ return _0xh === w || _0xh.endsWith('.' + w); });
+    if (!_isOk) { _0xKill(); }
+  })();
+})();
 </script>
 
+<div id="toastMessage"></div>
 <div id="status-bar-protector" data-html2canvas-ignore="true"></div>
 <div id="bg-layer"><video id="bg-video" autoplay playsinline muted></video><img id="bg-image" src="" alt="背景圖片"></div>
 <div id="grid-overlay"></div>
 
 <div id="vipModal" class="modal-overlay">
-  <div class="modal-box">
+  <div class="modal-box" id="vipModalBox">
     <h3>🔒 專業版功能解鎖 <span class="vip-badge" style="display:inline-block;">PRO</span></h3>
     <p>您即將啟用「<span id="vipFeatureName" class="highlight"></span>」！</p>
     <p id="vipFeatureDesc" style="font-size:14px; color:var(--safe); font-weight:bold; margin-bottom: 12px;"></p>
@@ -324,7 +359,7 @@
 
     <div class="card" id="mainCard">
       <div class="topbar">
-        <div class="title-tag">
+        <div class="title-tag" id="mainTitleText">
           <div class="title-left">
             <svg width="24" height="24" viewBox="0 0 100 100">
                <rect width="100" height="100" fill="#0f1623" rx="10"/>
@@ -334,7 +369,6 @@
                <line x1="50" y1="72" x2="50" y2="58" stroke="#ef4444" stroke-width="4" stroke-linecap="round"/>
             </svg>
             <div class="title-divider"></div>
-            <!-- 💡 V11.0 煥然一新的超強戰鬥代號 -->
             <span>索道張力儀 (動態滑行版) <span class="vip-badge">PRO</span></span>
           </div>
           <img src="./sunmoon_logo.png" alt="散木團隊" style="width: 30px; height: 30px; border-radius: 6px; object-fit: cover; box-shadow: 0 2px 4px rgba(0,0,0,0.5);">
@@ -572,11 +606,33 @@
 </div>
 
 <script>
-const VIP_SECRET_KEYS = ["SM-PRO-2024", "SUNMOON-V10", "RESCUE-VIP"];
+// 💡 散木專屬浮動提示框 (取代容易被封鎖的原生 alert)
+function showToast(msg, type = 'safe') {
+    const toast = document.getElementById('toastMessage');
+    toast.innerHTML = msg;
+    toast.style.borderLeftColor = `var(--${type})`;
+    toast.style.display = 'block';
+    setTimeout(() => { toast.style.display = 'none'; }, 3000);
+}
+
+// 💡 戰術升級：索道張力儀專屬獨立金鑰 (SMT = SunMoon Trackline)
+const PERMANENT_KEYS = ["SMT-A7K9-X2M4", "SMT-B3Q8-P9Y1", "SMT-C5R2-W6Z7"];
+const MASTER_KEY = "SUNMOONBOSS"; // 💡 總司令匿蹤版金鑰：輸入小寫 sunmoonboss 亦可無痛通關
+
+function getDailyKey(offsetDays = 0) {
+    const d = new Date(); d.setDate(d.getDate() + offsetDays);
+    const dateStr = d.toLocaleDateString('zh-TW', { timeZone: 'Asia/Taipei', year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '');
+    const hash = (parseInt(dateStr) * 17 % 9000) + 1000;
+    return "SMT-" + hash; // 💡 體驗碼也加上專屬前綴
+}
+
+const todayStr = new Date().toLocaleDateString('en-CA', {timeZone: 'Asia/Taipei'}); 
 let isUserVip = false;
 
 try {
-    isUserVip = localStorage.getItem('sunmoon_vip_status') === 'true';
+    // 💡 戰術升級：專屬獨立記憶鎖頭 (sunmoon_vip_trackline_status)
+    if (localStorage.getItem('sunmoon_vip_trackline_status') === 'true') { isUserVip = true; }
+    else if (localStorage.getItem('sunmoon_vip_trackline_expire') === todayStr) { isUserVip = true; }
 } catch (e) {
     console.warn("系統提示：當前預覽環境沙盒已限制記憶體存取。");
 }
@@ -594,12 +650,14 @@ const featureDescriptions = {
     '↕️ 峽谷高低差模擬': '解鎖高低差限制，真實模擬深谷上拉與下放的極端物理張力變化！'
 };
 
+const originalVipModalHtml = document.getElementById('vipModalBox').innerHTML;
 let pendingFeatureCallback = null;
 
 function attemptFeature(featureName, callback) {
     if (isUserVip) { callback(); } 
     else {
         pendingFeatureCallback = callback;
+        document.getElementById('vipModalBox').innerHTML = originalVipModalHtml; 
         document.getElementById('vipFeatureName').textContent = featureName;
         
         let desc = "";
@@ -621,23 +679,93 @@ function closeVipModal() {
     pendingFeatureCallback = null;
 }
 
+// 💡 隱藏的指揮官暗門通道 (點擊標題召喚)
+const mainTitleEl = document.getElementById('mainTitleText');
+if (mainTitleEl) {
+    mainTitleEl.addEventListener('click', () => {
+        if (isUserVip) {
+            pendingFeatureCallback = null;
+            document.getElementById('vipModalBox').innerHTML = originalVipModalHtml; 
+            document.getElementById('vipFeatureName').textContent = "🛡️ 系統狀態：已解鎖";
+            document.getElementById('vipFeatureDesc').textContent = "如需進入指揮官控制台，請輸入最高權限金鑰：";
+            
+            document.getElementById('vipErrorMsg').textContent = "";
+            document.getElementById('vipPwdInput').value = "";
+            document.getElementById('vipModal').classList.add('show');
+            setTimeout(() => document.getElementById('vipPwdInput').focus(), 100);
+        }
+    });
+}
+
+// 💡 一鍵清除獨立鎖頭授權 (登出)
+window.logoutVip = function() {
+    try {
+        localStorage.removeItem('sunmoon_vip_trackline_status');
+        localStorage.removeItem('sunmoon_vip_trackline_expire');
+    } catch(e) {}
+    showToast("🔄 登出成功，正在重新載入鎖定狀態...", "warn");
+    setTimeout(() => { window.location.reload(); }, 1000); 
+};
+
 function verifyVip() {
-    const inputPwd = document.getElementById('vipPwdInput').value.trim();
+    const inputPwd = document.getElementById('vipPwdInput').value.trim().toUpperCase(); 
     const errorMsg = document.getElementById('vipErrorMsg');
     
-    if (VIP_SECRET_KEYS.includes(inputPwd)) {
-        try { localStorage.setItem('sunmoon_vip_status', 'true'); } catch(e){}
-        isUserVip = true;
+    // 【第三層：指揮官控制台】
+    if (inputPwd === MASTER_KEY) {
+        try { localStorage.setItem('sunmoon_vip_trackline_status', 'true'); } catch(e){} 
+        isUserVip = true; 
         document.body.classList.add('is-vip'); 
-        document.getElementById('inHeight').removeAttribute('readonly'); 
-        closeVipModal();
-        try { alert("🎉 授權成功！歡迎使用散木專業版全功能！"); } catch(e) {}
-        if (pendingFeatureCallback) { pendingFeatureCallback(); pendingFeatureCallback = null; }
-    } else {
-        errorMsg.textContent = "❌ 密碼錯誤，請確認輸入是否正確。";
-        document.getElementById('vipPwdInput').classList.add('shock-anim');
-        setTimeout(() => document.getElementById('vipPwdInput').classList.remove('shock-anim'), 1000);
+        document.getElementById('inHeight').removeAttribute('readonly');
+        
+        const todayKey = getDailyKey(0); const tmrwKey = getDailyKey(1); const permKey = PERMANENT_KEYS[0];
+        document.getElementById('vipModalBox').innerHTML = `
+          <h3 style="color: var(--warn); margin-top:0;">👑 指揮官專屬控制台</h3>
+          <p style="font-size:14px; margin-bottom:15px; color:var(--text);">報告長官！以下是動態教學體驗碼：</p>
+          <div style="background:rgba(0,0,0,0.3); padding:12px; border-radius:8px; margin-bottom:10px; text-align:left; border-left: 4px solid var(--safe);">
+            <span style="color:var(--muted); font-size:12px;">👉 今天的體驗碼 (今晚 23:59 失效)</span><br><strong style="color:var(--safe); font-size:22px; letter-spacing:1px;">${todayKey}</strong>
+          </div>
+          <div style="background:rgba(0,0,0,0.3); padding:12px; border-radius:8px; margin-bottom:10px; text-align:left; border-left: 4px solid var(--warn);">
+            <span style="color:var(--muted); font-size:12px;">👉 明天的體驗碼</span><br><strong style="color:var(--warn); font-size:22px; letter-spacing:1px;">${tmrwKey}</strong>
+          </div>
+          <div style="background:rgba(0,0,0,0.3); padding:12px; border-radius:8px; margin-bottom:20px; text-align:left; border-left: 4px solid var(--vip);">
+            <span style="color:var(--muted); font-size:12px;">👉 🌟 總部專屬配發碼</span><br><strong style="color:var(--vip); font-size:18px; letter-spacing:1px;">${permKey}</strong>
+          </div>
+          <div class="modal-actions" style="margin-top: 15px;">
+            <button class="btn-cancel" style="border:1px solid var(--bad); color:var(--bad);" onclick="logoutVip()">清除授權(登出)</button>
+            <button class="btn-unlock" style="background:var(--warn); color:#000;" onclick="closeVipModal()">關閉控制台</button>
+          </div>
+        `;
+        return; 
     }
+
+    // 【第一層：終身金鑰】
+    if (PERMANENT_KEYS.includes(inputPwd)) {
+        try { localStorage.setItem('sunmoon_vip_trackline_status', 'true'); } catch(e){} 
+        isUserVip = true; 
+        document.body.classList.add('is-vip'); 
+        document.getElementById('inHeight').removeAttribute('readonly');
+        closeVipModal();
+        showToast("🎉 授權成功！歡迎使用散木專業版全功能！", "safe");
+        if (pendingFeatureCallback) { pendingFeatureCallback(); pendingFeatureCallback = null; }
+        return;
+    }
+
+    // 【第二層：今日體驗碼】
+    if (inputPwd === getDailyKey(0)) {
+        try { localStorage.setItem('sunmoon_vip_trackline_expire', todayStr); } catch(e){} 
+        isUserVip = true; 
+        document.body.classList.add('is-vip'); 
+        document.getElementById('inHeight').removeAttribute('readonly');
+        closeVipModal();
+        showToast("⏱️ 體驗授權成功！您已解鎖今日的專業版權限 (今晚 23:59 自動失效)。", "safe");
+        if (pendingFeatureCallback) { pendingFeatureCallback(); pendingFeatureCallback = null; }
+        return;
+    }
+
+    errorMsg.textContent = "❌ 密碼錯誤或已過期，請確認輸入是否正確。";
+    document.getElementById('vipPwdInput').classList.add('shock-anim');
+    setTimeout(() => document.getElementById('vipPwdInput').classList.remove('shock-anim'), 1000);
 }
 
 function handleImageUploadClick(e) {
@@ -854,7 +982,6 @@ function updateEngine(skipSliderUpdate = false) {
           Fx = tension * cos1 + tension * cos2; 
       }
 
-      // 💡 依據國際索道規範更新警戒線：150°(2倍)黃燈，160°(3倍)紅燈
       let isDanger = interiorAngle >= 160 || tension >= baseW * 3 || isStraight; 
       let isWarn = !isDanger && (interiorAngle >= 150 || tension >= baseW * 2);
       let color = isDanger ? "var(--bad)" : (isWarn ? "var(--warn)" : "var(--safe)");
@@ -893,7 +1020,6 @@ function updateEngine(skipSliderUpdate = false) {
           
           let pullA = forceA / currentMA;
           let pullB = forceB / currentMA;
-          let systemPull = Math.max(pullA, pullB);
           
           let txtA = pullA > 0.05 ? `${pullA.toFixed(1)} kg` + (isShockOn ? '(峰值)' : '') : '0 kg';
           let txtB = pullB > 0.05 ? `${pullB.toFixed(1)} kg` + (isShockOn ? '(峰值)' : '') : '0 kg';
@@ -1149,27 +1275,27 @@ async function toggleCamera() {
       mainCard.classList.add('camera-mode');
       document.body.classList.add('camera-mode');
     } catch (err) { 
-      try { alert("⚠️ 鏡頭啟動失敗：" + err.message); } catch(e){} 
+      showToast("⚠️ 鏡頭啟動失敗：" + err.message, "bad"); 
     } 
   } 
 }
 
 async function toggleFlashlight() {
   if (!videoTrack) { 
-    try { alert("⚠️ 請先開啟 📷 實境鏡頭！"); } catch(e){} 
+    showToast("⚠️ 請先開啟 📷 實境鏡頭！", "warn"); 
     return; 
   }
   try {
     const capabilities = videoTrack.getCapabilities();
     if (!capabilities.torch) { 
-        try { alert("⚠️ 您的裝置或瀏覽器不支援手電筒功能！"); } catch(e){} 
+        showToast("⚠️ 您的裝置或瀏覽器不支援手電筒功能！", "bad"); 
         return; 
     }
     torchOn = !torchOn;
     await videoTrack.applyConstraints({ advanced: [{ torch: torchOn }] });
     if(torchOn) btnFlashlight.classList.add('active'); else btnFlashlight.classList.remove('active');
   } catch(e) { 
-      try { alert("⚠️ 手電筒切換失敗：" + e.message); } catch(err){} 
+      showToast("⚠️ 手電筒切換失敗：" + e.message, "bad"); 
   }
 }
 
@@ -1248,7 +1374,7 @@ async function takeScreenshot() {
     link.href = canvas.toDataURL('image/png'); 
     link.click();
   } catch(e) { 
-      try { alert("截圖失敗：" + e); } catch(err){} 
+      showToast("❌ 截圖失敗：" + e, "bad"); 
   }
   
   // 復原 input
@@ -1269,7 +1395,7 @@ if(shareBtnAction) {
         else {
           const dummy = document.createElement('input'); document.body.appendChild(dummy); dummy.value = window.location.href;
           dummy.select(); document.execCommand('copy'); document.body.removeChild(dummy);
-          try { alert('系統回報：系統網址已複製，您可以貼上分享給其他人囉！'); } catch(e){}
+          showToast('🔗 系統回報：系統網址已複製，您可以貼上分享給其他人囉！', 'safe');
         }
       } catch (err) { console.error('分享失敗', err); }
     });
@@ -1284,21 +1410,15 @@ if ('serviceWorker' in navigator) {
 }
 
 function checkForUpdates() {
-  let confirmUpdate = true;
-  try {
-      confirmUpdate = confirm("系統將連線檢查是否有最新版本的運算參數。\n\n請問是否立即執行更新程序？");
-  } catch(e) {
-  }
-  
-  if (confirmUpdate) { 
-    if ('caches' in window) {
-      caches.keys().then((names) => {
-        names.forEach(name => caches.delete(name));
-      });
-    }
-    try { alert("✅ 已準備就緒！即將為您重新載入最新版本系統。"); } catch(e){}
-    window.location.href = window.location.href.split('?')[0] + '?v=' + new Date().getTime(); 
-  }
+    showToast("🔄 正在清除快取並載入最新版本...", "warn");
+    setTimeout(() => {
+        if ('caches' in window) {
+          caches.keys().then((names) => {
+            names.forEach(name => caches.delete(name));
+          });
+        }
+        window.location.href = window.location.href.split('?')[0] + '?v=' + new Date().getTime(); 
+    }, 1500);
 }
 
 const menuGroups = document.querySelectorAll('.menu-group');
