@@ -119,7 +119,6 @@
   }
   .capture-mode .capture-hide { display: none !important; }
   
-  /* 💡 統一：極簡標題與 VIP 徽章 */
   .topbar { display: flex; flex-direction: column; gap: 10px; margin-bottom: 8px; padding: 0 4px; }
   .title-row { display: flex; align-items: center; width: 100%; justify-content: space-between; }
   .title-left { display: flex; align-items: center; cursor: pointer; user-select: none; }
@@ -131,7 +130,6 @@
   .vip-badge { display: none; background: var(--vip); color: #fff; font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 12px; letter-spacing: 0.5px; box-shadow: 0 0 8px rgba(192, 132, 252, 0.6); margin-left: 4px; }
   .is-vip .vip-badge { display: inline-block; }
 
-  /* 💡 全新下拉式語言選單樣式 (下放選單) */
   #langSelect {
     background: rgba(255,255,255,0.05); border: 1px solid var(--line); color: var(--muted);
     border-radius: 8px; padding: 4px 6px; font-size: 13px; font-weight: bold; cursor: pointer;
@@ -167,7 +165,7 @@
     background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255,255,255,0.1);
     border-radius: 10px; padding: 8px 10px; color: var(--text);
     display: flex; flex-direction: column; gap: 6px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.2);
-    flex: 1; min-width: 0;
+    flex: 1; max-width: calc(50% - 25px); 
   }
   
   .hud-title { font-size: 12px; font-weight: 900; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 4px; margin-bottom: 2px; }
@@ -292,7 +290,6 @@
   
   .footer-disclaimer { margin-top: 20px; padding: 15px; font-size: 12px; color: var(--muted); line-height: 1.6; text-align: justify; background: rgba(150,150,150,0.05); border-radius: 10px; border-left: 4px solid var(--bad); }
 
-  /* 💡 散木專屬浮動提示框 (Toast) 樣式 */
   #toastMessage {
     display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
     background: var(--card); color: var(--text); padding: 14px 24px; border-radius: 10px;
@@ -310,8 +307,334 @@
 
 <div class="safe-area-blocker"></div>
 
+<!-- 💡 VIP Modal -->
+<div id="vipModal" class="modal-overlay">
+  <div class="modal-box" id="vipModalBox">
+    <h3><span data-i18n="vipTitle">🔒 專業版功能解鎖</span> <span class="vip-badge" style="display:inline-block; margin-left:8px;">PRO</span></h3>
+    <p><span data-i18n="vipEnable1">您即將啟用「</span><span id="vipFeatureName" style="color:var(--vip); font-weight:bold; font-size:16px;"></span><span data-i18n="vipEnable2">」！</span></p>
+    <p id="vipFeatureDesc" style="font-size:14px; color:var(--safe); font-weight:bold; margin-bottom: 12px;"></p>
+    <p style="font-size:13px;" data-i18n="vipProOnly">此功能為進階專業版限定。<br>支持散木團隊研發，永久解鎖全功能！</p>
+    
+    <div style="background:rgba(0,0,0,0.3); padding:10px; border-radius:8px; border-left:4px solid var(--bad); margin-bottom:12px; text-align:left;">
+      <span style="color:var(--bad); font-size:12px; font-weight:bold; line-height:1.5; display:block;" data-i18n="vipDisclaimer">⚠️ 注意：本系統採單機授權，遺失密碼或更換設備請重新購買，恕無提供補發與人工客服。</span>
+    </div>
+
+    <button class="primary-btn" style="background:var(--vip); margin-bottom:10px;" onclick="window.open('https://gumroad.com', '_blank')" data-i18n="vipStoreBtn">🛒 前往專業版自動販賣機</button>
+    <hr style="border:0; border-top:1px dashed var(--line); margin: 15px 0;">
+    <p style="font-size:12px; color:var(--muted); margin-bottom:8px;" data-i18n="vipHasPwd">已取得密碼？請在此輸入：</p>
+    <input type="text" id="vipPwdInput" data-i18n-plh="vipPwdPlh" placeholder="輸入 VIP 通關密碼" style="width: 100%; padding: 10px; font-size: 16px; text-align: center; border-radius: 8px; border: 1px solid var(--line); background: rgba(0,0,0,0.3); color: #fff; margin-bottom: 12px; letter-spacing: 2px; font-family: monospace;" autocomplete="off">
+    <div id="vipErrorMsg" style="color:var(--bad); font-size:12px; height:16px; margin-bottom:8px;"></div>
+    <div class="modal-btn-group">
+      <button class="primary-btn" style="background:transparent; border:1px solid var(--line); color:var(--text);" onclick="closeVipModal()" data-i18n="cancel">取消</button>
+      <button class="primary-btn" onclick="verifyVip()" data-i18n="vipUnlock">立即解鎖 🔓</button>
+    </div>
+  </div>
+</div>
+
+<!-- 💡 Support Modal -->
+<div id="supportModal" class="modal-overlay">
+  <div class="modal-box">
+    <h3 style="color:var(--warn); margin-top:0;" data-i18n="supTitle">💬 系統問題回報</h3>
+    <p style="text-align:left; font-size:13px; line-height:1.7; margin-bottom:15px; color:var(--text);" data-i18n="supDesc">
+      發現小蟲子 (Bug) 或系統異常嗎？<br><br>請點擊下方按鈕，填寫您的問題與建議，研發團隊會盡快進行修復與優化！
+    </p>
+    <div class="modal-btn-group" style="margin-top: 15px;">
+      <button class="primary-btn" style="background:transparent; border:1px solid var(--line); color:var(--text);" onclick="document.getElementById('supportModal').style.display='none'" data-i18n="cancel">取消</button>
+      <button class="primary-btn" style="background:var(--warn); color:#000;" onclick="window.open('https://forms.gle/fnxHcegcwQSPKmuQ6', '_blank'); document.getElementById('supportModal').style.display='none'" data-i18n="supGo">前往填寫表單</button>
+    </div>
+  </div>
+</div>
+
+<!-- 💡 HTML 更新確認視窗 -->
+<div id="updateModal" class="modal-overlay">
+  <div class="modal-box">
+    <h3 style="color:var(--warn); margin-top:0;">🔄 <span data-i18n="menu4">檢查並載入最新版本</span></h3>
+    <p style="text-align:left; font-size:13px; line-height:1.7; margin-bottom:15px; color:var(--text);" id="updateMsgText"></p>
+    <div class="modal-btn-group" style="margin-top: 15px;">
+      <button class="primary-btn" style="background:transparent; border:1px solid var(--line); color:var(--text);" onclick="document.getElementById('updateModal').style.display='none'" data-i18n="cancel">取消</button>
+      <button class="primary-btn" style="background:var(--warn); color:#000;" onclick="executeUpdate()" data-i18n="confirmUpdate">確認更新</button>
+    </div>
+  </div>
+</div>
+
+<div id="toastMessage"></div>
+
+<div id="scroll-wrapper">
+  <div class="app-container" id="capture-area">
+
+    <div class="card" id="mainCard">
+      <div class="topbar">
+        <div class="title-row">
+          <div class="title-left" id="mainTitleText">
+            <img src="icon-192.png" alt="[ICON]" style="width: 28px; height: 28px; border-radius: 6px; margin-right: 8px; object-fit: cover; border: 1px solid var(--line); display: inline-block;" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><rect width=\'100\' height=\'100\' fill=\'%23334155\'/><text x=\'50\' y=\'65\' font-size=\'40\' fill=\'%23fff\' text-anchor=\'middle\'>?</text></svg>'">
+            <div class="title-tag"><span id="modeTitleLabel" data-i18n="appTitle">索道張力儀 (動態滑行版)</span> <span class="vip-badge">PRO</span></div>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <img src="./sunmoon_logo.png" alt="散木團隊" style="width: 26px; height: 26px; border-radius: 4px; object-fit: cover; box-shadow: 0 2px 4px rgba(0,0,0,0.5);" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><rect width=\'100\' height=\'100\' fill=\'%23334155\' rx=\'6\'/><text x=\'50\' y=\'70\' font-size=\'50\' font-weight=\'bold\' fill=\'%23fff\' text-anchor=\'middle\' font-family=\'sans-serif\'>木</text></svg>'">
+          </div>
+        </div>
+      </div>
+
+      <div class="icon-bar" data-html2canvas-ignore="true">
+        <button class="icon-btn" id="btn-camera" onclick="attemptFeature('featCam', toggleCamera)" title="實境相機">📷<span class="lock-icon">🔒</span></button>
+        <button class="icon-btn" id="btn-flashlight" onclick="toggleFlashlight()" title="手電筒">🔦</button>
+        <label class="icon-btn" onclick="handleImageUploadClick(event)" title="載入照片" style="margin:0;">📁<span class="lock-icon">🔒</span></label>
+        <input type="file" id="upload-image" accept="image/*" onchange="loadImage(event)">
+        <button class="icon-btn" onclick="toggleGrid()" title="工程網格">🌐</button>
+        <button class="icon-btn" onclick="toggleHUD()" title="專注/淨空模式">👁️</button>
+        <button class="icon-btn" id="btn-shock" onclick="attemptFeature('featShock', toggleShock)" title="動態震動衝擊">📳<span class="lock-icon">🔒</span></button>
+        <button class="icon-btn" onclick="attemptFeature('featShot', takeScreenshot)" title="戰術截圖">📸<span class="lock-icon">🔒</span></button>
+        <button class="icon-btn" onclick="resetEngine()" title="重置沙盤">↺</button>
+      </div>
+
+      <div class="hud-container">
+        <div class="hud-panel hud-tl" id="hudA">
+           <div class="hud-title" data-i18n="anchorA">A 錨點</div>
+           <div class="hud-row">
+             <span class="hud-lbl" data-i18n="tension">張力:</span>
+             <span id="txtTenA" class="hud-val" style="color:var(--safe)">--</span>
+           </div>
+           <div class="hud-row">
+             <span class="hud-lbl" data-i18n="vertical">抗重:</span>
+             <span id="txtVertA" class="hud-val" style="color:var(--warn)">--</span>
+           </div>
+        </div>
+        <div class="hud-panel hud-tr" id="hudB">
+           <div class="hud-title" data-i18n="anchorB">B 錨點</div>
+           <div class="hud-row">
+             <span class="hud-lbl" data-i18n="tension">張力:</span>
+             <span id="txtTenB" class="hud-val" style="color:var(--safe)">--</span>
+           </div>
+           <div class="hud-row">
+             <span class="hud-lbl" data-i18n="vertical">抗重:</span>
+             <span id="txtVertB" class="hud-val" style="color:var(--warn)">--</span>
+           </div>
+        </div>
+      </div>
+
+      <div class="svgWrap" id="svgWrap">
+        <svg id="canvas" viewBox="0 0 400 460" preserveAspectRatio="xMidYMid meet">
+          <line id="tagLineA" stroke="var(--tagline)" stroke-width="4" stroke-dasharray="6 4" stroke-linecap="round" />
+          <line id="tagLineB" stroke="var(--tagline)" stroke-width="4" stroke-dasharray="6 4" stroke-linecap="round" />
+
+          <line id="ropeL" stroke="var(--safe)" stroke-width="6" stroke-linecap="round" style="transition: stroke 0.3s ease;" />
+          <line id="ropeR" stroke="var(--safe)" stroke-width="6" stroke-linecap="round" style="transition: stroke 0.3s ease;" />
+          
+          <path id="angleArc" fill="none" stroke="var(--warn)" stroke-width="2" style="transition: stroke 0.3s ease;" />
+          <text id="angleText" fill="var(--warn)" font-size="15" font-weight="bold" text-anchor="middle" style="transition: fill 0.3s ease;"></text>
+          
+          <!-- 💡 智慧導引箭頭 -->
+          <line id="anglePointer" stroke="var(--warn)" stroke-width="1.5" stroke-dasharray="2 2" style="display:none; transition: stroke 0.3s ease;" />
+          <path id="anglePointerArrow" fill="none" stroke="var(--warn)" stroke-width="1.5" style="display:none; transition: stroke 0.3s ease;" />
+
+          <g id="pulleyGroup" class="draggable-pulley">
+              <circle cx="0" cy="0" r="50" fill="transparent" />
+              <circle id="pulley" r="20" fill="var(--warn)" stroke="var(--bg)" stroke-width="2.5" />
+              <circle id="pulleyCenter" r="4" fill="var(--bg)" />
+              <line id="pulleyNeedle" stroke="#000" stroke-width="2.5" stroke-linecap="round" />
+          </g>
+
+          <line id="suspL" stroke="var(--muted)" stroke-width="5" stroke-linecap="round" />
+          <line id="suspR" stroke="var(--muted)" stroke-width="5" stroke-linecap="round" />
+          
+          <g id="anchorGroupA" class="anchor-dot">
+             <circle cx="0" cy="0" r="50" fill="transparent" /> 
+             <circle r="14" fill="var(--bg)" stroke="var(--safe)" stroke-width="3.5" style="transition: stroke 0.3s ease;" id="dotA" />
+             <text y="4" fill="var(--text)" font-size="13" font-weight="bold" text-anchor="middle" pointer-events="none">A</text>
+          </g>
+          
+          <g id="anchorGroupB" class="anchor-dot">
+             <circle cx="0" cy="0" r="50" fill="transparent" />
+             <circle r="14" fill="var(--bg)" stroke="var(--safe)" stroke-width="3.5" style="transition: stroke 0.3s ease;" id="dotB" />
+             <text y="4" fill="var(--text)" font-size="13" font-weight="bold" text-anchor="middle" pointer-events="none">B</text>
+          </g>
+        </svg>
+
+        <div id="tagBadgeA" class="tag-badge">--</div>
+        <div id="tagBadgeB" class="tag-badge">--</div>
+        
+        <div id="floatLoad" class="stretcher-tag">
+           <div class="stretcher-handles">
+              <div class="handle-block"></div><div class="handle-block"></div>
+           </div>
+           <div class="stretcher-content">
+              <div style="display:flex; align-items:baseline; gap:4px;">
+                 <input type="number" id="inLoad" value="100" step="1"><span style="font-size:14px; font-weight:bold; color:#fff;">kg</span>
+              </div>
+              <div id="shockInputWrap">
+                 <span style="font-size:12px; color:#fca5a5;">⚡+</span>
+                 <input type="number" id="inShock" value="30" step="1" min="0">
+                 <span style="font-size:12px; color:#fca5a5;">%</span>
+              </div>
+           </div>
+        </div>
+      </div>
+      
+      <div class="control-deck">
+         <div class="angle-slider-header capture-hide">
+            <span data-i18n="angleLoose">鬆 (夾角小)</span>
+            <span style="color:var(--text);" data-i18n="angleDrag">📐 滑動調整主繩夾角</span>
+            <span data-i18n="angleTight">緊 (夾角大)</span>
+         </div>
+         <input type="range" id="angleSlider" class="capture-hide" min="0" max="180" step="0.5" value="120">
+         
+         <hr class="capture-hide" style="border:0; border-top:1px dashed rgba(255,255,255,0.1); margin: 2px 0;">
+
+         <div class="dash-inputs">
+            <div class="dash-input-group">
+               <span class="lbl" data-i18n="ropeLen">➰ 總繩長</span>
+               <div><input type="number" id="inRope" value="23.1" step="0.1"><span style="color:var(--muted); font-size:11px;">m</span></div>
+            </div>
+            <div class="dash-input-group">
+               <span class="lbl" data-i18n="span">↔️ 跨距</span>
+               <div><input type="number" id="inSpan" value="20" min="5" step="1"><span style="color:var(--muted); font-size:11px;">m</span></div>
+            </div>
+            <div class="dash-input-group" onclick="handleHeightClick(event)" style="cursor: pointer;">
+               <span class="lbl"><span data-i18n="height">↕️ 高差</span> <span class="lock-icon-inline">🔒</span></span>
+               <div><input type="number" id="inHeight" value="0" step="1" readonly><span style="color:var(--muted); font-size:11px;">m</span></div>
+            </div>
+         </div>
+         <div class="dash-sag-row">
+            <span id="sagText" style="color:var(--tagline); font-size:13px; font-weight:bold; letter-spacing: 1px;" data-i18n="sagLabel">下垂量計算中...</span>
+         </div>
+      </div>
+      
+      <div class="tagline-wrap" id="taglineWrap">
+         <div id="taglineInfo" data-i18n="dragTip">📍 在沙盤中自由上下左右拖曳進行動態模擬</div>
+         <div class="ma-control" id="maControl" style="display:none;">
+            <span style="font-size:13px; color:var(--tagline); font-weight:bold;" data-i18n="maTitle">⚙️ 水平牽引省力比</span>
+            <div class="ma-btn-group">
+              <button class="ma-btn active" data-ma="1">1:1</button>
+              <button class="ma-btn" data-ma="3">3:1<span class="lock-icon">🔒</span></button>
+              <button class="ma-btn" data-ma="4">4:1<span class="lock-icon">🔒</span></button>
+              <button class="ma-btn" data-ma="5">5:1<span class="lock-icon">🔒</span></button>
+              <button class="ma-btn" data-ma="9">9:1<span class="lock-icon">🔒</span></button>
+            </div>
+         </div>
+      </div>
+    </div> 
+    
+    <div class="menu-list" data-html2canvas-ignore="true">
+      <details class="main-accordion" id="theoryAccordion">
+        <summary><div style="display:flex; align-items:center; gap:8px;"><span class="menu-icon">📚</span> <span data-i18n="menu1">專業名詞與原理解析</span></div></summary>
+        <div class="menu-group">
+          <div class="menu-content">
+            <p><b style="color:var(--safe)" data-i18n="thTensionT">🔗 張力 (Tension)</b><br><span data-i18n="thTensionD">系統內部主繩繃緊的程度。由於滑輪會滾動平衡力量，整條主繩的張力是一樣的。張力過大將導致主繩斷裂！</span></p>
+            <p><b style="color:var(--warn)" data-i18n="thVertT">⚓ 抗重 (Vertical Load)</b><br><span data-i18n="thVertD">錨點（A/B點）實際承受的「垂直往下扯」的力量。擔架越靠近某一側，該錨點承受的抗重越大，固定點就有被連根拔起的危機。</span></p>
+            <p><b style="color:var(--tagline)" data-i18n="thTagT">↔️ 水平牽引力 (Tagline Force)</b><br><span data-i18n="thTagD">控制擔架橫向移動的力量。系統中藍色徽章代表當前需要「上拉 / 煞車」的受力端；灰色徽章則代表「鬆弛 / 收繩」的無受力端。教官可依此判斷兩岸的任務分配，並搭配省力系統換算實際所需拉力。</span></p>
+            <p><b style="color:var(--bad)" data-i18n="thShockT">📳 動態震動衝擊 (Shock Load)</b><br><span data-i18n="thShockD">拖拉過程中產生的頓挫與晃動，會瞬間放大系統受力。開啟系統頂端的「📳」按鈕，可自訂百分比，精準模擬最危險的峰值衝擊。</span></p>
+            <button type="button" class="btn-collapse-inner" onclick="this.closest('details').removeAttribute('open')" data-i18n="collapse">🔼 收起說明</button>
+          </div>
+        </div>
+      </details>
+
+      <details class="main-accordion">
+        <summary><div style="display:flex; align-items:center; gap:8px;"><span class="menu-icon">⚙️</span> <span data-i18n="menu2">系統工具與說明書</span></div></summary>
+        <div class="menu-group">
+          
+          <div class="menu-action-btn" style="border-bottom: 1px solid var(--line); justify-content: space-between; cursor: default;">
+            <div class="menu-header-left"><span class="menu-icon">🌍</span><span data-i18n="menuLang">語言設定 / Language</span></div>
+            <select id="langSelect" onchange="changeLang(this.value)">
+              <option value="zh">🇹🇼 繁中</option>
+              <option value="en">🇺🇸 EN</option>
+              <option value="ja">🇯🇵 日本語</option>
+              <option value="ko">🇰🇷 한국어</option>
+              <option value="fr">🇫🇷 Français</option>
+              <option value="de">🇩🇪 Deutsch</option>
+              <option value="es">🇪🇸 Español</option>
+              <option value="pt">🇵🇹 Português</option>
+            </select>
+          </div>
+
+          <details class="menu-item">
+            <summary>
+              <div class="menu-header-left"><span class="menu-icon">📖</span><span data-i18n="menuOp">系統操作說明</span></div>
+              <span class="menu-arrow">❯</span>
+            </summary>
+            <div class="menu-content">
+              <ul style="margin-top: 0; padding-left: 20px;">
+                <li style="margin-bottom: 6px;" data-i18n="op1">直接拖曳畫布上的 <b>A點/B點</b> 設定地形跨距與高低差。</li>
+                <li style="margin-bottom: 6px;" data-i18n="op2">直接拖曳橘色 <b>大擔架</b> 或滑輪，可精準模擬傷患過河的張力變化。</li>
+                <li style="margin-bottom: 6px;" data-i18n="op3">當擔架處於偏離點時，可點選下方的 <b>⚙️水平牽引省力比</b> 換算手拉力。</li>
+                <li style="margin-bottom: 6px;" data-i18n="op4">滑動下方的 <b>夾角拉桿</b>，系統會自動反推繩長並平滑變形。</li>
+                <li style="margin-bottom: 6px;" data-i18n="op5">點擊 <b>📷實境 / 🌐網格 / 👁️淨空</b> 等工具進行實地測量與 <b>📸戰術截圖</b>。</li>
+              </ul>
+              <button type="button" class="btn-collapse-inner" onclick="this.closest('details').removeAttribute('open')" data-i18n="collapse">🔼 收起說明</button>
+            </div>
+          </details>
+
+          <details class="menu-item">
+            <summary>
+              <div class="menu-header-left"><span class="menu-icon">ℹ️</span><span data-i18n="menuInfo">版本與開發資訊</span></div>
+              <span class="menu-arrow">❯</span>
+            </summary>
+            <div class="menu-content">
+              <div style="text-align: center; margin-bottom: 15px;">
+                <span data-i18n="devTitle" style="display:inline-block; background:var(--safe); color:#0f1623; font-weight:bold; padding:4px 14px; border-radius:20px; font-size:13px; letter-spacing:0.5px; box-shadow: 0 2px 6px rgba(34,197,94,0.3);">散木索道儀 專業正式版</span>
+              </div>
+              <p style="margin-top: 0; margin-bottom: 6px; font-weight: bold; color: var(--text); text-align: center;" data-i18n="devTeam">本工具由 <span style="color:var(--warn);">散木團隊</span> 開發製作</p>
+              <p style="margin-top: 0; margin-bottom: 4px; font-size: 13px; text-align: center;" data-i18n="devT1">教學架構與工程判斷／徐世豐</p>
+              <p style="margin-top: 0; margin-bottom: 12px; font-size: 13px; text-align: center;" data-i18n="devT2">工具設計與互動介面／吳佩芳（朵朵）</p>
+              <button type="button" class="btn-collapse-inner" onclick="this.closest('details').removeAttribute('open')" data-i18n="collapse">🔼 收起說明</button>
+            </div>
+          </details>
+
+          <details class="menu-item">
+            <summary>
+              <div class="menu-header-left"><span class="menu-icon">📱</span><span data-i18n="menuPWA">加入主畫面說明</span></div>
+              <span class="menu-arrow">❯</span>
+            </summary>
+            <div class="menu-content">
+              <button id="installAppBtn" style="display:none; width:100%; padding:12px; margin-bottom:12px; background:var(--safe); color:#0f1623; border:none; border-radius:8px; font-weight:bold; font-size:15px; cursor:pointer; box-shadow:0 4px 10px rgba(34, 197, 94, 0.3);" data-i18n="installBtn">📥 點擊一鍵安裝 APP</button>
+              <p style="margin-top: 0; margin-bottom: 8px; color: var(--text);" data-i18n="pwaDesc">將捷徑加至主畫面，獲得無網址列的 100% 沉浸式體驗：</p>
+              <div style="background: rgba(150,150,150,0.05); padding: 12px; border-radius: 8px; margin-bottom: 12px;">
+                <p style="margin-top: 0; margin-bottom: 8px; font-weight: bold; color: var(--safe);" data-i18n="pwaAnd">🤖 Android (安卓版)</p>
+                <ol style="padding-left: 20px; margin: 0; font-size: 13px;">
+                  <li style="margin-bottom: 4px;" data-i18n="pwaStep1">點開連結（可直接從 LINE 開啟）</li>
+                  <li style="margin-bottom: 4px;" data-i18n="pwaStep2">點選瀏覽器右上角的「⋮」</li>
+                  <li style="margin-bottom: 4px;" data-i18n="pwaStep3">選擇「加到主畫面」或「安裝應用程式」</li>
+                  <li style="margin-bottom: 0;" data-i18n="pwaStep4">點選「安裝」，即可在桌面找到 APP</li>
+                </ol>
+              </div>
+              <div style="background: rgba(150,150,150,0.05); padding: 12px; border-radius: 8px;">
+                <p style="margin-top: 0; margin-bottom: 8px; font-weight: bold; color: var(--safe);" data-i18n="pwaIOS">🍎 iOS (iPhone)</p>
+                <ol style="padding-left: 20px; margin: 0; font-size: 13px;">
+                  <li style="margin-bottom: 4px;" data-i18n="pwaStep5">請務必使用 <b>Safari</b> 瀏覽器開啟</li>
+                  <li style="margin-bottom: 4px;" data-i18n="pwaStep6">點選畫面下方的「分享」圖示</li>
+                  <li style="margin-bottom: 4px;" data-i18n="pwaStep7">往下滑，選擇「加入主畫面」</li>
+                  <li style="margin-bottom: 0;" data-i18n="pwaStep8">點選「加入」，即可將捷徑加到主畫面</li>
+                </ol>
+              </div>
+            </div>
+          </details>
+        </div>
+      </details>
+
+      <div class="main-accordion" style="display: flex; flex-direction: column;">
+        <div class="menu-action-btn" id="shareBtnAction" style="border-bottom: 1px solid var(--line);">
+          <div class="menu-header-left"><span class="menu-icon">🔗</span><span data-i18n="menu3">分享系統連結</span></div>
+          <span class="menu-arrow">❯</span>
+        </div>
+        <div class="menu-action-btn" onclick="checkForUpdates()" style="border-bottom: 1px solid var(--line);">
+          <div class="menu-header-left"><span class="menu-icon">🔄</span><span data-i18n="menu4">檢查並載入最新版本</span></div>
+          <span class="menu-arrow">❯</span>
+        </div>
+        <div class="menu-action-btn" id="supportBtnAction">
+          <div class="menu-header-left"><span class="menu-icon">💬</span><span data-i18n="menu5">系統問題回報</span></div>
+          <span class="menu-arrow">❯</span>
+        </div>
+      </div>
+
+      <div class="footer-disclaimer" data-i18n="disclaimer">
+        <strong style="color: var(--bad); font-size: 14px;">⚠️ 軟體免責聲明：</strong><br>
+        本軟體為理論物理運算輔助工具，不包含繩索材質疲勞、極端摩擦力等環境變數。實際救援操作之系統架設與安全確保，均須由專業教官與指揮官實地判定，開發團隊不負任何實地操作之法律與賠償責任。<br><br><span style='color:var(--warn);'>※ 本系統採單機授權，為保障研發團隊權益，遺失密碼或更換設備請重新購買，恕無提供補發與人工客服。</span>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
-// 散木團隊 · 多層次防盜保護系統 v5.0
+// 散木團隊 · 多層次防盜保護系統 v6.2
 (function(){
   const _0xd = atob('ZmFuZzU3NjEtc291cmNlLmdpdGh1Yi5pbw=='); 
   const _0xh = window[atob('bG9jYXRpb24=')][atob('aG9zdG5hbWU=')]; 
@@ -337,9 +660,7 @@
     if (!_isOk) { _0xKill(); }
   })();
 })();
-</script>
 
-<script>
 // 💡 V6.3 多國語言精簡化：新增更新視窗按鈕語言
 const i18n = {
   zh: {
@@ -1242,330 +1563,6 @@ function changeLang(selectedLang) {
 }
 </script>
 
-<div id="vipModal" class="modal-overlay">
-  <div class="modal-box" id="vipModalBox">
-    <h3><span data-i18n="vipTitle">🔒 專業版功能解鎖</span> <span class="vip-badge" style="display:inline-block; margin-left:8px;">PRO</span></h3>
-    <p><span data-i18n="vipEnable1">您即將啟用「</span><span id="vipFeatureName" style="color:var(--vip); font-weight:bold; font-size:16px;"></span><span data-i18n="vipEnable2">」！</span></p>
-    <p id="vipFeatureDesc" style="font-size:14px; color:var(--safe); font-weight:bold; margin-bottom: 12px;"></p>
-    <p style="font-size:13px;" data-i18n="vipProOnly">此功能為進階專業版限定。<br>支持散木團隊研發，永久解鎖全功能！</p>
-    
-    <div style="background:rgba(0,0,0,0.3); padding:10px; border-radius:8px; border-left:4px solid var(--bad); margin-bottom:12px; text-align:left;">
-      <span style="color:var(--bad); font-size:12px; font-weight:bold; line-height:1.5; display:block;" data-i18n="vipDisclaimer">⚠️ 注意：本系統採單機授權，遺失密碼或更換設備請重新購買，恕無提供補發與人工客服。</span>
-    </div>
-
-    <button class="primary-btn" style="background:var(--vip); margin-bottom:10px;" onclick="window.open('https://gumroad.com', '_blank')" data-i18n="vipStoreBtn">🛒 前往專業版自動販賣機</button>
-    <hr style="border:0; border-top:1px dashed var(--line); margin: 15px 0;">
-    <p style="font-size:12px; color:var(--muted); margin-bottom:8px;" data-i18n="vipHasPwd">已取得密碼？請在此輸入：</p>
-    <input type="text" id="vipPwdInput" data-i18n-plh="vipPwdPlh" placeholder="輸入 VIP 通關密碼" style="width: 100%; padding: 10px; font-size: 16px; text-align: center; border-radius: 8px; border: 1px solid var(--line); background: rgba(0,0,0,0.3); color: #fff; margin-bottom: 12px; letter-spacing: 2px; font-family: monospace;" autocomplete="off">
-    <div id="vipErrorMsg" style="color:var(--bad); font-size:12px; height:16px; margin-bottom:8px;"></div>
-    <div class="modal-btn-group">
-      <button class="primary-btn" style="background:transparent; border:1px solid var(--line); color:var(--text);" onclick="closeVipModal()" data-i18n="cancel">取消</button>
-      <button class="primary-btn" onclick="verifyVip()" data-i18n="vipUnlock">立即解鎖 🔓</button>
-    </div>
-  </div>
-</div>
-
-<div id="supportModal" class="modal-overlay">
-  <div class="modal-box">
-    <h3 style="color:var(--warn); margin-top:0;" data-i18n="supTitle">💬 系統問題回報</h3>
-    <p style="text-align:left; font-size:13px; line-height:1.7; margin-bottom:15px; color:var(--text);" data-i18n="supDesc">
-      發現小蟲子 (Bug) 或系統異常嗎？<br><br>請點擊下方按鈕，填寫您的問題與建議，研發團隊會盡快進行修復與優化！
-    </p>
-    <div class="modal-btn-group" style="margin-top: 15px;">
-      <button class="primary-btn" style="background:transparent; border:1px solid var(--line); color:var(--text);" onclick="document.getElementById('supportModal').style.display='none'" data-i18n="cancel">取消</button>
-      <button class="primary-btn" style="background:var(--warn); color:#000;" onclick="window.open('https://forms.gle/fnxHcegcwQSPKmuQ6', '_blank'); document.getElementById('supportModal').style.display='none'" data-i18n="supGo">前往填寫表單</button>
-    </div>
-  </div>
-</div>
-
-<!-- 💡 V6.3 專屬的 HTML 更新確認視窗，徹底解決 iOS WebView 或 PWA 原生彈窗失效問題 -->
-<div id="updateModal" class="modal-overlay">
-  <div class="modal-box">
-    <h3 style="color:var(--warn); margin-top:0;">🔄 <span data-i18n="menu4">檢查並載入最新版本</span></h3>
-    <p style="text-align:left; font-size:13px; line-height:1.7; margin-bottom:15px; color:var(--text);" id="updateMsgText">
-      <!-- 內容由 JS 注入 -->
-    </p>
-    <div class="modal-btn-group" style="margin-top: 15px;">
-      <button class="primary-btn" style="background:transparent; border:1px solid var(--line); color:var(--text);" onclick="document.getElementById('updateModal').style.display='none'" data-i18n="cancel">取消</button>
-      <button class="primary-btn" style="background:var(--warn); color:#000;" onclick="executeUpdate()" data-i18n="confirmUpdate">確認更新</button>
-    </div>
-  </div>
-</div>
-
-<div id="toastMessage"></div>
-
-<div id="scroll-wrapper">
-  <div class="app-container" id="capture-area">
-
-    <div class="card" id="mainCard">
-      <div class="topbar">
-        <div class="title-row">
-          <div class="title-left" id="mainTitleText">
-            <img src="icon-192.png" alt="[ICON]" style="width: 28px; height: 28px; border-radius: 6px; margin-right: 8px; object-fit: cover; border: 1px solid var(--line); display: inline-block;" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><rect width=\'100\' height=\'100\' fill=\'%23334155\'/><text x=\'50\' y=\'65\' font-size=\'40\' fill=\'%23fff\' text-anchor=\'middle\'>?</text></svg>'">
-            <div class="title-tag"><span id="modeTitleLabel" data-i18n="appTitle">索道張力儀 (動態滑行版)</span> <span class="vip-badge">PRO</span></div>
-          </div>
-          <div style="display:flex; align-items:center; gap:8px;">
-            <img src="./sunmoon_logo.png" alt="散木團隊" style="width: 26px; height: 26px; border-radius: 4px; object-fit: cover; box-shadow: 0 2px 4px rgba(0,0,0,0.5);" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><rect width=\'100\' height=\'100\' fill=\'%23334155\' rx=\'6\'/><text x=\'50\' y=\'70\' font-size=\'50\' font-weight=\'bold\' fill=\'%23fff\' text-anchor=\'middle\' font-family=\'sans-serif\'>木</text></svg>'">
-          </div>
-        </div>
-      </div>
-
-      <div class="icon-bar" data-html2canvas-ignore="true">
-        <button class="icon-btn" id="btn-camera" onclick="attemptFeature('featCam', toggleCamera)" title="實境相機">📷<span class="lock-icon">🔒</span></button>
-        <button class="icon-btn" id="btn-flashlight" onclick="toggleFlashlight()" title="手電筒">🔦</button>
-        <label class="icon-btn" onclick="handleImageUploadClick(event)" title="載入照片" style="margin:0;">📁<span class="lock-icon">🔒</span></label>
-        <input type="file" id="upload-image" accept="image/*" onchange="loadImage(event)">
-        <button class="icon-btn" onclick="toggleGrid()" title="工程網格">🌐</button>
-        <button class="icon-btn" onclick="toggleHUD()" title="專注/淨空模式">👁️</button>
-        <button class="icon-btn" id="btn-shock" onclick="attemptFeature('featShock', toggleShock)" title="動態震動衝擊">📳<span class="lock-icon">🔒</span></button>
-        <button class="icon-btn" onclick="attemptFeature('featShot', takeScreenshot)" title="戰術截圖">📸<span class="lock-icon">🔒</span></button>
-        <button class="icon-btn" onclick="resetEngine()" title="重置沙盤">↺</button>
-      </div>
-
-      <div class="hud-container">
-        <div class="hud-panel hud-tl" id="hudA">
-           <div class="hud-title" data-i18n="anchorA">A 錨點</div>
-           <div class="hud-row">
-             <span class="hud-lbl" data-i18n="tension">張力:</span>
-             <span id="txtTenA" class="hud-val" style="color:var(--safe)">--</span>
-           </div>
-           <div class="hud-row">
-             <span class="hud-lbl" data-i18n="vertical">抗重:</span>
-             <span id="txtVertA" class="hud-val" style="color:var(--warn)">--</span>
-           </div>
-        </div>
-        <div class="hud-panel hud-tr" id="hudB">
-           <div class="hud-title" data-i18n="anchorB">B 錨點</div>
-           <div class="hud-row">
-             <span class="hud-lbl" data-i18n="tension">張力:</span>
-             <span id="txtTenB" class="hud-val" style="color:var(--safe)">--</span>
-           </div>
-           <div class="hud-row">
-             <span class="hud-lbl" data-i18n="vertical">抗重:</span>
-             <span id="txtVertB" class="hud-val" style="color:var(--warn)">--</span>
-           </div>
-        </div>
-      </div>
-
-      <div class="svgWrap" id="svgWrap">
-        <svg id="canvas" viewBox="0 0 400 460" preserveAspectRatio="xMidYMid meet">
-          <line id="tagLineA" stroke="var(--tagline)" stroke-width="4" stroke-dasharray="6 4" stroke-linecap="round" />
-          <line id="tagLineB" stroke="var(--tagline)" stroke-width="4" stroke-dasharray="6 4" stroke-linecap="round" />
-
-          <line id="ropeL" stroke="var(--safe)" stroke-width="6" stroke-linecap="round" style="transition: stroke 0.3s ease;" />
-          <line id="ropeR" stroke="var(--safe)" stroke-width="6" stroke-linecap="round" style="transition: stroke 0.3s ease;" />
-          
-          <path id="angleArc" fill="none" stroke="var(--warn)" stroke-width="2" style="transition: stroke 0.3s ease;" />
-          <text id="angleText" fill="var(--warn)" font-size="15" font-weight="bold" text-anchor="middle" style="transition: fill 0.3s ease;"></text>
-          <!-- 💡 智慧導引箭頭 (專為小於 50 度設計) -->
-          <line id="anglePointer" stroke="var(--warn)" stroke-width="1.5" stroke-dasharray="2 2" style="display:none; transition: stroke 0.3s ease;" />
-
-          <g id="pulleyGroup" class="draggable-pulley">
-              <circle cx="0" cy="0" r="50" fill="transparent" />
-              <circle id="pulley" r="20" fill="var(--warn)" stroke="var(--bg)" stroke-width="2.5" />
-              <circle id="pulleyCenter" r="4" fill="var(--bg)" />
-              <line id="pulleyNeedle" stroke="#000" stroke-width="2.5" stroke-linecap="round" />
-          </g>
-
-          <line id="suspL" stroke="var(--muted)" stroke-width="5" stroke-linecap="round" />
-          <line id="suspR" stroke="var(--muted)" stroke-width="5" stroke-linecap="round" />
-          
-          <g id="anchorGroupA" class="anchor-dot">
-             <circle cx="0" cy="0" r="50" fill="transparent" /> 
-             <circle r="14" fill="var(--bg)" stroke="var(--safe)" stroke-width="3.5" style="transition: stroke 0.3s ease;" id="dotA" />
-             <text y="4" fill="var(--text)" font-size="13" font-weight="bold" text-anchor="middle" pointer-events="none">A</text>
-          </g>
-          
-          <g id="anchorGroupB" class="anchor-dot">
-             <circle cx="0" cy="0" r="50" fill="transparent" />
-             <circle r="14" fill="var(--bg)" stroke="var(--safe)" stroke-width="3.5" style="transition: stroke 0.3s ease;" id="dotB" />
-             <text y="4" fill="var(--text)" font-size="13" font-weight="bold" text-anchor="middle" pointer-events="none">B</text>
-          </g>
-        </svg>
-
-        <div id="tagBadgeA" class="tag-badge">--</div>
-        <div id="tagBadgeB" class="tag-badge">--</div>
-        
-        <div id="floatLoad" class="stretcher-tag">
-           <div class="stretcher-handles">
-              <div class="handle-block"></div><div class="handle-block"></div>
-           </div>
-           <div class="stretcher-content">
-              <div style="display:flex; align-items:baseline; gap:4px;">
-                 <input type="number" id="inLoad" value="100" step="1"><span style="font-size:14px; font-weight:bold; color:#fff;">kg</span>
-              </div>
-              <div id="shockInputWrap">
-                 <span style="font-size:12px; color:#fca5a5;">⚡+</span>
-                 <input type="number" id="inShock" value="30" step="1" min="0">
-                 <span style="font-size:12px; color:#fca5a5;">%</span>
-              </div>
-           </div>
-        </div>
-      </div>
-      
-      <div class="control-deck">
-         <div class="angle-slider-header capture-hide">
-            <span data-i18n="angleLoose">鬆 (夾角小)</span>
-            <span style="color:var(--text);" data-i18n="angleDrag">📐 滑動調整主繩夾角</span>
-            <span data-i18n="angleTight">緊 (夾角大)</span>
-         </div>
-         <input type="range" id="angleSlider" class="capture-hide" min="0" max="180" step="0.5" value="120">
-         
-         <hr class="capture-hide" style="border:0; border-top:1px dashed rgba(255,255,255,0.1); margin: 2px 0;">
-
-         <div class="dash-inputs">
-            <div class="dash-input-group">
-               <span class="lbl" data-i18n="ropeLen">➰ 總繩長</span>
-               <div><input type="number" id="inRope" value="23.1" step="0.1"><span style="color:var(--muted); font-size:11px;">m</span></div>
-            </div>
-            <div class="dash-input-group">
-               <span class="lbl" data-i18n="span">↔️ 跨距</span>
-               <div><input type="number" id="inSpan" value="20" min="5" step="1"><span style="color:var(--muted); font-size:11px;">m</span></div>
-            </div>
-            <div class="dash-input-group" onclick="handleHeightClick(event)" style="cursor: pointer;">
-               <span class="lbl"><span data-i18n="height">↕️ 高差</span> <span class="lock-icon-inline">🔒</span></span>
-               <div><input type="number" id="inHeight" value="0" step="1" readonly><span style="color:var(--muted); font-size:11px;">m</span></div>
-            </div>
-         </div>
-         <div class="dash-sag-row">
-            <span id="sagText" style="color:var(--tagline); font-size:13px; font-weight:bold; letter-spacing: 1px;" data-i18n="sagLabel">下垂量計算中...</span>
-         </div>
-      </div>
-      
-      <div class="tagline-wrap" id="taglineWrap">
-         <div id="taglineInfo" data-i18n="dragTip">📍 在沙盤中自由上下左右拖曳進行動態模擬</div>
-         <div class="ma-control" id="maControl" style="display:none;">
-            <span style="font-size:13px; color:var(--tagline); font-weight:bold;" data-i18n="maTitle">⚙️ 水平牽引省力比</span>
-            <div class="ma-btn-group">
-              <button class="ma-btn active" data-ma="1">1:1</button>
-              <button class="ma-btn" data-ma="3">3:1<span class="lock-icon">🔒</span></button>
-              <button class="ma-btn" data-ma="4">4:1<span class="lock-icon">🔒</span></button>
-              <button class="ma-btn" data-ma="5">5:1<span class="lock-icon">🔒</span></button>
-              <button class="ma-btn" data-ma="9">9:1<span class="lock-icon">🔒</span></button>
-            </div>
-         </div>
-      </div>
-    </div> 
-    
-    <div class="menu-list" data-html2canvas-ignore="true">
-      <details class="main-accordion" id="theoryAccordion">
-        <summary><div style="display:flex; align-items:center; gap:8px;"><span class="menu-icon">📚</span> <span data-i18n="menu1">專業名詞與原理解析</span></div></summary>
-        <div class="menu-group">
-          <div class="menu-content">
-            <p><b style="color:var(--safe)" data-i18n="thTensionT">🔗 張力 (Tension)</b><br><span data-i18n="thTensionD">系統內部主繩繃緊的程度。由於滑輪會滾動平衡力量，整條主繩的張力是一樣的。張力過大將導致主繩斷裂！</span></p>
-            <p><b style="color:var(--warn)" data-i18n="thVertT">⚓ 抗重 (Vertical Load)</b><br><span data-i18n="thVertD">錨點（A/B點）實際承受的「垂直往下扯」的力量。擔架越靠近某一側，該錨點承受的抗重越大，固定點就有被連根拔起的危機。</span></p>
-            <p><b style="color:var(--tagline)" data-i18n="thTagT">↔️ 水平牽引力 (Tagline Force)</b><br><span data-i18n="thTagD">控制擔架橫向移動的力量。系統中藍色徽章代表當前需要「上拉 / 煞車」的受力端；灰色徽章則代表「鬆弛 / 收繩」的無受力端。教官可依此判斷兩岸的任務分配，並搭配省力系統換算實際所需拉力。</span></p>
-            <p><b style="color:var(--bad)" data-i18n="thShockT">📳 動態震動衝擊 (Shock Load)</b><br><span data-i18n="thShockD">拖拉過程中產生的頓挫與晃動，會瞬間放大系統受力。開啟系統頂端的「📳」按鈕，可自訂百分比，精準模擬最危險的峰值衝擊。</span></p>
-            <button type="button" class="btn-collapse-inner" onclick="this.closest('details').removeAttribute('open')" data-i18n="collapse">🔼 收起說明</button>
-          </div>
-        </div>
-      </details>
-
-      <details class="main-accordion">
-        <summary><div style="display:flex; align-items:center; gap:8px;"><span class="menu-icon">⚙️</span> <span data-i18n="menu2">系統工具與說明書</span></div></summary>
-        <div class="menu-group">
-          
-          <div class="menu-action-btn" style="border-bottom: 1px solid var(--line); justify-content: space-between; cursor: default;">
-            <div class="menu-header-left"><span class="menu-icon">🌍</span><span data-i18n="menuLang">語言設定 / Language</span></div>
-            <select id="langSelect" onchange="changeLang(this.value)">
-              <option value="zh">🇹🇼 繁中</option>
-              <option value="en">🇺🇸 EN</option>
-              <option value="ja">🇯🇵 日本語</option>
-              <option value="ko">🇰🇷 한국어</option>
-              <option value="fr">🇫🇷 Français</option>
-              <option value="de">🇩🇪 Deutsch</option>
-              <option value="es">🇪🇸 Español</option>
-              <option value="pt">🇵🇹 Português</option>
-            </select>
-          </div>
-
-          <details class="menu-item">
-            <summary>
-              <div class="menu-header-left"><span class="menu-icon">📖</span><span data-i18n="menuOp">系統操作說明</span></div>
-              <span class="menu-arrow">❯</span>
-            </summary>
-            <div class="menu-content">
-              <ul style="margin-top: 0; padding-left: 20px;">
-                <li style="margin-bottom: 6px;" data-i18n="op1">直接拖曳畫布上的 <b>A點/B點</b> 設定地形跨距與高低差。</li>
-                <li style="margin-bottom: 6px;" data-i18n="op2">直接拖曳橘色 <b>大擔架</b> 或滑輪，可精準模擬傷患過河的張力變化。</li>
-                <li style="margin-bottom: 6px;" data-i18n="op3">當擔架處於偏離點時，可點選下方的 <b>⚙️水平牽引省力比</b> 換算手拉力。</li>
-                <li style="margin-bottom: 6px;" data-i18n="op4">滑動下方的 <b>夾角拉桿</b>，系統會自動反推繩長並平滑變形。</li>
-                <li style="margin-bottom: 6px;" data-i18n="op5">點擊 <b>📷實境 / 🌐網格 / 👁️淨空</b> 等工具進行實地測量與 <b>📸戰術截圖</b>。</li>
-              </ul>
-              <button type="button" class="btn-collapse-inner" onclick="this.closest('details').removeAttribute('open')" data-i18n="collapse">🔼 收起說明</button>
-            </div>
-          </details>
-
-          <details class="menu-item">
-            <summary>
-              <div class="menu-header-left"><span class="menu-icon">ℹ️</span><span data-i18n="menuInfo">版本與開發資訊</span></div>
-              <span class="menu-arrow">❯</span>
-            </summary>
-            <div class="menu-content">
-              <div style="text-align: center; margin-bottom: 15px;">
-                <span data-i18n="devTitle" style="display:inline-block; background:var(--safe); color:#0f1623; font-weight:bold; padding:4px 14px; border-radius:20px; font-size:13px; letter-spacing:0.5px; box-shadow: 0 2px 6px rgba(34,197,94,0.3);">散木索道儀 專業正式版</span>
-              </div>
-              <p style="margin-top: 0; margin-bottom: 6px; font-weight: bold; color: var(--text); text-align: center;" data-i18n="devTeam">本工具由 <span style="color:var(--warn);">散木團隊</span> 開發製作</p>
-              <p style="margin-top: 0; margin-bottom: 4px; font-size: 13px; text-align: center;" data-i18n="devT1">教學架構與工程判斷／徐世豐</p>
-              <p style="margin-top: 0; margin-bottom: 12px; font-size: 13px; text-align: center;" data-i18n="devT2">工具設計與互動介面／吳佩芳（朵朵）</p>
-              <button type="button" class="btn-collapse-inner" onclick="this.closest('details').removeAttribute('open')" data-i18n="collapse">🔼 收起說明</button>
-            </div>
-          </details>
-
-          <details class="menu-item">
-            <summary>
-              <div class="menu-header-left"><span class="menu-icon">📱</span><span data-i18n="menuPWA">加入主畫面說明</span></div>
-              <span class="menu-arrow">❯</span>
-            </summary>
-            <div class="menu-content">
-              <button id="installAppBtn" style="display:none; width:100%; padding:12px; margin-bottom:12px; background:var(--safe); color:#0f1623; border:none; border-radius:8px; font-weight:bold; font-size:15px; cursor:pointer; box-shadow:0 4px 10px rgba(34, 197, 94, 0.3);" data-i18n="installBtn">📥 點擊一鍵安裝 APP</button>
-              <p style="margin-top: 0; margin-bottom: 8px; color: var(--text);" data-i18n="pwaDesc">將捷徑加至主畫面，獲得無網址列的 100% 沉浸式體驗：</p>
-              <div style="background: rgba(150,150,150,0.05); padding: 12px; border-radius: 8px; margin-bottom: 12px;">
-                <p style="margin-top: 0; margin-bottom: 8px; font-weight: bold; color: var(--safe);" data-i18n="pwaAnd">🤖 Android (安卓版)</p>
-                <ol style="padding-left: 20px; margin: 0; font-size: 13px;">
-                  <li style="margin-bottom: 4px;" data-i18n="pwaStep1">點開連結（可直接從 LINE 開啟）</li>
-                  <li style="margin-bottom: 4px;" data-i18n="pwaStep2">點選瀏覽器右上角的「⋮」</li>
-                  <li style="margin-bottom: 4px;" data-i18n="pwaStep3">選擇「加到主畫面」或「安裝應用程式」</li>
-                  <li style="margin-bottom: 0;" data-i18n="pwaStep4">點選「安裝」，即可在桌面找到 APP</li>
-                </ol>
-              </div>
-              <div style="background: rgba(150,150,150,0.05); padding: 12px; border-radius: 8px;">
-                <p style="margin-top: 0; margin-bottom: 8px; font-weight: bold; color: var(--safe);" data-i18n="pwaIOS">🍎 iOS (iPhone)</p>
-                <ol style="padding-left: 20px; margin: 0; font-size: 13px;">
-                  <li style="margin-bottom: 4px;" data-i18n="pwaStep5">請務必使用 <b>Safari</b> 瀏覽器開啟</li>
-                  <li style="margin-bottom: 4px;" data-i18n="pwaStep6">點選畫面下方的「分享」圖示</li>
-                  <li style="margin-bottom: 4px;" data-i18n="pwaStep7">往下滑，選擇「加入主畫面」</li>
-                  <li style="margin-bottom: 0;" data-i18n="pwaStep8">點選「加入」，即可將捷徑加到主畫面</li>
-                </ol>
-              </div>
-            </div>
-          </details>
-        </div>
-      </details>
-
-      <div class="main-accordion" style="display: flex; flex-direction: column;">
-        <div class="menu-action-btn" id="shareBtnAction" style="border-bottom: 1px solid var(--line);">
-          <div class="menu-header-left"><span class="menu-icon">🔗</span><span data-i18n="menu3">分享系統連結</span></div>
-          <span class="menu-arrow">❯</span>
-        </div>
-        <div class="menu-action-btn" onclick="checkForUpdates()" style="border-bottom: 1px solid var(--line);">
-          <div class="menu-header-left"><span class="menu-icon">🔄</span><span data-i18n="menu4">檢查並載入最新版本</span></div>
-          <span class="menu-arrow">❯</span>
-        </div>
-        <div class="menu-action-btn" id="supportBtnAction">
-          <div class="menu-header-left"><span class="menu-icon">💬</span><span data-i18n="menu5">系統問題回報</span></div>
-          <span class="menu-arrow">❯</span>
-        </div>
-      </div>
-
-      <div class="footer-disclaimer" data-i18n="disclaimer">
-        <strong style="color: var(--bad); font-size: 14px;">⚠️ 軟體免責聲明：</strong><br>
-        本軟體為理論物理運算輔助工具，不包含繩索材質疲勞、極端摩擦力等環境變數。實際救援操作之系統架設與安全確保，均須由專業教官與指揮官實地判定，開發團隊不負任何實地操作之法律與賠償責任。<br><br><span style='color:var(--warn);'>※ 本系統採單機授權，為保障研發團隊權益，遺失密碼或更換設備請重新購買，恕無提供補發與人工客服。</span>
-      </div>
-    </div>
-  </div>
-</div>
-
 <script>
 // 💡 V6.1 金鑰與防護
 const PERMANENT_KEYS = ["SMT-A7K9-X2M4", "SMT-B3Q8-P9Y1", "SMT-C5R2-W6Z7"];
@@ -1591,7 +1588,6 @@ if (isUserVip) {
     document.getElementById('inHeight').removeAttribute('readonly'); 
 }
 
-const originalVipModalHtml = document.getElementById('vipModalBox').innerHTML;
 let pendingFeatureCallback = null;
 
 function attemptFeature(featureKey, callback) {
@@ -1723,7 +1719,8 @@ const els = {
   txtTenB: document.getElementById('txtTenB'), txtVertB: document.getElementById('txtVertB'),
   sagText: document.getElementById('sagText'),
   angleArc: document.getElementById('angleArc'), angleText: document.getElementById('angleText'),
-  anglePointer: document.getElementById('anglePointer'), /* 💡 新增導引箭頭 */
+  anglePointer: document.getElementById('anglePointer'), 
+  anglePointerArrow: document.getElementById('anglePointerArrow'), 
   tagLineA: document.getElementById('tagLineA'), tagLineB: document.getElementById('tagLineB'),
   tagBadgeA: document.getElementById('tagBadgeA'), tagBadgeB: document.getElementById('tagBadgeB'),
   svgWrap: document.getElementById('svgWrap'), floatLoad: document.getElementById('floatLoad'),
@@ -1822,9 +1819,10 @@ function updateEngine(skipSliderUpdate = false) {
       let isStraight = (!isBroken) && (L <= minL + 0.001); 
       let calcL = isStraight ? minL : (isBroken ? L : L);
 
+      /* 💡 終極防空領域：將畫布高度往下擠 80，確保 A/B 點跟上面的數據面板永遠有安全距離 */
       let maxCanvasH = 460 - 80; 
       scale = Math.min((400 - 80) / Math.max(10, S), maxCanvasH / Math.max(10, Math.abs(H) + Math.max(minL, calcL)*0.5));
-      offsetY = 60 + (H < 0 ? Math.abs(H)*scale : 0); 
+      offsetY = 100 + (H < 0 ? Math.abs(H)*scale : 0); 
 
       let ax = 0, ay = 0, bx = S, by = H, px = S * currentSliderPct;
       let s_ax = toX(ax), s_ay = toY(ay), s_bx = toX(bx), s_by = toY(by);
@@ -1852,6 +1850,7 @@ function updateEngine(skipSliderUpdate = false) {
           els.angleArc.style.display = 'none';
           els.angleText.style.display = 'none';
           els.anglePointer.style.display = 'none';
+          els.anglePointerArrow.style.display = 'none';
           els.tagLineA.style.display = 'none'; 
           els.tagLineB.style.display = 'none'; 
           els.tagBadgeA.style.display = 'none';
@@ -1867,7 +1866,7 @@ function updateEngine(skipSliderUpdate = false) {
           els.txtTenB.innerHTML = `--`;
           els.txtVertB.innerHTML = `--`;
           els.hudA.style.borderLeftColor = 'var(--bad)';
-          els.hudB.style.borderLeftColor = 'var(--bad)'; 
+          els.hudB.style.borderRightColor = 'var(--bad)'; 
 
           els.sagText.textContent = `${t('sagCalc')}: ${t('sagFail')}`;
 
@@ -1922,20 +1921,28 @@ function updateEngine(skipSliderUpdate = false) {
       els.angleArc.setAttribute("stroke", color);
       els.angleText.textContent = interiorAngle.toFixed(1) + "°";
       els.angleText.setAttribute('fill', color);
-      els.angleText.setAttribute('x', s_px); 
       
-      /* 💡 精確導引箭頭：當小於 50 度時，強制把文字彈射到更高處，並用箭頭指引 */
+      /* 💡 角度脫逃計畫：小於 50 度時將文字與箭頭強制往上彈射，避開紅色擔架 */
       if (interiorAngle < 50 && !isStraight && !isBroken) {
-          els.angleText.setAttribute('y', s_py - 85);
+          els.angleText.setAttribute('x', s_px);
+          els.angleText.setAttribute('y', s_py - 75);
+          
           els.anglePointer.setAttribute('x1', s_px);
-          els.anglePointer.setAttribute('y1', s_py - 80);
+          els.anglePointer.setAttribute('y1', s_py - 65);
           els.anglePointer.setAttribute('x2', s_px);
           els.anglePointer.setAttribute('y2', s_py - 30);
           els.anglePointer.setAttribute('stroke', color);
           els.anglePointer.style.display = 'block';
+
+          els.anglePointerArrow.setAttribute('d', `M ${s_px - 4} ${s_py - 35} L ${s_px} ${s_py - 30} L ${s_px + 4} ${s_py - 35}`);
+          els.anglePointerArrow.setAttribute('stroke', color);
+          els.anglePointerArrow.style.display = 'block';
+
       } else {
+          els.angleText.setAttribute('x', s_px); 
           els.angleText.setAttribute('y', s_py - 48); 
           els.anglePointer.style.display = 'none';
+          els.anglePointerArrow.style.display = 'none';
       }
 
       if (isStraight) {
@@ -1981,6 +1988,7 @@ function updateEngine(skipSliderUpdate = false) {
 
               let safeMarginX = 55; 
               
+              /* 💡 標籤彈射：牽引力標籤往上方放置，避免被擔架壓住 */
               let badgeXA = pulleyHtmlX - 85; 
               let badgeYA = pulleyHtmlY - 15; 
 
@@ -2020,7 +2028,8 @@ function updateEngine(skipSliderUpdate = false) {
       let nRad = needleAngle * Math.PI / 180;
       els.pulleyNeedle.setAttribute('x1', 0); els.pulleyNeedle.setAttribute('y1', 0); els.pulleyNeedle.setAttribute('x2', 12 * Math.sin(nRad)); els.pulleyNeedle.setAttribute('y2', -12 * Math.cos(nRad));
       
-      let loadDrop = 75; 
+      /* 💡 擔架懸吊加長，保證絕不擋住角度數字 */
+      let loadDrop = 85; 
       els.suspL.setAttribute('x1', s_px); els.suspL.setAttribute('y1', s_py + 5); els.suspL.setAttribute('x2', s_px - 35); els.suspL.setAttribute('y2', s_py + loadDrop - 2);
       els.suspR.setAttribute('x1', s_px); els.suspR.setAttribute('y1', s_py + 5); els.suspR.setAttribute('x2', s_px + 35); els.suspR.setAttribute('y2', s_py + loadDrop - 2);
 
@@ -2037,6 +2046,7 @@ function updateEngine(skipSliderUpdate = false) {
           els.floatLoad.style.top = `${flY}px`;
       }
 
+      /* 💡 更新儀表板，分離數值與單位，保證不折行 */
       let tText = (isStraight || tension > 9999) ? t('deadLineShort') : tension.toFixed(1);
       let vAText = (isStraight || verticalA > 9999) ? t('deadLineShort') : verticalA.toFixed(1);
       let vBText = (isStraight || verticalB > 9999) ? t('deadLineShort') : verticalB.toFixed(1);
@@ -2052,7 +2062,7 @@ function updateEngine(skipSliderUpdate = false) {
       els.txtTenB.innerHTML = `${tText}<span class="hud-unit">${unitText}</span>${shockBadge}`;
       els.txtTenB.style.color = color;
       els.txtVertB.innerHTML = `${vBText}<span class="hud-unit">${unitText}</span>${shockBadge}`;
-      els.hudB.style.borderLeftColor = color;
+      els.hudB.style.borderRightColor = color;
 
       let sagBaseY = ay + (by - ay) * currentSliderPct;
       let actualSag = isStraight ? 0 : py - sagBaseY; 
@@ -2324,7 +2334,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
     }
 });
 
-// 💡 更新 V6.3：呼叫 HTML 更新防護艙
+// 💡 終極修復 V6.3：呼叫專屬 HTML 戰術更新視窗，保證任何瀏覽器都有反應！
 function checkForUpdates() {
     const msg = t('updateMsg').replace(/\n/g, '<br>');
     document.getElementById('updateMsgText').innerHTML = msg;
