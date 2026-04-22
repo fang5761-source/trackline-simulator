@@ -119,15 +119,16 @@
   }
   .capture-mode .capture-hide { display: none !important; }
   
+  /* 💡 統一：極簡標題與 VIP 徽章 (移除LOGO避免跑版) */
   .topbar { display: flex; flex-direction: column; gap: 10px; margin-bottom: 8px; padding: 0 4px; }
-  .title-row { display: flex; align-items: center; width: 100%; justify-content: space-between; }
+  .title-row { display: flex; align-items: center; width: 100%; justify-content: center; }
   .title-left { display: flex; align-items: center; cursor: pointer; user-select: none; }
   .title-tag {
-    font-size: 15px; color: var(--text); font-weight: bold;
+    font-size: 16px; color: var(--text); font-weight: bold;
     border-left: 4px solid var(--warn); padding-left: 8px; letter-spacing: 0.5px; display: flex; align-items: center;
   }
   
-  .vip-badge { display: none; background: var(--vip); color: #fff; font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 12px; letter-spacing: 0.5px; box-shadow: 0 0 8px rgba(192, 132, 252, 0.6); margin-left: 4px; }
+  .vip-badge { display: none; background: var(--vip); color: #fff; font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 12px; letter-spacing: 0.5px; box-shadow: 0 0 8px rgba(192, 132, 252, 0.6); margin-left: 6px; }
   .is-vip .vip-badge { display: inline-block; }
 
   #langSelect {
@@ -146,7 +147,6 @@
   .icon-btn.active { background: var(--safe); color: var(--bg); border-color: var(--safe); }
   .icon-btn.active-shock { background: var(--bad); color: #fff; border-color: var(--bad); animation: pulse 1.5s infinite; }
   
-  /* 💡 修復實境/手電筒按鈕無反應：消除子元素的滑鼠事件阻擋 */
   .lock-icon { position: absolute; bottom: 2px; right: 2px; font-size: 10px; background: rgba(0,0,0,0.8); border-radius: 50%; padding: 2px; pointer-events: none; }
   .is-vip .lock-icon { display: none; }
   .lock-icon-inline { font-size: 10px; margin-left: 4px; color: var(--vip); pointer-events: none; }
@@ -158,29 +158,30 @@
 
   /* 💡 HUD 戰術儀表板 (修復文字溢出與折行防護) */
   .hud-container {
-    display: flex; justify-content: space-between; align-items: stretch; gap: 8px;
+    display: flex; justify-content: space-between; align-items: stretch; gap: 6px;
     width: 100%; margin-bottom: 8px; z-index: 10;
   }
   
   .hud-panel {
-    background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 10px; padding: 6px 8px; color: var(--text);
+    background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px; padding: 8px 10px; color: var(--text);
     display: flex; flex-direction: column; gap: 4px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.2);
-    flex: 1; max-width: calc(50% - 10px); 
+    flex: 1; max-width: calc(50% - 4px); /* 確保兩邊絕對不重疊 */
   }
   
   .hud-title { font-size: 12px; font-weight: 900; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 4px; margin-bottom: 2px; }
   .hud-tr .hud-title { text-align: right; }
   
-  .hud-row { display: flex; justify-content: space-between; align-items: baseline; gap: 2px; flex-wrap: wrap; }
-  .hud-lbl { font-size: 11px; color: var(--muted); white-space: nowrap; }
-  .hud-val { font-size: clamp(12px, 3.5vw, 15px); font-weight: bold; font-family: monospace; display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: baseline; gap: 2px; word-break: break-word;}
-  .hud-unit { font-size: 10px; font-weight: normal; margin-left: 1px; }
+  /* 💡 強制不換行，避免破圖 */
+  .hud-row { display: flex; justify-content: space-between; align-items: baseline; gap: 4px; flex-wrap: nowrap; }
+  .hud-lbl { font-size: 11px; color: var(--muted); white-space: nowrap; flex-shrink: 0; }
+  .hud-val { font-size: 14px; font-weight: bold; font-family: monospace; white-space: nowrap; flex-shrink: 0;}
+  .hud-unit { font-size: 10px; font-weight: normal; margin-left: 2px; }
   
   .hud-tl { border-left: 4px solid var(--safe); } 
   .hud-tr { border-right: 4px solid var(--safe); } 
 
-  /* 💡 撤除絕對防滑，僅鎖定需拖曳的元件，恢復畫面捲動 */
+  /* 💡 解除畫布整體滾動鎖定，僅保留 draggable 元件的 touch-action */
   .svgWrap { 
     position:relative; width:100%; height: 42vh; min-height: 280px; max-height: 420px;
     background: transparent; border-radius: 12px; border: 1px dashed var(--line); overflow: hidden; 
@@ -190,7 +191,7 @@
   .anchor-dot, .draggable-pulley { cursor: grab; touch-action: none; }
   .anchor-dot:active, .draggable-pulley:active { cursor: grabbing; }
 
-  /* 💡 修正淨空模式的隱藏對象 */
+  /* 💡 修正淨空模式的隱藏對象：不隱藏拉桿與擔架 */
   .hud-container, .tagline-wrap, .tag-badge { transition: opacity 0.3s ease; }
 
   .tag-badge {
@@ -291,6 +292,7 @@
   
   .footer-disclaimer { margin-top: 20px; padding: 15px; font-size: 12px; color: var(--muted); line-height: 1.6; text-align: justify; background: rgba(150,150,150,0.05); border-radius: 10px; border-left: 4px solid var(--bad); }
 
+  /* 💡 散木專屬浮動提示框 (Toast) 樣式 */
   #toastMessage {
     display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
     background: var(--card); color: var(--text); padding: 14px 24px; border-radius: 10px;
@@ -358,6 +360,15 @@
   </div>
 </div>
 
+<!-- 💡 相機權限請求視窗 -->
+<div id="permissionModalOverlay" class="modal-overlay">
+  <div class="modal-box">
+    <h3 data-i18n="permTitle">🛡️ 系統安全提示</h3>
+    <p data-i18n="permDesc" style="text-align:left;">為了精準比對現場繩索角度，本功能將開啟您的相機鏡頭。<br><br>請放心，所有影像疊圖運算皆僅於手機<strong>「本地端」</strong>處理，絕不錄影或外洩您的隱私。<br><br>請在接下來的系統提示中點選<strong>「允許」</strong>即可啟動 AR 實境！</p>
+    <button id="permissionAgreeBtn" class="primary-btn btn-unlock" style="margin-top: 10px;" type="button" data-i18n="permBtn">我瞭解了，開始授權</button>
+  </div>
+</div>
+
 <div id="toastMessage"></div>
 
 <div id="scroll-wrapper">
@@ -369,9 +380,6 @@
           <div class="title-left" id="mainTitleText">
             <img src="icon-192.png" alt="[ICON]" style="width: 28px; height: 28px; border-radius: 6px; margin-right: 8px; object-fit: cover; border: 1px solid var(--line); display: inline-block;" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><rect width=\'100\' height=\'100\' fill=\'%23334155\'/><text x=\'50\' y=\'65\' font-size=\'40\' fill=\'%23fff\' text-anchor=\'middle\'>?</text></svg>'">
             <div class="title-tag"><span id="modeTitleLabel" data-i18n="appTitle">索道張力儀 (動態滑行版)</span> <span class="vip-badge">PRO</span></div>
-          </div>
-          <div style="display:flex; align-items:center; gap:8px;">
-            <img src="./sunmoon_logo.png" alt="散木團隊" style="width: 26px; height: 26px; border-radius: 4px; object-fit: cover; box-shadow: 0 2px 4px rgba(0,0,0,0.5);" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><rect width=\'100\' height=\'100\' fill=\'%23334155\' rx=\'6\'/><text x=\'50\' y=\'70\' font-size=\'50\' font-weight=\'bold\' fill=\'%23fff\' text-anchor=\'middle\' font-family=\'sans-serif\'>木</text></svg>'">
           </div>
         </div>
       </div>
@@ -388,6 +396,7 @@
         <button class="icon-btn" onclick="resetEngine()" title="重置沙盤">↺</button>
       </div>
 
+      <!-- 💡 A/B 數據獨立面板區 -->
       <div class="hud-container">
         <div class="hud-panel hud-tl" id="hudA">
            <div class="hud-title" data-i18n="anchorA">A 錨點</div>
@@ -574,6 +583,10 @@
                 <span data-i18n="devTitle" style="display:inline-block; background:var(--safe); color:#0f1623; font-weight:bold; padding:4px 14px; border-radius:20px; font-size:13px; letter-spacing:0.5px; box-shadow: 0 2px 6px rgba(34,197,94,0.3);">散木索道儀 專業正式版</span>
               </div>
               <p style="margin-top: 0; margin-bottom: 6px; font-weight: bold; color: var(--text); text-align: center;" data-i18n="devTeam">本工具由 <span style="color:var(--warn);">散木團隊</span> 開發製作</p>
+              <!-- 💡 散木團隊 LOGO 改放於此 -->
+              <div style="display:flex; justify-content:center; margin-bottom:10px;">
+                <img src="./sunmoon_logo.png" alt="散木團隊" style="width: 40px; height: 40px; border-radius: 6px; object-fit: cover; box-shadow: 0 2px 4px rgba(0,0,0,0.5);" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><rect width=\'100\' height=\'100\' fill=\'%23334155\' rx=\'6\'/><text x=\'50\' y=\'70\' font-size=\'50\' font-weight=\'bold\' fill=\'%23fff\' text-anchor=\'middle\' font-family=\'sans-serif\'>木</text></svg>'">
+              </div>
               <p style="margin-top: 0; margin-bottom: 4px; font-size: 13px; text-align: center;" data-i18n="devT1">教學架構與工程判斷／徐世豐</p>
               <p style="margin-top: 0; margin-bottom: 12px; font-size: 13px; text-align: center;" data-i18n="devT2">工具設計與互動介面／吳佩芳（朵朵）</p>
               <button type="button" class="btn-collapse-inner" onclick="this.closest('details').removeAttribute('open')" data-i18n="collapse">🔼 收起說明</button>
@@ -662,7 +675,7 @@
   })();
 })();
 
-// 💡 V6.3 多國語言精簡化：新增更新視窗按鈕語言
+// 💡 V6.3 多國語言精簡化：新增更新視窗按鈕語言與相機權限
 const i18n = {
   zh: {
     appTitle: "索道張力儀 (動態滑行版)",
@@ -768,7 +781,10 @@ const i18n = {
     featMA: "⚙️ 牽引省力比換算",
     featMADesc: "解鎖進階機械利益換算，精準評估岸上救援手所需的真實拉力！",
     cancel: "取消",
-    confirmUpdate: "確認更新"
+    confirmUpdate: "確認更新",
+    permTitle: "🛡️ 系統安全提示",
+    permDesc: "為了精準比對現場繩索角度，本功能將開啟您的相機鏡頭。<br><br>請放心，所有影像疊圖運算皆僅於手機<strong>「本地端」</strong>處理，絕不錄影或外洩您的隱私。<br><br>請點選<strong>「允許」</strong>即可啟動實境！",
+    permBtn: "我瞭解了，開始授權"
   },
   en: {
     appTitle: "Trackline Simulator",
@@ -874,7 +890,10 @@ const i18n = {
     featMA: "⚙️ Horizontal MA Calc",
     featMADesc: "Unlock advanced Mechanical Advantage for accurate pulling force estimation!",
     cancel: "Cancel",
-    confirmUpdate: "Update"
+    confirmUpdate: "Update",
+    permTitle: "🛡️ Camera Access",
+    permDesc: "Camera access is required for AR. Processing is 100% local. No data is recorded or sent.",
+    permBtn: "Allow Access"
   },
   ja: {
     appTitle: "トラックライン張力計",
@@ -980,7 +999,10 @@ const i18n = {
     featMA: "⚙️ 倍力比の計算",
     featMADesc: "高度なMA(倍力システム)計算をロック解除！",
     cancel: "キャンセル",
-    confirmUpdate: "更新"
+    confirmUpdate: "更新",
+    permTitle: "🛡️ セキュリティ警告",
+    permDesc: "カメラを起動して現場の角度をシミュレーションします。<br>画像処理はすべてスマホの<strong>ローカル</strong>で行われます。録画やデータ送信は一切行いません。",
+    permBtn: "許可する"
   },
   ko: {
     appTitle: "트랙라인 장력계",
@@ -1045,7 +1067,7 @@ const i18n = {
     pwaStep7: "아래로 스크롤하여 '홈 화면에 추가'를 선택합니다.",
     pwaStep8: "'추가'를 누릅니다.",
     installBtn: "📥 앱 설치하기",
-    disclaimer: "<strong style='color: var(--bad); font 사=14px;'>⚠️ 면책 조항:</strong><br>본 소프트웨어는 이론적 물리 연산 도구입니다. 실제 구조 작업 및 안전은 반드시 현장의 전문 교관이 판단해야 합니다.<br><br><span style='color:var(--warn);'>※ 본 앱은 1기기 라이선스입니다. 기기 변경 시 비밀번호 재발급 및 고객 지원은 제공되지 않습니다. 개발 지원을 위해 재구매를 부탁드립니다.</span>",
+    disclaimer: "<strong style='color: var(--bad); font-size: 14px;'>⚠️ 면책 조항:</strong><br>본 소프트웨어는 이론적 물리 연산 도구입니다. 실제 구조 작업 및 안전은 반드시 현장의 전문 교관이 판단해야 합니다.<br><br><span style='color:var(--warn);'>※ 본 앱은 1기기 라이선스입니다. 기기 변경 시 비밀번호 재발급 및 고객 지원은 제공되지 않습니다. 개발 지원을 위해 재구매를 부탁드립니다.</span>",
     vipTitle: "🔒 PRO 기능 잠금 해제",
     vipEnable1: "다음 기능을 활성화합니다: '",
     vipEnable2: "'",
@@ -1086,7 +1108,10 @@ const i18n = {
     featMA: "⚙️ 수평 MA 계산",
     featMADesc: "고급 MA(기계적 이점) 계산을 잠금 해제하여 견인력을 추정하세요!",
     cancel: "취소",
-    confirmUpdate: "업데이트"
+    confirmUpdate: "업데이트",
+    permTitle: "🛡️ 카메라 접근 권한",
+    permDesc: "AR 시뮬레이션을 위해 카메라 접근이 필요합니다. 데이터는 녹화되거나 전송되지 않습니다.",
+    permBtn: "접근 허용"
   },
   fr: {
     appTitle: "Simulateur de Tyrolienne",
@@ -1192,7 +1217,10 @@ const i18n = {
     featMA: "⚙️ Calcul de l'AM",
     featMADesc: "Débloquez le calcul de l'Avantage Mécanique pour la force de traction !",
     cancel: "Annuler",
-    confirmUpdate: "Mettre à jour"
+    confirmUpdate: "Mettre à jour",
+    permTitle: "🛡️ Accès Caméra",
+    permDesc: "L'accès à la caméra est requis pour l'AR. Le traitement est local. Aucune donnée n'est envoyée.",
+    permBtn: "Autoriser l'accès"
   },
   de: {
     appTitle: "Seilbahn Simulator",
@@ -1298,7 +1326,10 @@ const i18n = {
     featMA: "⚙️ Flaschenzug Berechnung",
     featMADesc: "Flaschenzug-Berechnung für genaue Zugkraft freischalten!",
     cancel: "Abbrechen",
-    confirmUpdate: "Aktualisieren"
+    confirmUpdate: "Aktualisieren",
+    permTitle: "🛡️ Kamerazugriff",
+    permDesc: "Für AR wird Kamerazugriff benötigt. Lokale Verarbeitung. Keine Datenaufzeichnung.",
+    permBtn: "Zugriff erlauben"
   },
   es: {
     appTitle: "Simulador de Tirolesa",
@@ -1404,7 +1435,10 @@ const i18n = {
     featMA: "⚙️ Cálculo de Ventaja Mecánica",
     featMADesc: "¡Desbloquee el cálculo de ventaja mecánica para la fuerza de tracción!",
     cancel: "Cancelar",
-    confirmUpdate: "Actualizar"
+    confirmUpdate: "Actualizar",
+    permTitle: "🛡️ Acceso a la Cámara",
+    permDesc: "Se requiere acceso para AR. Procesamiento 100% local. No se envían datos.",
+    permBtn: "Permitir Acceso"
   },
   pt: {
     appTitle: "Simulador de Tirolesa",
@@ -1510,7 +1544,10 @@ const i18n = {
     featMA: "⚙️ Cálculo de Vantagem Mecânica",
     featMADesc: "Desbloqueie o cálculo de vantagem mecânica para a força de tração!",
     cancel: "Cancelar",
-    confirmUpdate: "Atualizar"
+    confirmUpdate: "Atualizar",
+    permTitle: "🛡️ Acesso à Câmera",
+    permDesc: "O acesso é necessário para AR. Processamento 100% local. Nenhum dado é enviado.",
+    permBtn: "Permitir Acesso"
   }
 };
 
@@ -1604,19 +1641,24 @@ function attemptFeature(featureKey, callback) {
     }
 }
 
+/* 💡 修復：點擊標題列能順利呼叫出指揮官控制台 */
 const mainTitleEl = document.getElementById('mainTitleText');
 if (mainTitleEl) {
     mainTitleEl.addEventListener('click', () => {
+        pendingFeatureCallback = null;
         if (isUserVip) {
-            pendingFeatureCallback = null;
             document.getElementById('vipFeatureName').parentElement.innerHTML = t('vipStateDesc');
             document.getElementById('vipFeatureDesc').textContent = "";
             document.querySelector('[data-i18n="vipTitle"]').textContent = t('vipStateUnlocked');
-            document.getElementById('vipErrorMsg').textContent = "";
-            document.getElementById('vipPwdInput').value = "";
-            document.getElementById('vipModal').style.display = 'flex';
-            setTimeout(() => document.getElementById('vipPwdInput').focus(), 100);
+        } else {
+            document.getElementById('vipFeatureName').parentElement.innerHTML = `<span data-i18n="vipEnable1">${t('vipEnable1')}</span><span id="vipFeatureName" style="color:var(--vip); font-weight:bold; font-size:16px;">${t('appTitle')}</span><span data-i18n="vipEnable2">${t('vipEnable2')}</span>`;
+            document.getElementById('vipFeatureDesc').textContent = "";
+            document.querySelector('[data-i18n="vipTitle"]').textContent = t('vipTitle');
         }
+        document.getElementById('vipErrorMsg').textContent = "";
+        document.getElementById('vipPwdInput').value = "";
+        document.getElementById('vipModal').style.display = 'flex';
+        setTimeout(() => document.getElementById('vipPwdInput').focus(), 100);
     });
 }
 
@@ -1820,10 +1862,10 @@ function updateEngine(skipSliderUpdate = false) {
       let isStraight = (!isBroken) && (L <= minL + 0.001); 
       let calcL = isStraight ? minL : (isBroken ? L : L);
 
-      /* 💡 終極防空領域：縮小計算畫布高度，預留 130px 的空間給底部的擔架與滑輪 */
-      let maxCanvasH = 460 - 130; 
+      /* 💡 終極防空領域：縮小畫布高度並將 offsetY 降至 100，保證 A/B 點跟上面的數據面板永遠有安全距離 */
+      let maxCanvasH = 460 - 110; 
       scale = Math.min((400 - 80) / Math.max(10, S), maxCanvasH / Math.max(10, Math.abs(H) + Math.max(minL, calcL)*0.5));
-      offsetY = 70 + (H < 0 ? Math.abs(H)*scale : 0); 
+      offsetY = 100 + (H < 0 ? Math.abs(H)*scale : 0); 
 
       let ax = 0, ay = 0, bx = S, by = H, px = S * currentSliderPct;
       let s_ax = toX(ax), s_ay = toY(ay), s_bx = toX(bx), s_by = toY(by);
@@ -1923,26 +1965,28 @@ function updateEngine(skipSliderUpdate = false) {
       els.angleText.textContent = interiorAngle.toFixed(1) + "°";
       els.angleText.setAttribute('fill', color);
       
-      /* 💡 角度脫逃計畫：當小於 50 度時，強制把文字彈射到左側或右側安全區，並用箭頭指引 */
+      /* 💡 角度脫逃計畫：當小於 50 度時，強制把文字彈射到外側並用箭頭指引，避免在夾角被包水餃 */
       if (interiorAngle < 50 && !isStraight && !isBroken) {
           let isLeft = (currentSliderPct > 0.5); 
-          let sideOffset = isLeft ? -55 : 55;
+          let sideOffset = isLeft ? -60 : 60;
           els.angleText.setAttribute('x', s_px + sideOffset);
-          els.angleText.setAttribute('y', s_py + 40);
+          els.angleText.setAttribute('y', s_py - 40);
           
-          els.anglePointer.setAttribute('x1', s_px + sideOffset * 0.7);
-          els.anglePointer.setAttribute('y1', s_py + 30);
-          els.anglePointer.setAttribute('x2', s_px + (isLeft ? -12 : 12));
-          els.anglePointer.setAttribute('y2', s_py + 12);
+          els.anglePointer.setAttribute('x1', s_px + sideOffset * 0.6);
+          els.anglePointer.setAttribute('y1', s_py - 35);
+          els.anglePointer.setAttribute('x2', s_px + (isLeft ? -8 : 8));
+          els.anglePointer.setAttribute('y2', s_py - 20);
           
           els.anglePointer.setAttribute('stroke', color);
           els.anglePointer.style.display = 'block';
 
-          els.anglePointerArrow.style.display = 'none';
+          els.anglePointerArrow.setAttribute('d', `M ${s_px + (isLeft ? -12 : 4)} ${s_py - 25} L ${s_px + (isLeft ? -8 : 8)} ${s_py - 20} L ${s_px + (isLeft ? -4 : 12)} ${s_py - 25}`);
+          els.anglePointerArrow.setAttribute('stroke', color);
+          els.anglePointerArrow.style.display = 'block';
 
       } else {
           els.angleText.setAttribute('x', s_px); 
-          els.angleText.setAttribute('y', s_py - 48); 
+          els.angleText.setAttribute('y', s_py - 45); 
           els.anglePointer.style.display = 'none';
           els.anglePointerArrow.style.display = 'none';
       }
@@ -2043,7 +2087,8 @@ function updateEngine(skipSliderUpdate = false) {
           let wrapRect = els.svgWrap.getBoundingClientRect();
           let flX = screenPt.x - wrapRect.left; 
           let flY = screenPt.y - wrapRect.top;
-          if (flY > wrapRect.height - 45) flY = wrapRect.height - 45;
+          /* 💡 防止擔架跑出邊界 */
+          if (flY > wrapRect.height - 55) flY = wrapRect.height - 55;
           els.floatLoad.style.left = `${flX}px`;
           els.floatLoad.style.top = `${flY}px`;
       }
@@ -2189,6 +2234,21 @@ function toggleShock() {
   updateEngine(true);
 }
 
+/* 💡 相機權限請求流程 */
+let hasAgreedToPermissions = false;
+function requestUserAgreement() {
+  if (hasAgreedToPermissions) return Promise.resolve();
+  return new Promise((resolve) => {
+    const permModal = document.getElementById('permissionModalOverlay');
+    permModal.style.display = 'flex';
+    document.getElementById('permissionAgreeBtn').onclick = () => { 
+        permModal.style.display = 'none'; 
+        hasAgreedToPermissions = true; 
+        resolve(); 
+    };
+  });
+}
+
 async function toggleCamera() { 
   if (stream) { 
     stream.getTracks().forEach(track => track.stop()); stream = null; videoTrack = null; 
@@ -2197,6 +2257,7 @@ async function toggleCamera() {
     mainCard.classList.remove('camera-mode');
     document.body.classList.remove('camera-mode');
   } else { 
+    await requestUserAgreement();
     try { 
       image.style.opacity = "0"; 
       stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }); 
@@ -2205,7 +2266,7 @@ async function toggleCamera() {
       mainCard.classList.add('camera-mode');
       document.body.classList.add('camera-mode');
     } catch (err) { 
-      alert("⚠️ 相機啟動失敗：請確認是否允許權限，或改用 Safari/Chrome 等原生瀏覽器開啟！"); 
+      showToast("⚠️ 相機啟動失敗：請確認是否允許權限，或改用 Safari/Chrome 等原生瀏覽器開啟！", "bad"); 
     } 
   } 
 }
@@ -2347,7 +2408,8 @@ function checkForUpdates() {
 function executeUpdate() {
     document.getElementById('updateModal').style.display = 'none';
     showToast("🔄 戰術系統重置中...", "warn");
-    window.scrollTo({ top: 0, behavior: 'smooth' }); // 強制捲動到頂部
+    /* 💡 強制捲動包含所有內容的 scroll-wrapper 到頂部 */
+    document.getElementById('scroll-wrapper').scrollTo({ top: 0, behavior: 'smooth' }); 
     setTimeout(() => {
         if ('caches' in window) {
             caches.keys().then((names) => {
@@ -2360,7 +2422,7 @@ function executeUpdate() {
         } else {
             window.location.href = window.location.href.split('?')[0] + '?v=' + new Date().getTime();
         }
-    }, 600);
+    }, 800);
 }
 
 const shareBtnAction = document.getElementById('shareBtnAction');
