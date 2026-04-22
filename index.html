@@ -164,29 +164,33 @@
   .anchor-dot, .draggable-pulley { cursor: grab; touch-action: none; }
   .anchor-dot:active, .draggable-pulley:active { cursor: grabbing; }
 
-  /* 💡 更新：HUD 容器使用 Flexbox 防擠壓 */
+  /* 💡 終極修復：HUD 鈦合金彈性防護艙 */
   .hud-container, .stretcher-tag, .tagline-wrap, .control-deck { transition: opacity 0.3s ease; }
   
   .hud-container {
-    position: absolute; top: 10px; left: 8px; right: 8px;
-    display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;
+    position: absolute; top: 12px; left: 10px; right: 10px;
+    display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;
     pointer-events: none; z-index: 10;
   }
   
   .hud-panel {
-    background: rgba(10, 15, 25, 0.7); border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 8px; padding: 6px 8px; color: var(--text); font-size: 11px; font-weight: bold;
-    backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); pointer-events: auto; display: flex; flex-direction: column; gap: 4px; box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-    flex: 1; max-width: calc(50% - 25px); /* 💡 擴大安全間距，強制保留中央 50px 通道給角度與滑輪 */
+    background: rgba(10, 15, 25, 0.85); border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 10px; padding: 8px 10px; color: var(--text);
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); pointer-events: auto; 
+    display: flex; flex-direction: column; gap: 6px; box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+    flex: 1; max-width: calc(50% - 25px); /* 強制空出中央走廊，絕對不撞機 */
   }
   
-  .hud-panel .val { 
-    font-size: 13px; font-family: monospace; display: flex; align-items: baseline; gap: 4px; 
-    flex-wrap: wrap; line-height: 1.2; word-break: break-word; /* 允許換行，防止撐破 */
-  }
+  .hud-title { font-size: 12px; font-weight: 900; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 4px; margin-bottom: 2px; }
+  .hud-tr .hud-title { text-align: right; }
+  
+  .hud-row { display: flex; justify-content: space-between; align-items: baseline; gap: 4px; }
+  .hud-lbl { font-size: 11px; color: var(--muted); white-space: nowrap; }
+  .hud-val { font-size: 15px; font-weight: bold; font-family: monospace; white-space: nowrap; }
+  .hud-unit { font-size: 10px; font-weight: normal; margin-left: 2px; }
   
   .hud-tl { border-left: 3px solid var(--safe); } 
-  .hud-tr { border-right: 3px solid var(--safe); text-align: right; align-items: flex-end; } 
+  .hud-tr { border-right: 3px solid var(--safe); } 
 
   .tag-badge {
     position: absolute; padding: 6px 12px; border-radius: 8px; font-size: 14px; font-weight: 900; white-space: nowrap;
@@ -232,7 +236,7 @@
   .ma-btn.active { background: var(--tagline); color: var(--bg); border-color: var(--tagline); }
   .ma-btn .lock-icon { bottom: 2px; right: 2px; font-size: 8px; }
 
-  /* 💡 Modals - 改用 display: none 解決按鈕阻擋問題 */
+  /* 💡 Modals */
   .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); }
   .modal-box { background: var(--card); border: 2px solid var(--vip); border-radius: 16px; padding: 24px; width: 85%; max-width: 400px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.8); position: relative; }
   .modal-box h3 { margin: 0 0 12px 0; color: var(--warn); font-size: 18px; }
@@ -245,7 +249,6 @@
   .modal-btn-group .btn-cancel { flex: 1; background: var(--muted); color: #fff; border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; }
   .modal-btn-group .btn-unlock { flex: 1; background: var(--safe); border: none; color: #0f1623; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
-  /* 統一：選單樣式全面對齊張力儀 */
   .menu-list { display: flex; flex-direction: column; width: 100%; margin-top: 5px; }
   
   details.main-accordion { margin-top: 12px; }
@@ -287,7 +290,7 @@
   
   .footer-disclaimer { margin-top: 20px; padding: 15px; font-size: 12px; color: var(--muted); line-height: 1.6; text-align: justify; background: rgba(150,150,150,0.05); border-radius: 10px; border-left: 4px solid var(--bad); }
 
-  /* 💡 散木專屬浮動提示框 (Toast) 樣式對齊 V6.3 */
+  /* 💡 散木專屬浮動提示框 (Toast) */
   #toastMessage {
     display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
     background: var(--card); color: var(--text); padding: 14px 24px; border-radius: 10px;
@@ -1268,6 +1271,16 @@ function changeLang(selectedLang) {
             <div class="title-tag"><span id="modeTitleLabel" data-i18n="appTitle">索道張力儀 (動態滑行版)</span> <span class="vip-badge">PRO</span></div>
           </div>
           <div style="display:flex; align-items:center; gap:8px;">
+            <select id="langSelect" onchange="changeLang(this.value)">
+              <option value="zh">🇹🇼 繁中</option>
+              <option value="en">🇺🇸 EN</option>
+              <option value="ja">🇯🇵 日本語</option>
+              <option value="ko">🇰🇷 한국어</option>
+              <option value="fr">🇫🇷 Français</option>
+              <option value="de">🇩🇪 Deutsch</option>
+              <option value="es">🇪🇸 Español</option>
+              <option value="pt">🇵🇹 Português</option>
+            </select>
             <img src="./sunmoon_logo.png" alt="散木團隊" style="width: 26px; height: 26px; border-radius: 4px; object-fit: cover; box-shadow: 0 2px 4px rgba(0,0,0,0.5);" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><rect width=\'100\' height=\'100\' fill=\'%23334155\' rx=\'6\'/><text x=\'50\' y=\'70\' font-size=\'50\' font-weight=\'bold\' fill=\'%23fff\' text-anchor=\'middle\' font-family=\'sans-serif\'>木</text></svg>'">
           </div>
         </div>
@@ -1322,17 +1335,29 @@ function changeLang(selectedLang) {
         <div id="tagBadgeA" class="tag-badge">--</div>
         <div id="tagBadgeB" class="tag-badge">--</div>
 
-        <!-- 💡 更新：使用 Flexbox 彈性防護艙包裹 HUD，避免碰撞 -->
+        <!-- 💡 終極修復：HUD 鈦合金彈性防護艙 -->
         <div class="hud-container">
           <div class="hud-panel hud-tl" id="hudA">
-             <div style="color:var(--muted); font-size:11px;" data-i18n="anchorA">A 錨點</div>
-             <div id="txtTenA" class="val" style="color:var(--safe)">張力: --</div>
-             <div id="txtVertA" class="val" style="color:var(--warn)">抗重: --</div>
+             <div class="hud-title" data-i18n="anchorA">A 錨點</div>
+             <div class="hud-row">
+               <span class="hud-lbl" data-i18n="tension">張力:</span>
+               <span id="txtTenA" class="hud-val" style="color:var(--safe)">--</span>
+             </div>
+             <div class="hud-row">
+               <span class="hud-lbl" data-i18n="vertical">抗重:</span>
+               <span id="txtVertA" class="hud-val" style="color:var(--warn)">--</span>
+             </div>
           </div>
           <div class="hud-panel hud-tr" id="hudB">
-             <div style="color:var(--muted); font-size:11px;" data-i18n="anchorB">B 錨點</div>
-             <div id="txtTenB" class="val" style="color:var(--safe)">張力: --</div>
-             <div id="txtVertB" class="val" style="color:var(--warn)">抗重: --</div>
+             <div class="hud-title" data-i18n="anchorB">B 錨點</div>
+             <div class="hud-row">
+               <span class="hud-lbl" data-i18n="tension">張力:</span>
+               <span id="txtTenB" class="hud-val" style="color:var(--safe)">--</span>
+             </div>
+             <div class="hud-row">
+               <span class="hud-lbl" data-i18n="vertical">抗重:</span>
+               <span id="txtVertB" class="hud-val" style="color:var(--warn)">--</span>
+             </div>
           </div>
         </div>
         
@@ -1414,21 +1439,6 @@ function changeLang(selectedLang) {
       <details class="main-accordion">
         <summary><div style="display:flex; align-items:center; gap:8px;"><span class="menu-icon">⚙️</span> <span data-i18n="menu2">系統工具與說明書</span></div></summary>
         <div class="menu-group">
-          
-          <div class="menu-action-btn" style="border-bottom: 1px solid var(--line); justify-content: space-between; cursor: default;">
-            <div class="menu-header-left"><span class="menu-icon">🌍</span><span data-i18n="menuLang">語言設定 / Language</span></div>
-            <select id="langSelect" onchange="changeLang(this.value)">
-              <option value="zh">🇹🇼 繁中</option>
-              <option value="en">🇺🇸 EN</option>
-              <option value="ja">🇯🇵 日本語</option>
-              <option value="ko">🇰🇷 한국어</option>
-              <option value="fr">🇫🇷 Français</option>
-              <option value="de">🇩🇪 Deutsch</option>
-              <option value="es">🇪🇸 Español</option>
-              <option value="pt">🇵🇹 Português</option>
-            </select>
-          </div>
-
           <details class="menu-item">
             <summary>
               <div class="menu-header-left"><span class="menu-icon">📖</span><span data-i18n="menuOp">系統操作說明</span></div>
@@ -1541,6 +1551,7 @@ if (isUserVip) {
     document.getElementById('inHeight').removeAttribute('readonly'); 
 }
 
+const originalVipModalHtml = document.getElementById('vipModalBox').innerHTML;
 let pendingFeatureCallback = null;
 
 function attemptFeature(featureKey, callback) {
@@ -1570,22 +1581,6 @@ if (mainTitleEl) {
             setTimeout(() => document.getElementById('vipPwdInput').focus(), 100);
         }
     });
-}
-
-function showToast(msg, type = 'safe') {
-    const toast = document.getElementById('toastMessage');
-    toast.innerHTML = msg;
-    toast.style.borderLeftColor = `var(--${type})`;
-    toast.style.display = 'block';
-
-    // 強制重繪啟動動畫
-    void toast.offsetWidth;
-
-    toast.classList.add('show');
-    setTimeout(() => {
-        toast.classList.remove('show');
-        setTimeout(() => toast.style.display = 'none', 300); // 動畫結束後隱藏
-    }, 3000);
 }
 
 window.logoutVip = function() {
@@ -1786,9 +1781,10 @@ function updateEngine(skipSliderUpdate = false) {
       let isStraight = (!isBroken) && (L <= minL + 0.001); 
       let calcL = isStraight ? minL : (isBroken ? L : L);
 
-      let maxCanvasH = 460 - 180; /* 💡 縮小畫布高度，把整體圖形往下擠 */
+      /* 💡 增加畫布下方淨空，確保 offsetY 往下推，給 HUD 絕對安全的中央雷達區 */
+      let maxCanvasH = 460 - 220; 
       scale = Math.min((400 - 80) / Math.max(10, S), maxCanvasH / Math.max(10, Math.abs(H) + Math.max(minL, calcL)*0.5));
-      offsetY = 175 + (H < 0 ? Math.abs(H)*scale : 0); /* 💡 增加 offsetY，將滑輪與主繩大幅度往下推，避開頂部 HUD 雷達區 */
+      offsetY = 190 + (H < 0 ? Math.abs(H)*scale : 0); 
 
       let ax = 0, ay = 0, bx = S, by = H, px = S * currentSliderPct;
       let s_ax = toX(ax), s_ay = toY(ay), s_bx = toX(bx), s_by = toY(by);
@@ -1825,10 +1821,10 @@ function updateEngine(skipSliderUpdate = false) {
           taglineInfo.innerHTML = `🚨 <b style="color:var(--bad);">${t('warnSpan')}</b>`;
           taglineInfo.style.background = "rgba(239, 68, 68, 0.15)";
 
-          els.txtTenA.innerHTML = `${t('tension')} <span style="font-size:15px">---</span>`;
-          els.txtVertA.innerHTML = `${t('vertical')} <span style="font-size:15px">---</span>`;
-          els.txtTenB.innerHTML = `${t('tension')} <span style="font-size:15px">---</span>`;
-          els.txtVertB.innerHTML = `${t('vertical')} <span style="font-size:15px">---</span>`;
+          els.txtTenA.innerHTML = `--`;
+          els.txtVertA.innerHTML = `--`;
+          els.txtTenB.innerHTML = `--`;
+          els.txtVertB.innerHTML = `--`;
           els.hudA.style.borderLeftColor = 'var(--bad)';
           els.hudB.style.borderRightColor = 'var(--bad)';
 
@@ -1885,7 +1881,9 @@ function updateEngine(skipSliderUpdate = false) {
       els.angleArc.setAttribute("stroke", color);
       els.angleText.textContent = interiorAngle.toFixed(1) + "°";
       els.angleText.setAttribute('fill', color);
-      els.angleText.setAttribute('x', s_px); els.angleText.setAttribute('y', s_py - 35);
+      els.angleText.setAttribute('x', s_px); 
+      /* 💡 稍微往上拉，避免跟下方標籤互撞 */
+      els.angleText.setAttribute('y', s_py - 40);
 
       if (isStraight) {
           maControl.style.display = "none"; 
@@ -1931,26 +1929,26 @@ function updateEngine(skipSliderUpdate = false) {
               let safeMarginX = 55; 
               let safeMarginYBottom = wrapRect.height - 25; 
               
-              let badgeXA = pulleyHtmlX - 65; 
-              let badgeYA = pulleyHtmlY + 18; 
+              let badgeXA = pulleyHtmlX - 70; 
+              let badgeYA = pulleyHtmlY + 20; 
 
-              if (pulleyHtmlX < 110) {
+              if (pulleyHtmlX < 120) {
                   badgeXA = safeMarginX; 
-                  badgeYA = pulleyHtmlY + 95; 
-                  if (badgeYA > safeMarginYBottom) badgeYA = pulleyHtmlY - 35; 
+                  /* 💡 智慧防撞：如果空間不夠，往上方彈射，絕對不遮住紅色擔架 */
+                  badgeYA = pulleyHtmlY - 35; 
               }
               if (badgeYA > safeMarginYBottom) badgeYA = safeMarginYBottom;
               
               els.tagBadgeA.style.left = `${badgeXA}px`;
               els.tagBadgeA.style.top = `${badgeYA}px`;
 
-              let badgeXB = pulleyHtmlX + 65;
-              let badgeYB = pulleyHtmlY + 18;
+              let badgeXB = pulleyHtmlX + 70;
+              let badgeYB = pulleyHtmlY + 20;
 
-              if (pulleyHtmlX > wrapRect.width - 110) {
+              if (pulleyHtmlX > wrapRect.width - 120) {
                   badgeXB = wrapRect.width - safeMarginX; 
-                  badgeYB = pulleyHtmlY + 95; 
-                  if (badgeYB > safeMarginYBottom) badgeYB = pulleyHtmlY - 35; 
+                  /* 💡 智慧防撞：往上方彈射 */
+                  badgeYB = pulleyHtmlY - 35; 
               }
               if (badgeYB > safeMarginYBottom) badgeYB = safeMarginYBottom;
               
@@ -1999,6 +1997,7 @@ function updateEngine(skipSliderUpdate = false) {
           els.floatLoad.style.top = `${flY}px`;
       }
 
+      /* 💡 終極修復：把數值與文字分離，放入專屬的網格中，絕不折行 */
       let tText = (isStraight || tension > 9999) ? t('deadLineShort') : tension.toFixed(1);
       let vAText = (isStraight || verticalA > 9999) ? t('deadLineShort') : verticalA.toFixed(1);
       let vBText = (isStraight || verticalB > 9999) ? t('deadLineShort') : verticalB.toFixed(1);
@@ -2006,12 +2005,14 @@ function updateEngine(skipSliderUpdate = false) {
       let shockBadge = isShockOn ? `<span style="font-size:10px; color:var(--bad); margin-left:4px;">⚡${t('peak')}</span>` : '';
       let unitText = isStraight ? '' : 'kg';
       
-      els.txtTenA.innerHTML = `${t('tension')} <span style="font-size:15px">${tText}</span><span style="font-size:11px">${unitText}</span>${shockBadge}`; els.txtTenA.style.color = color;
-      els.txtVertA.innerHTML = `${t('vertical')} <span style="font-size:15px">${vAText}</span><span style="font-size:11px">${unitText}</span>${shockBadge}`;
+      els.txtTenA.innerHTML = `${tText}<span class="hud-unit">${unitText}</span>${shockBadge}`;
+      els.txtTenA.style.color = color;
+      els.txtVertA.innerHTML = `${vAText}<span class="hud-unit">${unitText}</span>${shockBadge}`;
       els.hudA.style.borderLeftColor = color; 
 
-      els.txtTenB.innerHTML = `${t('tension')} <span style="font-size:15px">${tText}</span><span style="font-size:11px">${unitText}</span>${shockBadge}`; els.txtTenB.style.color = color;
-      els.txtVertB.innerHTML = `${t('vertical')} <span style="font-size:15px">${vBText}</span><span style="font-size:11px">${unitText}</span>${shockBadge}`;
+      els.txtTenB.innerHTML = `${tText}<span class="hud-unit">${unitText}</span>${shockBadge}`;
+      els.txtTenB.style.color = color;
+      els.txtVertB.innerHTML = `${vBText}<span class="hud-unit">${unitText}</span>${shockBadge}`;
       els.hudB.style.borderRightColor = color;
 
       let sagBaseY = ay + (by - ay) * currentSliderPct;
