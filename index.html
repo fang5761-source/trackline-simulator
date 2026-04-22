@@ -122,7 +122,7 @@
   /* 💡 統一：極簡標題與 VIP 徽章 */
   .topbar { display: flex; flex-direction: column; gap: 10px; margin-bottom: 8px; padding: 0 4px; }
   .title-row { display: flex; align-items: center; width: 100%; justify-content: space-between; }
-  .title-left { display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; font-size: 15px; font-weight: bold; white-space: nowrap; }
+  .title-left { display: flex; align-items: center; cursor: pointer; user-select: none; }
   .title-tag {
     font-size: 15px; color: var(--text); font-weight: bold;
     border-left: 4px solid var(--warn); padding-left: 8px; letter-spacing: 0.5px; display: flex; align-items: center;
@@ -133,11 +133,13 @@
 
   /* 💡 全新下拉式語言選單樣式 (下放選單) */
   #langSelect {
-    background: rgba(255,255,255,0.05); border: 1px solid var(--line); color: var(--text);
-    border-radius: 6px; padding: 4px 8px; font-size: 13px; font-weight: bold; cursor: pointer;
+    background: rgba(255,255,255,0.05); border: 1px solid var(--line); color: var(--muted);
+    border-radius: 8px; padding: 4px 6px; font-size: 13px; font-weight: bold; cursor: pointer;
+    transition: all 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.3); margin-left: auto;
+    flex: 0 0 auto !important; width: fit-content !important; min-width: 0 !important;
     outline: none; -webkit-appearance: menulist;
   }
-  #langSelect:focus { border-color: var(--safe); }
+  #langSelect:focus { border-color: var(--safe); color: var(--text); }
   #langSelect option { background: var(--bg); color: var(--text); }
 
   .icon-bar { display: flex; justify-content: space-between; align-items: center; gap: 6px; background: rgba(0,0,0,0.4); padding: 6px 8px; border-radius: 12px; margin-bottom: 8px; border: 1px solid var(--line); }
@@ -155,9 +157,33 @@
   @keyframes glow-red { 0%, 100% { box-shadow: 0 4px 10px rgba(0,0,0,0.6); border-color: #9a3412; } 50% { box-shadow: 0 0 15px rgba(239,68,68,0.8); border-color: #ef4444; } }
   .shock-anim { animation: glow-red 1s infinite; }
 
-  /* 💡 高摩擦係數絕對防滑裝甲：加入 touch-action: none; 確保畫布拖拉不捲動網頁 */
+  /* 💡 終極修復：HUD 戰術儀表板獨立計畫 */
+  .hud-container {
+    display: flex; justify-content: space-between; align-items: stretch; gap: 8px;
+    width: 100%; margin-bottom: 8px; z-index: 10;
+  }
+  
+  .hud-panel {
+    background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px; padding: 8px 10px; color: var(--text);
+    display: flex; flex-direction: column; gap: 6px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.2);
+    flex: 1; min-width: 0; /* 允許縮小，防止撐破 */
+  }
+  
+  .hud-title { font-size: 12px; font-weight: 900; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 4px; margin-bottom: 2px; }
+  .hud-tr .hud-title { text-align: right; }
+  
+  .hud-row { display: flex; justify-content: space-between; align-items: center; gap: 4px; }
+  .hud-lbl { font-size: 11px; color: var(--muted); white-space: nowrap; }
+  .hud-val { font-size: 15px; font-weight: bold; font-family: monospace; white-space: nowrap; }
+  .hud-unit { font-size: 10px; font-weight: normal; margin-left: 2px; }
+  
+  .hud-tl { border-left: 4px solid var(--safe); } 
+  .hud-tr { border-right: 4px solid var(--safe); } 
+
+  /* 💡 高摩擦係數絕對防滑裝甲 */
   .svgWrap { 
-    position:relative; width:100%; height: 45vh; min-height: 320px; max-height: 460px;
+    position:relative; width:100%; height: 42vh; min-height: 280px; max-height: 420px;
     background: transparent; border-radius: 12px; border: 1px dashed var(--line); overflow: hidden; 
     touch-action: none; 
   }
@@ -166,33 +192,7 @@
   .anchor-dot, .draggable-pulley { cursor: grab; touch-action: none; }
   .anchor-dot:active, .draggable-pulley:active { cursor: grabbing; }
 
-  /* 💡 終極修復：HUD 鈦合金彈性防護艙 */
-  .hud-container, .stretcher-tag, .tagline-wrap, .control-deck { transition: opacity 0.3s ease; }
-  
-  .hud-container {
-    position: absolute; top: 12px; left: 10px; right: 10px;
-    display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;
-    pointer-events: none; z-index: 10;
-  }
-  
-  .hud-panel {
-    background: rgba(10, 15, 25, 0.85); border: 1px solid rgba(255,255,255,0.15);
-    border-radius: 10px; padding: 8px 10px; color: var(--text);
-    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); pointer-events: auto; 
-    display: flex; flex-direction: column; gap: 6px; box-shadow: 0 6px 12px rgba(0,0,0,0.4);
-    flex: 1; max-width: calc(50% - 25px); /* 強制空出中央走廊，絕對不撞機 */
-  }
-  
-  .hud-title { font-size: 12px; font-weight: 900; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 4px; margin-bottom: 2px; }
-  .hud-tr .hud-title { text-align: right; }
-  
-  .hud-row { display: flex; justify-content: space-between; align-items: baseline; gap: 4px; }
-  .hud-lbl { font-size: 11px; color: var(--muted); white-space: nowrap; }
-  .hud-val { font-size: 15px; font-weight: bold; font-family: monospace; white-space: nowrap; }
-  .hud-unit { font-size: 10px; font-weight: normal; margin-left: 2px; }
-  
-  .hud-tl { border-left: 3px solid var(--safe); } 
-  .hud-tr { border-right: 3px solid var(--safe); } 
+  .stretcher-tag, .tagline-wrap, .control-deck { transition: opacity 0.3s ease; }
 
   .tag-badge {
     position: absolute; padding: 6px 12px; border-radius: 8px; font-size: 14px; font-weight: 900; white-space: nowrap;
@@ -340,7 +340,7 @@
 </script>
 
 <script>
-// 💡 V6.1 8國語言智慧切換引擎 (i18n)
+// 💡 V6.3 多國語言精簡化：移除冗長的標籤字眼，確保版面純淨
 const i18n = {
   zh: {
     appTitle: "索道張力儀 (動態滑行版)",
@@ -555,7 +555,7 @@ const i18n = {
     anchorA: "支点 A",
     anchorB: "支点 B",
     tension: "張力:",
-    vertical: "垂直荷重:",
+    vertical: "荷重:",
     ropeLen: "➰ ロープ長",
     span: "↔️ スパン",
     height: "↕️ 高低差",
@@ -659,7 +659,7 @@ const i18n = {
     anchorA: "앵커 A",
     anchorB: "앵커 B",
     tension: "장력:",
-    vertical: "수직 하중:",
+    vertical: "하중:",
     ropeLen: "➰ 로프 길이",
     span: "↔️ 스팬",
     height: "↕️ 높이 차이",
@@ -754,7 +754,7 @@ const i18n = {
     featShot: "📸 전술 스크린샷",
     featShotDesc: "노이즈를 필터링하고 워터마크 없는 고해상도 리포트를 출력합니다!",
     featHeight: "↕️ 고저차 시뮬레이션",
-    featHeightDesc: "고저차 제한을 해제하여 극한의 장력 변화를 시뮬레이션하세요!",
+    featHeightDesc: "고저차 제한을 해제하여 극한의 장력 변화 시뮬레이션을 해제하세요!",
     featMA: "⚙️ 수평 MA 계산",
     featMADesc: "고급 MA(기계적 이점) 계산을 잠금 해제하여 견인력을 추정하세요!"
   },
@@ -762,8 +762,8 @@ const i18n = {
     appTitle: "Simulateur de Tyrolienne",
     anchorA: "Ancrage A",
     anchorB: "Ancrage B",
-    tension: "Tension :",
-    vertical: "Vertical :",
+    tension: "Tension:",
+    vertical: "Charge:",
     ropeLen: "➰ Longueur",
     span: "↔️ Portée",
     height: "↕️ Dénivelé",
@@ -867,7 +867,7 @@ const i18n = {
     anchorA: "Anker A",
     anchorB: "Anker B",
     tension: "Spannung:",
-    vertical: "Vertikal:",
+    vertical: "Last:",
     ropeLen: "➰ Seillänge",
     span: "↔️ Spannweite",
     height: "↕️ Höhenunterschied",
@@ -971,7 +971,7 @@ const i18n = {
     anchorA: "Anclaje A",
     anchorB: "Anclaje B",
     tension: "Tensión:",
-    vertical: "Vertical:",
+    vertical: "Carga:",
     ropeLen: "➰ Longitud",
     span: "↔️ Tramo",
     height: "↕️ Altura",
@@ -1075,7 +1075,7 @@ const i18n = {
     anchorA: "Ancoragem A",
     anchorB: "Ancoragem B",
     tension: "Tensão:",
-    vertical: "Vertical:",
+    vertical: "Carga:",
     ropeLen: "➰ Comprimento",
     span: "↔️ Vão",
     height: "↕️ Altura",
@@ -1292,6 +1292,32 @@ function changeLang(selectedLang) {
         <button class="icon-btn" onclick="resetEngine()" title="重置沙盤">↺</button>
       </div>
 
+      <!-- 💡 終極修復：戰術儀表板獨立計畫 (移出 SVG 沙盤，變成上方專屬儀表區) -->
+      <div class="hud-container">
+        <div class="hud-panel hud-tl" id="hudA">
+           <div class="hud-title" data-i18n="anchorA">A 錨點</div>
+           <div class="hud-row">
+             <span class="hud-lbl" data-i18n="tension">張力:</span>
+             <span id="txtTenA" class="hud-val" style="color:var(--safe)">--</span>
+           </div>
+           <div class="hud-row">
+             <span class="hud-lbl" data-i18n="vertical">抗重:</span>
+             <span id="txtVertA" class="hud-val" style="color:var(--warn)">--</span>
+           </div>
+        </div>
+        <div class="hud-panel hud-tr" id="hudB">
+           <div class="hud-title" data-i18n="anchorB">B 錨點</div>
+           <div class="hud-row">
+             <span class="hud-lbl" data-i18n="tension">張力:</span>
+             <span id="txtTenB" class="hud-val" style="color:var(--safe)">--</span>
+           </div>
+           <div class="hud-row">
+             <span class="hud-lbl" data-i18n="vertical">抗重:</span>
+             <span id="txtVertB" class="hud-val" style="color:var(--warn)">--</span>
+           </div>
+        </div>
+      </div>
+
       <div class="svgWrap" id="svgWrap">
         <svg id="canvas" viewBox="0 0 400 460" preserveAspectRatio="xMidYMid meet">
           <line id="tagLineA" stroke="var(--tagline)" stroke-width="4" stroke-dasharray="6 4" stroke-linecap="round" />
@@ -1328,32 +1354,6 @@ function changeLang(selectedLang) {
 
         <div id="tagBadgeA" class="tag-badge">--</div>
         <div id="tagBadgeB" class="tag-badge">--</div>
-
-        <!-- 💡 終極修復：HUD 鈦合金彈性防護艙 -->
-        <div class="hud-container">
-          <div class="hud-panel hud-tl" id="hudA">
-             <div class="hud-title" data-i18n="anchorA">A 錨點</div>
-             <div class="hud-row">
-               <span class="hud-lbl" data-i18n="tension">張力:</span>
-               <span id="txtTenA" class="hud-val" style="color:var(--safe)">--</span>
-             </div>
-             <div class="hud-row">
-               <span class="hud-lbl" data-i18n="vertical">抗重:</span>
-               <span id="txtVertA" class="hud-val" style="color:var(--warn)">--</span>
-             </div>
-          </div>
-          <div class="hud-panel hud-tr" id="hudB">
-             <div class="hud-title" data-i18n="anchorB">B 錨點</div>
-             <div class="hud-row">
-               <span class="hud-lbl" data-i18n="tension">張力:</span>
-               <span id="txtTenB" class="hud-val" style="color:var(--safe)">--</span>
-             </div>
-             <div class="hud-row">
-               <span class="hud-lbl" data-i18n="vertical">抗重:</span>
-               <span id="txtVertB" class="hud-val" style="color:var(--warn)">--</span>
-             </div>
-          </div>
-        </div>
         
         <div id="floatLoad" class="stretcher-tag">
            <div class="stretcher-handles">
@@ -1790,10 +1790,10 @@ function updateEngine(skipSliderUpdate = false) {
       let isStraight = (!isBroken) && (L <= minL + 0.001); 
       let calcL = isStraight ? minL : (isBroken ? L : L);
 
-      /* 💡 增加畫布下方淨空，確保 offsetY 往下推，給 HUD 絕對安全的中央雷達區 */
-      let maxCanvasH = 460 - 220; 
+      /* 💡 終極防空領域：縮小畫布佔用，將整體影像往下推，並讓出上方 80px 的戰術 HUD 空間 */
+      let maxCanvasH = 460 - 80; 
       scale = Math.min((400 - 80) / Math.max(10, S), maxCanvasH / Math.max(10, Math.abs(H) + Math.max(minL, calcL)*0.5));
-      offsetY = 190 + (H < 0 ? Math.abs(H)*scale : 0); 
+      offsetY = 60 + (H < 0 ? Math.abs(H)*scale : 0); 
 
       let ax = 0, ay = 0, bx = S, by = H, px = S * currentSliderPct;
       let s_ax = toX(ax), s_ay = toY(ay), s_bx = toX(bx), s_by = toY(by);
@@ -1835,7 +1835,7 @@ function updateEngine(skipSliderUpdate = false) {
           els.txtTenB.innerHTML = `--`;
           els.txtVertB.innerHTML = `--`;
           els.hudA.style.borderLeftColor = 'var(--bad)';
-          els.hudB.style.borderRightColor = 'var(--bad)';
+          els.hudB.style.borderLeftColor = 'var(--bad)'; /* 💡 A/B 皆維持左側邊框，更加統一俐落 */
 
           els.sagText.textContent = `${t('sagCalc')}: ${t('sagFail')}`;
 
@@ -1891,8 +1891,8 @@ function updateEngine(skipSliderUpdate = false) {
       els.angleText.textContent = interiorAngle.toFixed(1) + "°";
       els.angleText.setAttribute('fill', color);
       els.angleText.setAttribute('x', s_px); 
-      /* 💡 稍微往上拉，避免跟下方標籤互撞 */
-      els.angleText.setAttribute('y', s_py - 40);
+      /* 💡 稍微往上拉，保證不跟紅色擔架互撞 */
+      els.angleText.setAttribute('y', s_py - 45);
 
       if (isStraight) {
           maControl.style.display = "none"; 
@@ -1936,31 +1936,19 @@ function updateEngine(skipSliderUpdate = false) {
               let pulleyHtmlY = (s_py * ctm.d + ctm.f) - wrapRect.top;
 
               let safeMarginX = 55; 
-              let safeMarginYBottom = wrapRect.height - 25; 
               
-              let badgeXA = pulleyHtmlX - 70; 
-              let badgeYA = pulleyHtmlY + 20; 
+              /* 💡 牽引力標籤「往上彈射」：放在滑輪的上面，避免往下壓到擔架 */
+              let badgeXA = pulleyHtmlX - 85; 
+              let badgeYA = pulleyHtmlY - 15; 
 
-              if (pulleyHtmlX < 120) {
-                  badgeXA = safeMarginX; 
-                  /* 💡 智慧防撞：如果空間不夠，往上方彈射，絕對不遮住紅色擔架 */
-                  badgeYA = pulleyHtmlY - 35; 
-              }
-              if (badgeYA > safeMarginYBottom) badgeYA = safeMarginYBottom;
-              
+              if (badgeXA < safeMarginX) badgeXA = safeMarginX;
               els.tagBadgeA.style.left = `${badgeXA}px`;
               els.tagBadgeA.style.top = `${badgeYA}px`;
 
-              let badgeXB = pulleyHtmlX + 70;
-              let badgeYB = pulleyHtmlY + 20;
+              let badgeXB = pulleyHtmlX + 85;
+              let badgeYB = pulleyHtmlY - 15;
 
-              if (pulleyHtmlX > wrapRect.width - 120) {
-                  badgeXB = wrapRect.width - safeMarginX; 
-                  /* 💡 智慧防撞：往上方彈射 */
-                  badgeYB = pulleyHtmlY - 35; 
-              }
-              if (badgeYB > safeMarginYBottom) badgeYB = safeMarginYBottom;
-              
+              if (badgeXB > wrapRect.width - safeMarginX) badgeXB = wrapRect.width - safeMarginX; 
               els.tagBadgeB.style.left = `${badgeXB}px`;
               els.tagBadgeB.style.top = `${badgeYB}px`;
           }
@@ -1989,7 +1977,8 @@ function updateEngine(skipSliderUpdate = false) {
       let nRad = needleAngle * Math.PI / 180;
       els.pulleyNeedle.setAttribute('x1', 0); els.pulleyNeedle.setAttribute('y1', 0); els.pulleyNeedle.setAttribute('x2', 12 * Math.sin(nRad)); els.pulleyNeedle.setAttribute('y2', -12 * Math.cos(nRad));
       
-      let loadDrop = 55; 
+      /* 💡 延長擔架懸吊距離，給中央角度留出絕佳視野 */
+      let loadDrop = 75; 
       els.suspL.setAttribute('x1', s_px); els.suspL.setAttribute('y1', s_py + 5); els.suspL.setAttribute('x2', s_px - 35); els.suspL.setAttribute('y2', s_py + loadDrop - 2);
       els.suspR.setAttribute('x1', s_px); els.suspR.setAttribute('y1', s_py + 5); els.suspR.setAttribute('x2', s_px + 35); els.suspR.setAttribute('y2', s_py + loadDrop - 2);
 
@@ -2006,7 +1995,6 @@ function updateEngine(skipSliderUpdate = false) {
           els.floatLoad.style.top = `${flY}px`;
       }
 
-      /* 💡 終極修復：把數值與文字分離，放入專屬的網格中，絕不折行 */
       let tText = (isStraight || tension > 9999) ? t('deadLineShort') : tension.toFixed(1);
       let vAText = (isStraight || verticalA > 9999) ? t('deadLineShort') : verticalA.toFixed(1);
       let vBText = (isStraight || verticalB > 9999) ? t('deadLineShort') : verticalB.toFixed(1);
@@ -2022,7 +2010,7 @@ function updateEngine(skipSliderUpdate = false) {
       els.txtTenB.innerHTML = `${tText}<span class="hud-unit">${unitText}</span>${shockBadge}`;
       els.txtTenB.style.color = color;
       els.txtVertB.innerHTML = `${vBText}<span class="hud-unit">${unitText}</span>${shockBadge}`;
-      els.hudB.style.borderRightColor = color;
+      els.hudB.style.borderLeftColor = color;
 
       let sagBaseY = ay + (by - ay) * currentSliderPct;
       let actualSag = isStraight ? 0 : py - sagBaseY; 
