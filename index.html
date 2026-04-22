@@ -60,14 +60,14 @@
   
   body.camera-mode { background-color: transparent !important; }
 
-  #status-bar-protector {
-    position: fixed; top: 0; left: 0; width: 100%;
+  /* 💡 V6.3 動態島防護罩 */
+  .safe-area-blocker {
+    position: fixed; top: 0; left: 0; right: 0;
     height: env(safe-area-inset-top);
-    background-color: var(--bg);
-    z-index: 9998; 
-    transition: background-color 0.3s ease, backdrop-filter 0.3s ease;
+    background: var(--bg); z-index: 10000;
+    transition: background 0.3s ease, backdrop-filter 0.3s ease;
   }
-  body.camera-mode #status-bar-protector {
+  body.camera-mode .safe-area-blocker {
     background-color: rgba(15, 22, 35, 0.7);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
@@ -122,7 +122,7 @@
   /* 💡 統一：極簡標題與 VIP 徽章 */
   .topbar { display: flex; flex-direction: column; gap: 10px; margin-bottom: 8px; padding: 0 4px; }
   .title-row { display: flex; align-items: center; width: 100%; justify-content: space-between; }
-  .title-left { display: flex; align-items: center; cursor: pointer; user-select: none; }
+  .title-left { display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; font-size: 15px; font-weight: bold; white-space: nowrap; }
   .title-tag {
     font-size: 15px; color: var(--text); font-weight: bold;
     border-left: 4px solid var(--warn); padding-left: 8px; letter-spacing: 0.5px; display: flex; align-items: center;
@@ -133,13 +133,11 @@
 
   /* 💡 全新下拉式語言選單樣式 */
   #langSelect {
-    background: rgba(255,255,255,0.05); border: 1px solid var(--line); color: var(--muted);
-    border-radius: 8px; padding: 4px 6px; font-size: 13px; font-weight: bold; cursor: pointer;
-    transition: all 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.3); margin-left: auto;
-    flex: 0 0 auto !important; width: fit-content !important; min-width: 0 !important;
+    background: rgba(255,255,255,0.05); border: 1px solid var(--line); color: var(--text);
+    border-radius: 6px; padding: 4px 8px; font-size: 13px; font-weight: bold; cursor: pointer;
     outline: none; -webkit-appearance: menulist;
   }
-  #langSelect:focus { border-color: var(--safe); color: var(--text); }
+  #langSelect:focus { border-color: var(--safe); }
   #langSelect option { background: var(--bg); color: var(--text); }
 
   .icon-bar { display: flex; justify-content: space-between; align-items: center; gap: 6px; background: rgba(0,0,0,0.4); padding: 6px 8px; border-radius: 12px; margin-bottom: 8px; border: 1px solid var(--line); }
@@ -276,24 +274,24 @@
   
   .footer-disclaimer { margin-top: 20px; padding: 15px; font-size: 12px; color: var(--muted); line-height: 1.6; text-align: justify; background: rgba(150,150,150,0.05); border-radius: 10px; border-left: 4px solid var(--bad); }
 
-  /* 💡 散木專屬浮動提示框 (Toast) 樣式 */
+  /* 💡 散木專屬浮動提示框 (Toast) 樣式對齊 V6.3 */
   #toastMessage {
     display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
     background: var(--card); color: var(--text); padding: 14px 24px; border-radius: 10px;
     border-left: 4px solid var(--safe); box-shadow: 0 8px 25px rgba(0,0,0,0.6);
     z-index: 10000; font-weight: bold; text-align: center; font-size: 14px; width: 85%; max-width: 320px;
-    animation: toast-slide-down 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: top 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
+    opacity: 0; pointer-events: none;
   }
-  @keyframes toast-slide-down {
-    from { top: -50px; opacity: 0; }
-    to { top: 20px; opacity: 1; }
-  }
+  #toastMessage.show { top: 20px; opacity: 1; pointer-events: auto; display: block; }
 </style>
 </head>
 <body>
 
+<div class="safe-area-blocker"></div>
+
 <script>
-// 散木團隊 · 多層次防盜保護系統 v5.0
+// 散木團隊 · 多層次防盜保護系統 v6.2
 (function(){
   const _0xd = atob('ZmFuZzU3NjEtc291cmNlLmdpdGh1Yi5pbw=='); 
   const _0xh = window[atob('bG9jYXRpb24=')][atob('aG9zdG5hbWU=')]; 
@@ -348,6 +346,7 @@ const i18n = {
     slackAction: "鬆弛/收繩",
     peak: "峰值",
     deadLineShort: "死線!",
+    menuLang: "語言設定 / Language",
     menu1: "專業名詞與原理解析",
     menu2: "系統工具與說明書",
     menu3: "分享系統連結",
@@ -409,6 +408,7 @@ const i18n = {
     toastAuthSuccess: "🎉 授權成功！歡迎使用！",
     toastTrialSuccess: "⏱️ 體驗授權成功！(今晚自動失效)",
     toastLogout: "🔄 登出成功，重新載入鎖定狀態...",
+    updateMsg: "系統回報：即將為您清除快取，並重新載入最新版本！\n\n請問是否繼續執行？",
     supTitle: "💬 系統問題回報",
     supDesc: "發現小蟲子 (Bug) 或系統異常嗎？<br><br>請點擊下方按鈕，填寫您的問題與建議，研發團隊會盡快進行修復與優化！",
     supLater: "稍後再說",
@@ -450,6 +450,7 @@ const i18n = {
     slackAction: "Slack",
     peak: "Peak",
     deadLineShort: "FAIL!",
+    menuLang: "Language",
     menu1: "Theory & Principles",
     menu2: "Manual & Tools",
     menu3: "Share Link",
@@ -511,6 +512,7 @@ const i18n = {
     toastAuthSuccess: "🎉 Auth Success!",
     toastTrialSuccess: "⏱️ Trial Activated!",
     toastLogout: "🔄 Logged out.",
+    updateMsg: "System Report: Clearing cache and reloading the latest version!\n\nContinue?",
     supTitle: "💬 Report an Issue",
     supDesc: "Found a bug or have a suggestion?<br><br>Click below to fill out the report form and help us improve the system!",
     supLater: "Maybe Later",
@@ -552,6 +554,7 @@ const i18n = {
     slackAction: "緩める",
     peak: "最大",
     deadLineShort: "破断!",
+    menuLang: "言語設定 / Language",
     menu1: "原理と専門用語",
     menu2: "ツールと操作",
     menu3: "リンク共有",
@@ -613,6 +616,7 @@ const i18n = {
     toastAuthSuccess: "🎉 認証成功！",
     toastTrialSuccess: "⏱️ 体験版有効化！",
     toastLogout: "🔄 ログアウトしました。",
+    updateMsg: "システム報告：キャッシュをクリアし、最新バージョンを再読み込みします！\n\n続行しますか？",
     supTitle: "💬 システム問題報告",
     supDesc: "バグや提案がありますか？<br><br>下のボタンからフォームに入力し、システムの改善にご協力ください！",
     supLater: "後で",
@@ -654,6 +658,7 @@ const i18n = {
     slackAction: "느슨하게",
     peak: "최대",
     deadLineShort: "파괴!",
+    menuLang: "언어 설정 / Language",
     menu1: "전문 용어 및 원리",
     menu2: "도구 및 매뉴얼",
     menu3: "링크 공유",
@@ -715,6 +720,7 @@ const i18n = {
     toastAuthSuccess: "🎉 인증 성공!",
     toastTrialSuccess: "⏱️ 체험판 활성화!",
     toastLogout: "🔄 로그아웃 되었습니다.",
+    updateMsg: "시스템 보고: 캐시를 지우고 최신 버전을 다시 로드합니다!\n\n계속하시겠습니까?",
     supTitle: "💬 문제 신고",
     supDesc: "버그나 제안 사항이 있나요?<br><br>아래 버튼을 눌러 양식을 작성하고 시스템 개선에 참여해 주세요!",
     supLater: "나중에",
@@ -756,6 +762,7 @@ const i18n = {
     slackAction: "Mou",
     peak: "Max",
     deadLineShort: "Rupture!",
+    menuLang: "Langue / Language",
     menu1: "Théorie et Principes",
     menu2: "Manuel et Outils",
     menu3: "Partager le lien",
@@ -817,6 +824,7 @@ const i18n = {
     toastAuthSuccess: "🎉 Authentification réussie !",
     toastTrialSuccess: "⏱️ Essai activé !",
     toastLogout: "🔄 Déconnecté.",
+    updateMsg: "Rapport système : Effacement du cache et rechargement de la dernière version !\n\nContinuer ?",
     supTitle: "💬 Signaler un Problème",
     supDesc: "Un bug ou une suggestion ?<br><br>Cliquez ci-dessous pour remplir le formulaire et nous aider à nous améliorer !",
     supLater: "Plus tard",
@@ -858,6 +866,7 @@ const i18n = {
     slackAction: "Locker",
     peak: "Max",
     deadLineShort: "Bruch!",
+    menuLang: "Sprache / Language",
     menu1: "Theorie & Prinzipien",
     menu2: "Handbuch & Werkzeuge",
     menu3: "Link teilen",
@@ -919,6 +928,7 @@ const i18n = {
     toastAuthSuccess: "🎉 Authentifizierung erfolgreich!",
     toastTrialSuccess: "⏱️ Testversion aktiviert!",
     toastLogout: "🔄 Abgemeldet.",
+    updateMsg: "Systembericht: Cache wird geleert und die neueste Version neu geladen!\n\nFortfahren?",
     supTitle: "💬 Fehler melden",
     supDesc: "Fehler gefunden oder Vorschläge?<br><br>Klicken Sie unten, um das Formular auszufüllen und uns zu helfen!",
     supLater: "Später",
@@ -960,6 +970,7 @@ const i18n = {
     slackAction: "Flojo",
     peak: "Pico",
     deadLineShort: "FALLA!",
+    menuLang: "Idioma / Language",
     menu1: "Teoría y Principios",
     menu2: "Manual y Herramientas",
     menu3: "Compartir Enlace",
@@ -1021,6 +1032,7 @@ const i18n = {
     toastAuthSuccess: "🎉 ¡Autenticación exitosa!",
     toastTrialSuccess: "⏱️ ¡Prueba activada!",
     toastLogout: "🔄 Sesión cerrada.",
+    updateMsg: "Reporte del Sistema: ¡Borrando caché y recargando la última versión!\n\n¿Continuar?",
     supTitle: "💬 Reportar Problema",
     supDesc: "¿Encontraste un error o tienes sugerencias?<br><br>¡Haz clic abajo para llenar el formulario y ayudarnos a mejorar!",
     supLater: "Más Tarde",
@@ -1062,6 +1074,7 @@ const i18n = {
     slackAction: "Frouxo",
     peak: "Pico",
     deadLineShort: "FALHA!",
+    menuLang: "Idioma / Language",
     menu1: "Teoria e Princípios",
     menu2: "Manual e Ferramentas",
     menu3: "Compartilhar Link",
@@ -1123,6 +1136,7 @@ const i18n = {
     toastAuthSuccess: "🎉 Autenticação bem-sucedida!",
     toastTrialSuccess: "⏱️ Teste ativado!",
     toastLogout: "🔄 Desconectado.",
+    updateMsg: "Relatório do Sistema: Limpando o cache e recarregando a última versão!\n\nContinuar?",
     supTitle: "💬 Relatar Problema",
     supDesc: "Encontrou um erro ou tem sugestões?<br><br>Clique abaixo para preencher o formulário e nos ajudar a melhorar!",
     supLater: "Mais tarde",
@@ -1241,16 +1255,6 @@ function changeLang(selectedLang) {
             <div class="title-tag"><span id="modeTitleLabel" data-i18n="appTitle">索道張力儀 (動態滑行版)</span> <span class="vip-badge">PRO</span></div>
           </div>
           <div style="display:flex; align-items:center; gap:8px;">
-            <select id="langSelect" onchange="changeLang(this.value)">
-              <option value="zh">🇹🇼 繁中</option>
-              <option value="en">🇺🇸 EN</option>
-              <option value="ja">🇯🇵 日本語</option>
-              <option value="ko">🇰🇷 한국어</option>
-              <option value="fr">🇫🇷 Français</option>
-              <option value="de">🇩🇪 Deutsch</option>
-              <option value="es">🇪🇸 Español</option>
-              <option value="pt">🇵🇹 Português</option>
-            </select>
             <img src="./sunmoon_logo.png" alt="散木團隊" style="width: 26px; height: 26px; border-radius: 4px; object-fit: cover; box-shadow: 0 2px 4px rgba(0,0,0,0.5);" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><rect width=\'100\' height=\'100\' fill=\'%23334155\' rx=\'6\'/><text x=\'50\' y=\'70\' font-size=\'50\' font-weight=\'bold\' fill=\'%23fff\' text-anchor=\'middle\' font-family=\'sans-serif\'>木</text></svg>'">
           </div>
         </div>
@@ -1394,6 +1398,21 @@ function changeLang(selectedLang) {
       <details class="main-accordion">
         <summary><div style="display:flex; align-items:center; gap:8px;"><span class="menu-icon">⚙️</span> <span data-i18n="menu2">系統工具與說明書</span></div></summary>
         <div class="menu-group">
+          
+          <div class="menu-action-btn" style="border-bottom: 1px solid var(--line); justify-content: space-between; cursor: default;">
+            <div class="menu-header-left"><span class="menu-icon">🌍</span><span data-i18n="menuLang">語言設定 / Language</span></div>
+            <select id="langSelect" onchange="changeLang(this.value)">
+              <option value="zh">🇹🇼 繁中</option>
+              <option value="en">🇺🇸 EN</option>
+              <option value="ja">🇯🇵 日本語</option>
+              <option value="ko">🇰🇷 한국어</option>
+              <option value="fr">🇫🇷 Français</option>
+              <option value="de">🇩🇪 Deutsch</option>
+              <option value="es">🇪🇸 Español</option>
+              <option value="pt">🇵🇹 Português</option>
+            </select>
+          </div>
+
           <details class="menu-item">
             <summary>
               <div class="menu-header-left"><span class="menu-icon">📖</span><span data-i18n="menuOp">系統操作說明</span></div>
@@ -1506,7 +1525,6 @@ if (isUserVip) {
     document.getElementById('inHeight').removeAttribute('readonly'); 
 }
 
-const originalVipModalHtml = document.getElementById('vipModalBox').innerHTML;
 let pendingFeatureCallback = null;
 
 function attemptFeature(featureKey, callback) {
@@ -1536,6 +1554,22 @@ if (mainTitleEl) {
             setTimeout(() => document.getElementById('vipPwdInput').focus(), 100);
         }
     });
+}
+
+function showToast(msg, type = 'safe') {
+    const toast = document.getElementById('toastMessage');
+    toast.innerHTML = msg;
+    toast.style.borderLeftColor = `var(--${type})`;
+    toast.style.display = 'block';
+
+    // 強制重繪啟動動畫
+    void toast.offsetWidth;
+
+    toast.classList.add('show');
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.style.display = 'none', 300); // 動畫結束後隱藏
+    }, 3000);
 }
 
 window.logoutVip = function() {
