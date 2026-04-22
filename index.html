@@ -164,16 +164,29 @@
   .anchor-dot, .draggable-pulley { cursor: grab; touch-action: none; }
   .anchor-dot:active, .draggable-pulley:active { cursor: grabbing; }
 
-  .hud-panel, .stretcher-tag, .tagline-wrap, .control-deck { transition: opacity 0.3s ease; }
+  /* 💡 更新：HUD 容器使用 Flexbox 防擠壓 */
+  .hud-container, .stretcher-tag, .tagline-wrap, .control-deck { transition: opacity 0.3s ease; }
+  
+  .hud-container {
+    position: absolute; top: 10px; left: 8px; right: 8px;
+    display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;
+    pointer-events: none; z-index: 10;
+  }
   
   .hud-panel {
-    position: absolute; background: rgba(10, 15, 25, 0.7); border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 8px; padding: 4px 6px; color: var(--text); font-size: 11px; font-weight: bold;
+    background: rgba(10, 15, 25, 0.7); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px; padding: 6px 8px; color: var(--text); font-size: 11px; font-weight: bold;
     backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); pointer-events: auto; display: flex; flex-direction: column; gap: 4px; box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    flex: 1; max-width: calc(50% - 25px); /* 💡 擴大安全間距，強制保留中央 50px 通道給角度與滑輪 */
   }
-  .hud-panel .val { font-size: 13px; font-family: monospace; white-space: nowrap; display: flex; align-items: baseline; gap: 4px; }
-  .hud-tl { top: 10px; left: 5px; border-left: 3px solid var(--safe); max-width: 48%; overflow: hidden; } 
-  .hud-tr { top: 10px; right: 5px; border-right: 3px solid var(--safe); text-align: right; align-items: flex-end; max-width: 48%; overflow: hidden; } 
+  
+  .hud-panel .val { 
+    font-size: 13px; font-family: monospace; display: flex; align-items: baseline; gap: 4px; 
+    flex-wrap: wrap; line-height: 1.2; word-break: break-word; /* 允許換行，防止撐破 */
+  }
+  
+  .hud-tl { border-left: 3px solid var(--safe); } 
+  .hud-tr { border-right: 3px solid var(--safe); text-align: right; align-items: flex-end; } 
 
   .tag-badge {
     position: absolute; padding: 6px 12px; border-radius: 8px; font-size: 14px; font-weight: 900; white-space: nowrap;
@@ -534,7 +547,7 @@ const i18n = {
     appTitle: "トラックライン張力計",
     anchorA: "支点 A",
     anchorB: "支点 B",
-    tension: "張力(Tension):",
+    tension: "張力:",
     vertical: "垂直荷重:",
     ropeLen: "➰ ロープ長",
     span: "↔️ スパン",
@@ -1309,15 +1322,18 @@ function changeLang(selectedLang) {
         <div id="tagBadgeA" class="tag-badge">--</div>
         <div id="tagBadgeB" class="tag-badge">--</div>
 
-        <div class="hud-panel hud-tl" id="hudA">
-           <div style="color:var(--muted); font-size:11px;" data-i18n="anchorA">A 錨點</div>
-           <div id="txtTenA" class="val" style="color:var(--safe)">張力: --</div>
-           <div id="txtVertA" class="val" style="color:var(--warn)">抗重: --</div>
-        </div>
-        <div class="hud-panel hud-tr" id="hudB">
-           <div style="color:var(--muted); font-size:11px;" data-i18n="anchorB">B 錨點</div>
-           <div id="txtTenB" class="val" style="color:var(--safe)">張力: --</div>
-           <div id="txtVertB" class="val" style="color:var(--warn)">抗重: --</div>
+        <!-- 💡 更新：使用 Flexbox 彈性防護艙包裹 HUD，避免碰撞 -->
+        <div class="hud-container">
+          <div class="hud-panel hud-tl" id="hudA">
+             <div style="color:var(--muted); font-size:11px;" data-i18n="anchorA">A 錨點</div>
+             <div id="txtTenA" class="val" style="color:var(--safe)">張力: --</div>
+             <div id="txtVertA" class="val" style="color:var(--warn)">抗重: --</div>
+          </div>
+          <div class="hud-panel hud-tr" id="hudB">
+             <div style="color:var(--muted); font-size:11px;" data-i18n="anchorB">B 錨點</div>
+             <div id="txtTenB" class="val" style="color:var(--safe)">張力: --</div>
+             <div id="txtVertB" class="val" style="color:var(--warn)">抗重: --</div>
+          </div>
         </div>
         
         <div id="floatLoad" class="stretcher-tag">
@@ -1770,9 +1786,9 @@ function updateEngine(skipSliderUpdate = false) {
       let isStraight = (!isBroken) && (L <= minL + 0.001); 
       let calcL = isStraight ? minL : (isBroken ? L : L);
 
-      let maxCanvasH = 460 - 150; 
+      let maxCanvasH = 460 - 180; /* 💡 縮小畫布高度，把整體圖形往下擠 */
       scale = Math.min((400 - 80) / Math.max(10, S), maxCanvasH / Math.max(10, Math.abs(H) + Math.max(minL, calcL)*0.5));
-      offsetY = 140 + (H < 0 ? Math.abs(H)*scale : 0); 
+      offsetY = 175 + (H < 0 ? Math.abs(H)*scale : 0); /* 💡 增加 offsetY，將滑輪與主繩大幅度往下推，避開頂部 HUD 雷達區 */
 
       let ax = 0, ay = 0, bx = S, by = H, px = S * currentSliderPct;
       let s_ax = toX(ax), s_ay = toY(ay), s_bx = toX(bx), s_by = toY(by);
@@ -2179,7 +2195,7 @@ function toggleGrid() { gridVisible = !gridVisible; gridOverlay.style.opacity = 
 
 function toggleHUD() {
   hudVisible = !hudVisible;
-  const huds = document.querySelectorAll('.hud-panel, .stretcher-tag, .tagline-wrap, .control-deck, .tag-badge');
+  const huds = document.querySelectorAll('.hud-container, .stretcher-tag, .tagline-wrap, .control-deck, .tag-badge');
   huds.forEach(el => el.style.opacity = hudVisible ? "1" : "0");
 }
 
