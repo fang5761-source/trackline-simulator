@@ -60,6 +60,7 @@
   
   body.camera-mode { background-color: transparent !important; }
 
+  /* 💡 V6.3 動態島防護罩 */
   .safe-area-blocker {
     position: fixed; top: 0; left: 0; right: 0;
     height: env(safe-area-inset-top);
@@ -80,6 +81,15 @@
   input, textarea { -webkit-user-select: auto; user-select: auto; box-sizing: border-box; }
   *{box-sizing:border-box}
 
+  /* 影像層調整：修復截圖過長問題 */
+  #bg-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; background-color: var(--bg); overflow: hidden; }
+  #bg-video, #bg-image { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; opacity: 0; transition: opacity 0.3s; z-index: 0; pointer-events: none;}
+  #grid-overlay {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;
+    background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 20px 20px; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+  }
+
   .app-container { 
     max-width: 500px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; position: relative; z-index: 1; 
     padding-top: calc(12px + env(safe-area-inset-top));
@@ -89,22 +99,13 @@
   }
   input[type="file"] { display: none; }
 
-  /* 💡 修復實境影像層：將影片與圖片容器整合進 mainCard 中 */
   .card { 
     width:100%; background:var(--card); border:1px solid var(--line); 
     border-radius:16px; padding: 12px; box-shadow:0 10px 30px rgba(0,0,0,.2); 
     backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); 
     transition: border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
-    position: relative; overflow: hidden; /* 防止背景超出邊界 */
+    position: relative; overflow: hidden;
   }
-  
-  #bg-video, #bg-image { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; opacity: 0; transition: opacity 0.3s; z-index: 0; pointer-events: none;}
-  #grid-overlay {
-    position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;
-    background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
-    background-size: 20px 20px; opacity: 0; pointer-events: none; transition: opacity 0.3s;
-  }
-
   .card > *:not(#bg-video):not(#bg-image):not(#grid-overlay) { position: relative; z-index: 2; }
 
   .card.camera-mode {
@@ -113,8 +114,6 @@
   }
   .card.capture-mode {
     background-color: var(--bg) !important;
-    background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px) !important;
-    background-size: 20px 20px !important;
     border-color: var(--line) !important; box-shadow: none !important; border-radius: 0 !important; 
     backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
   }
@@ -141,13 +140,12 @@
   #langSelect:focus { border-color: var(--safe); color: var(--text); }
   #langSelect option { background: var(--bg); color: var(--text); }
 
-  .icon-bar { display: flex; justify-content: space-between; align-items: center; gap: 6px; background: rgba(0,0,0,0.4); padding: 6px 8px; border-radius: 12px; margin-bottom: 8px; border: 1px solid var(--line); }
+  .icon-bar { display: flex; justify-content: space-between; align-items: center; gap: 6px; background: rgba(0,0,0,0.4); padding: 6px 8px; border-radius: 12px; margin-bottom: 8px; border: 1px solid var(--line); z-index: 10;}
   .icon-btn { flex: 1; aspect-ratio: 1/1; max-height: 38px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid transparent; display: flex; justify-content: center; align-items: center; position: relative; cursor: pointer; transition: all 0.2s; font-size: 18px; color: var(--text); padding: 0; }
   .icon-btn:active { background: var(--line); transform: scale(0.95); }
   .icon-btn.active { background: var(--safe); color: var(--bg); border-color: var(--safe); }
   .icon-btn.active-shock { background: var(--bad); color: #fff; border-color: var(--bad); animation: pulse 1.5s infinite; }
   
-  /* 💡 修復：紅線閉眼模式 */
   .eye-slash::after { content: ''; position: absolute; width: 80%; height: 3px; background: var(--bad); transform: rotate(45deg); border-radius: 2px; }
 
   .lock-icon { position: absolute; bottom: 2px; right: 2px; font-size: 10px; background: rgba(0,0,0,0.8); border-radius: 50%; padding: 2px; pointer-events: none; }
@@ -170,20 +168,21 @@
   .hud-tl { border-left: 4px solid var(--safe); } 
   .hud-tr { border-right: 4px solid var(--safe); } 
 
-  .svgWrap { position:relative; width:100%; height: 42vh; min-height: 280px; max-height: 420px; background: transparent; border-radius: 12px; border: 1px dashed var(--line); overflow: hidden; touch-action: none; }
+  /* 💡 取消 touch-action: none，允許空白區域滑動 */
+  .svgWrap { position:relative; width:100%; height: 42vh; min-height: 280px; max-height: 420px; background: transparent; border-radius: 12px; border: 1px dashed var(--line); overflow: hidden; }
   svg { display: block; width: 100%; height: 100%; }
 
-  .anchor-dot, .draggable-pulley { cursor: grab; touch-action: none; }
-  .anchor-dot:active, .draggable-pulley:active { cursor: grabbing; }
+  /* 💡 僅鎖定 A/B 點、滑輪與擔架的觸控滑動 */
+  .anchor-dot, .draggable-pulley, .stretcher-tag { cursor: grab; touch-action: none; }
+  .anchor-dot:active, .draggable-pulley:active, .stretcher-tag:active { cursor: grabbing; }
 
-  .stretcher-tag, .tagline-wrap, .control-deck { transition: opacity 0.3s ease; }
+  .hud-container, .tagline-wrap, .tag-badge { transition: opacity 0.3s ease; }
 
   .tag-badge { position: absolute; padding: 6px 12px; border-radius: 8px; font-size: 14px; font-weight: 900; white-space: nowrap; pointer-events: none; transform: translate(-50%, -50%); box-shadow: 0 4px 12px rgba(0,0,0,0.6); transition: left 0.15s ease-out, top 0.15s ease-out, background 0.2s, border 0.2s; z-index: 90; display: none; }
   .tag-badge.active { background: rgba(15, 22, 35, 0.95); border: 1px solid var(--tagline); color: var(--tagline); }
   .tag-badge.inactive { background: rgba(20, 30, 45, 0.95); border: 1px solid rgba(168, 179, 197, 0.3); color: rgba(168, 179, 197, 0.8); }
 
   .stretcher-tag { position: absolute; background: #ea580c; border: 2px solid #9a3412; border-radius: 8px; padding: 8px 12px; color: var(--bg); transform: translate(-50%, 0); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 50; box-shadow: 0 4px 10px rgba(0,0,0,0.6); pointer-events: auto; touch-action: none; cursor: grab; min-width: 100px; width: auto; }
-  .stretcher-tag:active { cursor: grabbing; }
   .stretcher-handles { width: calc(100% + 24px); height: 8px; position: absolute; top: 16px; left: -12px; display: flex; justify-content: space-between; z-index: -1; }
   .handle-block { width: 14px; height: 8px; background: #c2410c; border: 1px solid #7c2d12; border-radius: 4px; }
   .stretcher-content { display: flex; flex-direction: row; align-items: center; gap: 10px; }
@@ -230,20 +229,19 @@
   
   details.main-accordion { margin-top: 12px; }
   
-  /* 💡 視覺分層：第一層級選單極度醒目化 */
+  /* 💡 視覺分層：移除背景色塊，只保留黃色特戰字體 */
   details.main-accordion > summary {
-    font-size: 15px; font-weight: bold; color: var(--bg); padding: 14px 16px; 
-    background: var(--warn); border-radius: 8px; letter-spacing: 0.5px; 
+    font-size: 15px; font-weight: bold; color: var(--warn); padding: 14px 16px; 
+    background: rgba(150,150,150,0.1); border-radius: 8px; letter-spacing: 0.5px; 
     cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; user-select: none; transition: background 0.2s;
-    box-shadow: 0 4px 10px rgba(255, 216, 77, 0.2);
   }
-  details.main-accordion > summary:active { transform: scale(0.98); }
+  details.main-accordion > summary:active { background: rgba(150,150,150,0.2); }
   details.main-accordion > summary::-webkit-details-marker { display: none; }
-  details.main-accordion > summary::after { content: "❯"; font-size: 14px; color: var(--bg); transition: transform 0.3s; display: inline-block; }
-  details.main-accordion[open] > summary { margin-bottom: 8px; border-radius: 8px 8px 0 0; }
+  details.main-accordion > summary::after { content: "❯"; font-size: 14px; color: var(--muted); transition: transform 0.3s; display: inline-block; }
+  details.main-accordion[open] > summary { margin-bottom: 8px; }
   details.main-accordion[open] > summary::after { transform: rotate(90deg); }
 
-  .menu-group { background: var(--card); border-radius: 0 0 14px 14px; border: 1px solid var(--line); border-top: none; box-shadow: 0 4px 12px rgba(0,0,0,0.05); overflow: hidden; display: flex; flex-direction: column; }
+  .menu-group { background: var(--card); border-radius: 14px; border: 1px solid var(--line); box-shadow: 0 4px 12px rgba(0,0,0,0.05); overflow: hidden; display: flex; flex-direction: column; }
 
   details.menu-item, .menu-action-btn { background: transparent; border: none; border-radius: 0; box-shadow: none; border-bottom: 1px solid rgba(150,150,150,0.1); margin: 0; font-size: 15px; font-weight: bold; color: var(--text); cursor: pointer; user-select: none; text-decoration: none; }
   details.menu-item { display: block; padding: 0; }
@@ -339,7 +337,6 @@
   <div class="app-container" id="capture-area">
 
     <div class="card" id="mainCard">
-      <!-- 💡 修復影像層順序，確保其被包在卡片內且不會擋住事件 -->
       <video id="bg-video" autoplay playsinline muted></video>
       <img id="bg-image" alt="" />
       <div id="grid-overlay"></div>
@@ -448,15 +445,15 @@
         </div>
       </div>
       
-      <div class="control-deck">
-         <div class="angle-slider-header capture-hide">
+      <div class="control-deck capture-hide">
+         <div class="angle-slider-header">
             <span data-i18n="angleLoose">鬆 (夾角小)</span>
             <span style="color:var(--text);" data-i18n="angleDrag">📐 滑動調整主繩夾角</span>
             <span data-i18n="angleTight">緊 (夾角大)</span>
          </div>
-         <input type="range" id="angleSlider" class="capture-hide" min="0" max="180" step="0.5" value="120">
+         <input type="range" id="angleSlider" min="0" max="180" step="0.5" value="120">
          
-         <hr class="capture-hide" style="border:0; border-top:1px dashed rgba(255,255,255,0.1); margin: 2px 0;">
+         <hr style="border:0; border-top:1px dashed rgba(255,255,255,0.1); margin: 2px 0;">
 
          <div class="dash-inputs">
             <div class="dash-input-group">
@@ -467,7 +464,7 @@
                <span class="lbl" data-i18n="span">↔️ 跨距</span>
                <div><input type="number" id="inSpan" value="20" min="5" step="1"><span style="color:var(--muted); font-size:11px;">m</span></div>
             </div>
-            <div class="dash-input-group" id="btn-height" style="cursor: pointer;">
+            <div class="dash-input-group" onclick="handleHeightClick(event)" style="cursor: pointer;">
                <span class="lbl"><span data-i18n="height">↕️ 高差</span> <span class="lock-icon-inline">🔒</span></span>
                <div><input type="number" id="inHeight" value="0" step="1" readonly><span style="color:var(--muted); font-size:11px;">m</span></div>
             </div>
@@ -477,7 +474,7 @@
          </div>
       </div>
       
-      <div class="tagline-wrap" id="taglineWrap">
+      <div class="tagline-wrap capture-hide" id="taglineWrap">
          <div id="taglineInfo" data-i18n="dragTip">📍 在沙盤中自由上下左右拖曳進行動態模擬</div>
          <div class="ma-control" id="maControl" style="display:none;">
             <span style="font-size:13px; color:var(--tagline); font-weight:bold;" data-i18n="maTitle">⚙️ 水平牽引省力比</span>
@@ -515,6 +512,12 @@
             <select id="langSelect" onchange="changeLang(this.value)">
               <option value="zh">🇹🇼 繁中</option>
               <option value="en">🇺🇸 EN</option>
+              <option value="ja">🇯🇵 日本語</option>
+              <option value="ko">🇰🇷 한국어</option>
+              <option value="fr">🇫🇷 Français</option>
+              <option value="de">🇩🇪 Deutsch</option>
+              <option value="es">🇪🇸 Español</option>
+              <option value="pt">🇵🇹 Português</option>
             </select>
           </div>
 
@@ -585,7 +588,6 @@
         </div>
       </details>
 
-      <!-- 💡 將系統操作功能獨立成醒目的區塊 -->
       <div class="action-block">
         <div class="menu-action-btn" id="shareBtnAction" style="border-bottom: 1px solid var(--line);">
           <div class="menu-header-left"><span class="menu-icon">🔗</span><span data-i18n="menu3">分享系統連結</span></div>
@@ -610,7 +612,6 @@
 </div>
 
 <script>
-// 散木團隊 · 多層次防盜保護系統 v6.2
 (function(){
   const _0xd = atob('ZmFuZzU3NjEtc291cmNlLmdpdGh1Yi5pbw=='); 
   const _0xh = window[atob('bG9jYXRpb24=')][atob('aG9zdG5hbWU=')]; 
@@ -637,7 +638,6 @@
   })();
 })();
 
-// 💡 V6.3 多國語言
 const i18n = {
   zh: {
     appTitle: "索道張力儀 (動態滑行版)",
@@ -962,17 +962,19 @@ const mainTitleEl = document.getElementById('mainTitleText');
 if (mainTitleEl) {
     mainTitleEl.addEventListener('click', () => {
         pendingFeatureCallback = null;
+        document.getElementById('vipModalBox').innerHTML = defaultVipModalHtml;
+        applyTranslations();
         if (isUserVip) {
-            showCommanderConsole();
+            document.getElementById('vipFeatureName').parentElement.innerHTML = t('vipStateDesc');
+            document.getElementById('vipFeatureDesc').textContent = "";
+            document.querySelector('[data-i18n="vipTitle"]').textContent = t('vipStateUnlocked');
         } else {
-            document.getElementById('vipModalBox').innerHTML = defaultVipModalHtml;
-            applyTranslations();
             document.getElementById('vipFeatureName').parentElement.innerHTML = `<span data-i18n="vipEnable1">${t('vipEnable1')}</span><span id="vipFeatureName" style="color:var(--vip); font-weight:bold; font-size:16px;">${t('appTitle')}</span><span data-i18n="vipEnable2">${t('vipEnable2')}</span>`;
             document.getElementById('vipFeatureDesc').textContent = "";
             document.querySelector('[data-i18n="vipTitle"]').textContent = t('vipTitle');
-            document.getElementById('vipModal').style.display = 'flex';
-            setTimeout(() => document.getElementById('vipPwdInput').focus(), 100);
         }
+        document.getElementById('vipModal').style.display = 'flex';
+        setTimeout(() => document.getElementById('vipPwdInput').focus(), 100);
     });
 }
 
@@ -994,7 +996,6 @@ function showCommanderConsole() {
         <button class="primary-btn" style="background:var(--warn); color:#000;" onclick="closeVipModal()">${t('cmdClose')}</button>
       </div>
     `;
-    document.getElementById('vipModal').style.display = 'flex';
 }
 
 function logoutVip() {
@@ -1282,28 +1283,28 @@ function updateEngine(skipSliderUpdate = false) {
       els.angleText.textContent = interiorAngle.toFixed(1) + "°";
       els.angleText.setAttribute('fill', color);
       
-      /* 💡 智慧導引箭頭計畫：<65度時，強制外拋到左右側外緣，用箭頭精準指向夾角，絕不被擔架壓住 */
+      /* 💡 智慧導引箭頭計畫：<65度時，強制外拋到左右側外緣，用箭頭精準指入夾角深處，絕不被擔架壓住 */
       if (interiorAngle < 65 && !isStraight && !isBroken) {
           let isLeft = (currentSliderPct > 0.5); 
-          let sideOffset = isLeft ? -75 : 75; // 推到最外面
+          let sideOffset = isLeft ? -50 : 50; 
           els.angleText.setAttribute('x', s_px + sideOffset);
-          els.angleText.setAttribute('y', s_py - 10);
+          els.angleText.setAttribute('y', s_py - 60);
           
-          els.anglePointer.setAttribute('x1', s_px + sideOffset * 0.7);
-          els.anglePointer.setAttribute('y1', s_py - 15);
-          els.anglePointer.setAttribute('x2', s_px + (isLeft ? -20 : 20));
-          els.anglePointer.setAttribute('y2', s_py - 15);
+          els.anglePointer.setAttribute('x1', s_px + sideOffset * 0.6);
+          els.anglePointer.setAttribute('y1', s_py - 55);
+          els.anglePointer.setAttribute('x2', s_px);
+          els.anglePointer.setAttribute('y2', s_py - 25);
           
           els.anglePointer.setAttribute('stroke', color);
           els.anglePointer.style.display = 'block';
 
-          els.anglePointerArrow.setAttribute('d', `M ${s_px + (isLeft ? -25 : 25)} ${s_py - 20} L ${s_px + (isLeft ? -20 : 20)} ${s_py - 15} L ${s_px + (isLeft ? -25 : 25)} ${s_py - 10}`);
+          els.anglePointerArrow.setAttribute('d', `M ${s_px - 4} ${s_py - 30} L ${s_px} ${s_py - 25} L ${s_px + 4} ${s_py - 30}`);
           els.anglePointerArrow.setAttribute('stroke', color);
           els.anglePointerArrow.style.display = 'block';
 
       } else {
           els.angleText.setAttribute('x', s_px); 
-          els.angleText.setAttribute('y', s_py - 40); 
+          els.angleText.setAttribute('y', s_py - 48); 
           els.anglePointer.style.display = 'none';
           els.anglePointerArrow.style.display = 'none';
       }
@@ -1351,16 +1352,15 @@ function updateEngine(skipSliderUpdate = false) {
 
               let safeMarginX = 55; 
               
-              /* 💡 標籤防護：往上推確保不擋住小角度箭頭 */
-              let badgeXA = pulleyHtmlX - 95; 
-              let badgeYA = pulleyHtmlY - 35; 
+              let badgeXA = pulleyHtmlX - 85; 
+              let badgeYA = pulleyHtmlY - 15; 
 
               if (badgeXA < safeMarginX) badgeXA = safeMarginX;
               els.tagBadgeA.style.left = `${badgeXA}px`;
               els.tagBadgeA.style.top = `${badgeYA}px`;
 
-              let badgeXB = pulleyHtmlX + 95;
-              let badgeYB = pulleyHtmlY - 35;
+              let badgeXB = pulleyHtmlX + 85;
+              let badgeYB = pulleyHtmlY - 15;
 
               if (badgeXB > wrapRect.width - safeMarginX) badgeXB = wrapRect.width - safeMarginX; 
               els.tagBadgeB.style.left = `${badgeXB}px`;
@@ -1454,6 +1454,9 @@ function getSVGPos(e) {
 let isDragging = null, dragStartX, dragStartY, startSpan, startHeight;
 function startDrag(e, node) { 
   if(e.target.tagName.toLowerCase() === 'input') return; 
+  /* 💡 只有碰觸到有觸控鎖定的物件，才啟動拖曳 */
+  if(!e.target.closest('.anchor-dot') && !e.target.closest('.draggable-pulley') && !e.target.closest('.stretcher-tag')) return;
+
   isDragging = node; 
   
   let clientX = e.touches ? e.touches[0].clientX : e.clientX;
@@ -1653,6 +1656,7 @@ function resetEngine() {
   adjustLForAngle(120);
 }
 
+/* 💡 修復 html2canvas 對於 object-fit 的 bug，防止截圖過長 */
 async function takeScreenshot() {
   const target = document.getElementById('mainCard'); 
   target.classList.add('capture-mode');
@@ -1675,6 +1679,30 @@ async function takeScreenshot() {
       inp.parentNode.insertBefore(span, inp);
       placeholders.push({ span, inp });
   });
+
+  // 把影像作為背景圖，避開 html2canvas 的超長渲染 BUG
+  let tempBgDataUrl = null;
+  let isCamWasOn = false;
+  let isImgWasOn = false;
+
+  if (stream && video.videoWidth) {
+      isCamWasOn = true;
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = video.videoWidth;
+      tempCanvas.height = video.videoHeight;
+      tempCanvas.getContext('2d').drawImage(video, 0, 0, tempCanvas.width, tempCanvas.height);
+      tempBgDataUrl = tempCanvas.toDataURL('image/jpeg');
+      target.style.backgroundImage = `url(${tempBgDataUrl})`;
+      target.style.backgroundSize = 'cover';
+      target.style.backgroundPosition = 'center top';
+      video.style.display = 'none';
+  } else if (image.style.opacity === "1") {
+      isImgWasOn = true;
+      target.style.backgroundImage = `url(${image.src})`;
+      target.style.backgroundSize = 'cover';
+      target.style.backgroundPosition = 'center top';
+      image.style.display = 'none';
+  }
 
   window.scrollTo(0, 0);
   await new Promise(r => setTimeout(r, 100));
@@ -1701,6 +1729,9 @@ async function takeScreenshot() {
   });
   
   target.classList.remove('capture-mode');
+  target.style.backgroundImage = '';
+  if (isCamWasOn) video.style.display = '';
+  if (isImgWasOn) image.style.display = '';
 }
 
 const supportBtnAction = document.getElementById('supportBtnAction');
@@ -1728,7 +1759,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
     }
 });
 
-// 💡 更新 V6.3：強制絕對捲動到最上方
+// 💡 絕對置頂的更新視窗
 function checkForUpdates() {
     const msg = t('updateMsg').replace(/\n/g, '<br>');
     document.getElementById('updateMsgText').innerHTML = msg;
@@ -1739,10 +1770,9 @@ function executeUpdate() {
     document.getElementById('updateModal').style.display = 'none';
     showToast("🔄 戰術系統重置中...", "warn");
     
-    /* 💡 強制捲動到最上方 (雙重保險) */
-    window.scrollTo({ top: 0, behavior: 'auto' }); 
+    /* 💡 強制捲動到最上方 */
     const scroller = document.getElementById('scroll-wrapper');
-    if(scroller) scroller.scrollTop = 0;
+    if(scroller) scroller.scrollTo({ top: 0, behavior: 'smooth' }); 
     
     setTimeout(() => {
         if ('caches' in window) {
