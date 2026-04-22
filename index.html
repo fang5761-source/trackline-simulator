@@ -146,16 +146,17 @@
   .icon-btn.active { background: var(--safe); color: var(--bg); border-color: var(--safe); }
   .icon-btn.active-shock { background: var(--bad); color: #fff; border-color: var(--bad); animation: pulse 1.5s infinite; }
   
-  .lock-icon { position: absolute; bottom: 2px; right: 2px; font-size: 10px; background: rgba(0,0,0,0.8); border-radius: 50%; padding: 2px; }
+  /* 💡 修復實境/手電筒按鈕無反應：消除子元素的滑鼠事件阻擋 */
+  .lock-icon { position: absolute; bottom: 2px; right: 2px; font-size: 10px; background: rgba(0,0,0,0.8); border-radius: 50%; padding: 2px; pointer-events: none; }
   .is-vip .lock-icon { display: none; }
-  .lock-icon-inline { font-size: 10px; margin-left: 4px; color: var(--vip); }
+  .lock-icon-inline { font-size: 10px; margin-left: 4px; color: var(--vip); pointer-events: none; }
   .is-vip .lock-icon-inline { display: none; }
 
   @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
   @keyframes glow-red { 0%, 100% { box-shadow: 0 4px 10px rgba(0,0,0,0.6); border-color: #9a3412; } 50% { box-shadow: 0 0 15px rgba(239,68,68,0.8); border-color: #ef4444; } }
   .shock-anim { animation: glow-red 1s infinite; }
 
-  /* 💡 HUD 戰術儀表板獨立計畫 */
+  /* 💡 HUD 戰術儀表板 (修復文字溢出與折行防護) */
   .hud-container {
     display: flex; justify-content: space-between; align-items: stretch; gap: 8px;
     width: 100%; margin-bottom: 8px; z-index: 10;
@@ -163,34 +164,34 @@
   
   .hud-panel {
     background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 10px; padding: 8px 10px; color: var(--text);
-    display: flex; flex-direction: column; gap: 6px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.2);
-    flex: 1; max-width: calc(50% - 25px); 
+    border-radius: 10px; padding: 6px 8px; color: var(--text);
+    display: flex; flex-direction: column; gap: 4px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.2);
+    flex: 1; max-width: calc(50% - 10px); 
   }
   
   .hud-title { font-size: 12px; font-weight: 900; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 4px; margin-bottom: 2px; }
   .hud-tr .hud-title { text-align: right; }
   
-  .hud-row { display: flex; justify-content: space-between; align-items: center; gap: 4px; }
+  .hud-row { display: flex; justify-content: space-between; align-items: baseline; gap: 2px; flex-wrap: wrap; }
   .hud-lbl { font-size: 11px; color: var(--muted); white-space: nowrap; }
-  .hud-val { font-size: 15px; font-weight: bold; font-family: monospace; white-space: nowrap; }
-  .hud-unit { font-size: 10px; font-weight: normal; margin-left: 2px; }
+  .hud-val { font-size: clamp(12px, 3.5vw, 15px); font-weight: bold; font-family: monospace; display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: baseline; gap: 2px; word-break: break-word;}
+  .hud-unit { font-size: 10px; font-weight: normal; margin-left: 1px; }
   
   .hud-tl { border-left: 4px solid var(--safe); } 
   .hud-tr { border-right: 4px solid var(--safe); } 
 
-  /* 💡 高摩擦係數絕對防滑裝甲 */
+  /* 💡 撤除絕對防滑，僅鎖定需拖曳的元件，恢復畫面捲動 */
   .svgWrap { 
     position:relative; width:100%; height: 42vh; min-height: 280px; max-height: 420px;
     background: transparent; border-radius: 12px; border: 1px dashed var(--line); overflow: hidden; 
-    touch-action: none; 
   }
   svg { display: block; width: 100%; height: 100%; }
 
   .anchor-dot, .draggable-pulley { cursor: grab; touch-action: none; }
   .anchor-dot:active, .draggable-pulley:active { cursor: grabbing; }
 
-  .stretcher-tag, .tagline-wrap, .control-deck { transition: opacity 0.3s ease; }
+  /* 💡 修正淨空模式的隱藏對象 */
+  .hud-container, .tagline-wrap, .tag-badge { transition: opacity 0.3s ease; }
 
   .tag-badge {
     position: absolute; padding: 6px 12px; border-radius: 8px; font-size: 14px; font-weight: 900; white-space: nowrap;
@@ -1044,7 +1045,7 @@ const i18n = {
     pwaStep7: "아래로 스크롤하여 '홈 화면에 추가'를 선택합니다.",
     pwaStep8: "'추가'를 누릅니다.",
     installBtn: "📥 앱 설치하기",
-    disclaimer: "<strong style='color: var(--bad); font-size: 14px;'>⚠️ 면책 조항:</strong><br>본 소프트웨어는 이론적 물리 연산 도구입니다. 실제 구조 작업 및 안전은 반드시 현장의 전문 교관이 판단해야 합니다.<br><br><span style='color:var(--warn);'>※ 본 앱은 1기기 라이선스입니다. 기기 변경 시 비밀번호 재발급 및 고객 지원은 제공되지 않습니다. 개발 지원을 위해 재구매를 부탁드립니다.</span>",
+    disclaimer: "<strong style='color: var(--bad); font 사=14px;'>⚠️ 면책 조항:</strong><br>본 소프트웨어는 이론적 물리 연산 도구입니다. 실제 구조 작업 및 안전은 반드시 현장의 전문 교관이 판단해야 합니다.<br><br><span style='color:var(--warn);'>※ 본 앱은 1기기 라이선스입니다. 기기 변경 시 비밀번호 재발급 및 고객 지원은 제공되지 않습니다. 개발 지원을 위해 재구매를 부탁드립니다.</span>",
     vipTitle: "🔒 PRO 기능 잠금 해제",
     vipEnable1: "다음 기능을 활성화합니다: '",
     vipEnable2: "'",
@@ -1468,7 +1469,7 @@ const i18n = {
     pwaStep7: "Selecione 'Adicionar à Tela de Início'",
     pwaStep8: "Toque em 'Adicionar'",
     installBtn: "📥 Instalar APP",
-    disclaimer: "<strong style='color: var(--bad); font-size: 14px;'>⚠️ Aviso Legal:</strong><br>Ferramenta teórica. A montagem real DEVE ser determinada por profissionais.<br><br><span style='color:var(--warn);'>* Licença para dispositivo único. Sem suporte para troca de aparelho. Por favor, compre novamente.</span>",
+    disclaimer: "<strong style='color: var(--bad); font-size: 14px;'>⚠️ Aviso Legal:</strong><br>Ferramenta teórica. A montagem real DEBE ser determinada por profissionais.<br><br><span style='color:var(--warn);'>* Licença para dispositivo único. Sem suporte para troca de aparelho. Por favor, compre novamente.</span>",
     vipTitle: "🔒 Recurso PRO",
     vipEnable1: "Ativar '",
     vipEnable2: "'",
@@ -1819,10 +1820,10 @@ function updateEngine(skipSliderUpdate = false) {
       let isStraight = (!isBroken) && (L <= minL + 0.001); 
       let calcL = isStraight ? minL : (isBroken ? L : L);
 
-      /* 💡 終極防空領域：將畫布高度往下擠 80，確保 A/B 點跟上面的數據面板永遠有安全距離 */
-      let maxCanvasH = 460 - 80; 
+      /* 💡 終極防空領域：縮小計算畫布高度，預留 130px 的空間給底部的擔架與滑輪 */
+      let maxCanvasH = 460 - 130; 
       scale = Math.min((400 - 80) / Math.max(10, S), maxCanvasH / Math.max(10, Math.abs(H) + Math.max(minL, calcL)*0.5));
-      offsetY = 100 + (H < 0 ? Math.abs(H)*scale : 0); 
+      offsetY = 70 + (H < 0 ? Math.abs(H)*scale : 0); 
 
       let ax = 0, ay = 0, bx = S, by = H, px = S * currentSliderPct;
       let s_ax = toX(ax), s_ay = toY(ay), s_bx = toX(bx), s_by = toY(by);
@@ -1922,21 +1923,22 @@ function updateEngine(skipSliderUpdate = false) {
       els.angleText.textContent = interiorAngle.toFixed(1) + "°";
       els.angleText.setAttribute('fill', color);
       
-      /* 💡 角度脫逃計畫：小於 50 度時將文字與箭頭強制往上彈射，避開紅色擔架 */
+      /* 💡 角度脫逃計畫：當小於 50 度時，強制把文字彈射到左側或右側安全區，並用箭頭指引 */
       if (interiorAngle < 50 && !isStraight && !isBroken) {
-          els.angleText.setAttribute('x', s_px);
-          els.angleText.setAttribute('y', s_py - 75);
+          let isLeft = (currentSliderPct > 0.5); 
+          let sideOffset = isLeft ? -55 : 55;
+          els.angleText.setAttribute('x', s_px + sideOffset);
+          els.angleText.setAttribute('y', s_py + 40);
           
-          els.anglePointer.setAttribute('x1', s_px);
-          els.anglePointer.setAttribute('y1', s_py - 65);
-          els.anglePointer.setAttribute('x2', s_px);
-          els.anglePointer.setAttribute('y2', s_py - 30);
+          els.anglePointer.setAttribute('x1', s_px + sideOffset * 0.7);
+          els.anglePointer.setAttribute('y1', s_py + 30);
+          els.anglePointer.setAttribute('x2', s_px + (isLeft ? -12 : 12));
+          els.anglePointer.setAttribute('y2', s_py + 12);
+          
           els.anglePointer.setAttribute('stroke', color);
           els.anglePointer.style.display = 'block';
 
-          els.anglePointerArrow.setAttribute('d', `M ${s_px - 4} ${s_py - 35} L ${s_px} ${s_py - 30} L ${s_px + 4} ${s_py - 35}`);
-          els.anglePointerArrow.setAttribute('stroke', color);
-          els.anglePointerArrow.style.display = 'block';
+          els.anglePointerArrow.style.display = 'none';
 
       } else {
           els.angleText.setAttribute('x', s_px); 
@@ -2029,7 +2031,7 @@ function updateEngine(skipSliderUpdate = false) {
       els.pulleyNeedle.setAttribute('x1', 0); els.pulleyNeedle.setAttribute('y1', 0); els.pulleyNeedle.setAttribute('x2', 12 * Math.sin(nRad)); els.pulleyNeedle.setAttribute('y2', -12 * Math.cos(nRad));
       
       /* 💡 擔架懸吊加長，保證絕不擋住角度數字 */
-      let loadDrop = 85; 
+      let loadDrop = 75; 
       els.suspL.setAttribute('x1', s_px); els.suspL.setAttribute('y1', s_py + 5); els.suspL.setAttribute('x2', s_px - 35); els.suspL.setAttribute('y2', s_py + loadDrop - 2);
       els.suspR.setAttribute('x1', s_px); els.suspR.setAttribute('y1', s_py + 5); els.suspR.setAttribute('x2', s_px + 35); els.suspR.setAttribute('y2', s_py + loadDrop - 2);
 
@@ -2203,7 +2205,7 @@ async function toggleCamera() {
       mainCard.classList.add('camera-mode');
       document.body.classList.add('camera-mode');
     } catch (err) { 
-      showToast("⚠️ 鏡頭啟動失敗：" + err.message, "bad"); 
+      alert("⚠️ 相機啟動失敗：請確認是否允許權限，或改用 Safari/Chrome 等原生瀏覽器開啟！"); 
     } 
   } 
 }
@@ -2243,9 +2245,10 @@ function loadImage(event) {
 }
 function toggleGrid() { gridVisible = !gridVisible; gridOverlay.style.opacity = gridVisible ? "0.5" : "0"; }
 
+/* 💡 修正淨空模式：只隱藏標籤，不隱藏控制拉桿與擔架 */
 function toggleHUD() {
   hudVisible = !hudVisible;
-  const huds = document.querySelectorAll('.hud-container, .stretcher-tag, .tagline-wrap, .control-deck, .tag-badge');
+  const huds = document.querySelectorAll('.hud-container, .tagline-wrap, .tag-badge');
   huds.forEach(el => el.style.opacity = hudVisible ? "1" : "0");
 }
 
@@ -2334,7 +2337,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
     }
 });
 
-// 💡 終極修復 V6.3：呼叫專屬 HTML 戰術更新視窗，保證任何瀏覽器都有反應！
+// 💡 終極修復 V6.3：呼叫專屬 HTML 戰術更新視窗，滾動至最上層給予視覺反饋
 function checkForUpdates() {
     const msg = t('updateMsg').replace(/\n/g, '<br>');
     document.getElementById('updateMsgText').innerHTML = msg;
@@ -2343,18 +2346,21 @@ function checkForUpdates() {
 
 function executeUpdate() {
     document.getElementById('updateModal').style.display = 'none';
-    showToast("🔄 ...", "warn");
-    if ('caches' in window) {
-        caches.keys().then((names) => {
-            Promise.all(names.map(name => caches.delete(name))).then(() => {
+    showToast("🔄 戰術系統重置中...", "warn");
+    window.scrollTo({ top: 0, behavior: 'smooth' }); // 強制捲動到頂部
+    setTimeout(() => {
+        if ('caches' in window) {
+            caches.keys().then((names) => {
+                Promise.all(names.map(name => caches.delete(name))).then(() => {
+                    window.location.href = window.location.href.split('?')[0] + '?v=' + new Date().getTime();
+                });
+            }).catch(() => {
                 window.location.href = window.location.href.split('?')[0] + '?v=' + new Date().getTime();
             });
-        }).catch(() => {
+        } else {
             window.location.href = window.location.href.split('?')[0] + '?v=' + new Date().getTime();
-        });
-    } else {
-        window.location.href = window.location.href.split('?')[0] + '?v=' + new Date().getTime();
-    }
+        }
+    }, 600);
 }
 
 const shareBtnAction = document.getElementById('shareBtnAction');
