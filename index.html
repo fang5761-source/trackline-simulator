@@ -157,7 +157,7 @@
   @keyframes glow-red { 0%, 100% { box-shadow: 0 4px 10px rgba(0,0,0,0.6); border-color: #9a3412; } 50% { box-shadow: 0 0 15px rgba(239,68,68,0.8); border-color: #ef4444; } }
   .shock-anim { animation: glow-red 1s infinite; }
 
-  /* 💡 終極修復：HUD 戰術儀表板獨立計畫 */
+  /* 💡 HUD 戰術儀表板獨立計畫 */
   .hud-container {
     display: flex; justify-content: space-between; align-items: stretch; gap: 8px;
     width: 100%; margin-bottom: 8px; z-index: 10;
@@ -167,7 +167,7 @@
     background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255,255,255,0.1);
     border-radius: 10px; padding: 8px 10px; color: var(--text);
     display: flex; flex-direction: column; gap: 6px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.2);
-    flex: 1; min-width: 0; /* 允許縮小，防止撐破 */
+    flex: 1; min-width: 0;
   }
   
   .hud-title { font-size: 12px; font-weight: 900; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 4px; margin-bottom: 2px; }
@@ -340,7 +340,7 @@
 </script>
 
 <script>
-// 💡 V6.3 多國語言精簡化：移除冗長的標籤字眼，確保版面純淨
+// 💡 V6.3 多國語言精簡化：新增更新視窗按鈕語言
 const i18n = {
   zh: {
     appTitle: "索道張力儀 (動態滑行版)",
@@ -444,7 +444,9 @@ const i18n = {
     featHeight: "↕️ 峽谷高低差模擬",
     featHeightDesc: "解鎖高低差限制，真實模擬深谷上拉與下放的極端物理張力變化！",
     featMA: "⚙️ 牽引省力比換算",
-    featMADesc: "解鎖進階機械利益換算，精準評估岸上救援手所需的真實拉力！"
+    featMADesc: "解鎖進階機械利益換算，精準評估岸上救援手所需的真實拉力！",
+    cancel: "取消",
+    confirmUpdate: "確認更新"
   },
   en: {
     appTitle: "Trackline Simulator",
@@ -548,7 +550,9 @@ const i18n = {
     featHeight: "↕️ Height Diff Simulation",
     featHeightDesc: "Unlock height limits for extreme physics tension variations!",
     featMA: "⚙️ Horizontal MA Calc",
-    featMADesc: "Unlock advanced Mechanical Advantage for accurate pulling force estimation!"
+    featMADesc: "Unlock advanced Mechanical Advantage for accurate pulling force estimation!",
+    cancel: "Cancel",
+    confirmUpdate: "Update"
   },
   ja: {
     appTitle: "トラックライン張力計",
@@ -652,7 +656,9 @@ const i18n = {
     featHeight: "↕️ 高低差シミュレーション",
     featHeightDesc: "高低差の制限を解除し、極端な張力変化をシミュレーション！",
     featMA: "⚙️ 倍力比の計算",
-    featMADesc: "高度なMA(倍力システム)計算をロック解除！"
+    featMADesc: "高度なMA(倍力システム)計算をロック解除！",
+    cancel: "キャンセル",
+    confirmUpdate: "更新"
   },
   ko: {
     appTitle: "트랙라인 장력계",
@@ -756,7 +762,9 @@ const i18n = {
     featHeight: "↕️ 고저차 시뮬레이션",
     featHeightDesc: "고저차 제한을 해제하여 극한의 장력 변화 시뮬레이션을 해제하세요!",
     featMA: "⚙️ 수평 MA 계산",
-    featMADesc: "고급 MA(기계적 이점) 계산을 잠금 해제하여 견인력을 추정하세요!"
+    featMADesc: "고급 MA(기계적 이점) 계산을 잠금 해제하여 견인력을 추정하세요!",
+    cancel: "취소",
+    confirmUpdate: "업데이트"
   },
   fr: {
     appTitle: "Simulateur de Tyrolienne",
@@ -860,7 +868,9 @@ const i18n = {
     featHeight: "↕️ Simulation de Dénivelé",
     featHeightDesc: "Débloquez les limites de dénivelé pour des variations extrêmes !",
     featMA: "⚙️ Calcul de l'AM",
-    featMADesc: "Débloquez le calcul de l'Avantage Mécanique pour la force de traction !"
+    featMADesc: "Débloquez le calcul de l'Avantage Mécanique pour la force de traction !",
+    cancel: "Annuler",
+    confirmUpdate: "Mettre à jour"
   },
   de: {
     appTitle: "Seilbahn Simulator",
@@ -964,7 +974,9 @@ const i18n = {
     featHeight: "↕️ Höhenunterschied",
     featHeightDesc: "Höhenunterschied für extreme Spannungsvariationen freischalten!",
     featMA: "⚙️ Flaschenzug Berechnung",
-    featMADesc: "Flaschenzug-Berechnung für genaue Zugkraft freischalten!"
+    featMADesc: "Flaschenzug-Berechnung für genaue Zugkraft freischalten!",
+    cancel: "Abbrechen",
+    confirmUpdate: "Aktualisieren"
   },
   es: {
     appTitle: "Simulador de Tirolesa",
@@ -1068,7 +1080,9 @@ const i18n = {
     featHeight: "↕️ Diferencia de Altura",
     featHeightDesc: "¡Desbloquee la simulación de diferencia de altura para cañones profundos!",
     featMA: "⚙️ Cálculo de Ventaja Mecánica",
-    featMADesc: "¡Desbloquee el cálculo de ventaja mecánica para la fuerza de tracción!"
+    featMADesc: "¡Desbloquee el cálculo de ventaja mecánica para la fuerza de tracción!",
+    cancel: "Cancelar",
+    confirmUpdate: "Actualizar"
   },
   pt: {
     appTitle: "Simulador de Tirolesa",
@@ -1172,7 +1186,9 @@ const i18n = {
     featHeight: "↕️ Diferença de Altura",
     featHeightDesc: "Desbloqueie a simulação de diferença de altura para cânions!",
     featMA: "⚙️ Cálculo de Vantagem Mecânica",
-    featMADesc: "Desbloqueie o cálculo de vantagem mecânica para a força de tração!"
+    featMADesc: "Desbloqueie o cálculo de vantagem mecânica para a força de tração!",
+    cancel: "Cancelar",
+    confirmUpdate: "Atualizar"
   }
 };
 
@@ -1243,7 +1259,7 @@ function changeLang(selectedLang) {
     <input type="text" id="vipPwdInput" data-i18n-plh="vipPwdPlh" placeholder="輸入 VIP 通關密碼" style="width: 100%; padding: 10px; font-size: 16px; text-align: center; border-radius: 8px; border: 1px solid var(--line); background: rgba(0,0,0,0.3); color: #fff; margin-bottom: 12px; letter-spacing: 2px; font-family: monospace;" autocomplete="off">
     <div id="vipErrorMsg" style="color:var(--bad); font-size:12px; height:16px; margin-bottom:8px;"></div>
     <div class="modal-btn-group">
-      <button class="primary-btn" style="background:transparent; border:1px solid var(--line); color:var(--text);" onclick="closeVipModal()" data-i18n="vipCancel">稍後再說</button>
+      <button class="primary-btn" style="background:transparent; border:1px solid var(--line); color:var(--text);" onclick="closeVipModal()" data-i18n="cancel">取消</button>
       <button class="primary-btn" onclick="verifyVip()" data-i18n="vipUnlock">立即解鎖 🔓</button>
     </div>
   </div>
@@ -1256,8 +1272,22 @@ function changeLang(selectedLang) {
       發現小蟲子 (Bug) 或系統異常嗎？<br><br>請點擊下方按鈕，填寫您的問題與建議，研發團隊會盡快進行修復與優化！
     </p>
     <div class="modal-btn-group" style="margin-top: 15px;">
-      <button class="primary-btn" style="background:transparent; border:1px solid var(--line); color:var(--text);" onclick="document.getElementById('supportModal').style.display='none'" data-i18n="supLater">稍後再說</button>
+      <button class="primary-btn" style="background:transparent; border:1px solid var(--line); color:var(--text);" onclick="document.getElementById('supportModal').style.display='none'" data-i18n="cancel">取消</button>
       <button class="primary-btn" style="background:var(--warn); color:#000;" onclick="window.open('https://forms.gle/fnxHcegcwQSPKmuQ6', '_blank'); document.getElementById('supportModal').style.display='none'" data-i18n="supGo">前往填寫表單</button>
+    </div>
+  </div>
+</div>
+
+<!-- 💡 V6.3 專屬的 HTML 更新確認視窗，徹底解決 iOS WebView 或 PWA 原生彈窗失效問題 -->
+<div id="updateModal" class="modal-overlay">
+  <div class="modal-box">
+    <h3 style="color:var(--warn); margin-top:0;">🔄 <span data-i18n="menu4">檢查並載入最新版本</span></h3>
+    <p style="text-align:left; font-size:13px; line-height:1.7; margin-bottom:15px; color:var(--text);" id="updateMsgText">
+      <!-- 內容由 JS 注入 -->
+    </p>
+    <div class="modal-btn-group" style="margin-top: 15px;">
+      <button class="primary-btn" style="background:transparent; border:1px solid var(--line); color:var(--text);" onclick="document.getElementById('updateModal').style.display='none'" data-i18n="cancel">取消</button>
+      <button class="primary-btn" style="background:var(--warn); color:#000;" onclick="executeUpdate()" data-i18n="confirmUpdate">確認更新</button>
     </div>
   </div>
 </div>
@@ -1292,7 +1322,6 @@ function changeLang(selectedLang) {
         <button class="icon-btn" onclick="resetEngine()" title="重置沙盤">↺</button>
       </div>
 
-      <!-- 💡 終極修復：戰術儀表板獨立計畫 (移出 SVG 沙盤，變成上方專屬儀表區) -->
       <div class="hud-container">
         <div class="hud-panel hud-tl" id="hudA">
            <div class="hud-title" data-i18n="anchorA">A 錨點</div>
@@ -1328,6 +1357,8 @@ function changeLang(selectedLang) {
           
           <path id="angleArc" fill="none" stroke="var(--warn)" stroke-width="2" style="transition: stroke 0.3s ease;" />
           <text id="angleText" fill="var(--warn)" font-size="15" font-weight="bold" text-anchor="middle" style="transition: fill 0.3s ease;"></text>
+          <!-- 💡 智慧導引箭頭 (專為小於 50 度設計) -->
+          <line id="anglePointer" stroke="var(--warn)" stroke-width="1.5" stroke-dasharray="2 2" style="display:none; transition: stroke 0.3s ease;" />
 
           <g id="pulleyGroup" class="draggable-pulley">
               <circle cx="0" cy="0" r="50" fill="transparent" />
@@ -1692,6 +1723,7 @@ const els = {
   txtTenB: document.getElementById('txtTenB'), txtVertB: document.getElementById('txtVertB'),
   sagText: document.getElementById('sagText'),
   angleArc: document.getElementById('angleArc'), angleText: document.getElementById('angleText'),
+  anglePointer: document.getElementById('anglePointer'), /* 💡 新增導引箭頭 */
   tagLineA: document.getElementById('tagLineA'), tagLineB: document.getElementById('tagLineB'),
   tagBadgeA: document.getElementById('tagBadgeA'), tagBadgeB: document.getElementById('tagBadgeB'),
   svgWrap: document.getElementById('svgWrap'), floatLoad: document.getElementById('floatLoad'),
@@ -1790,7 +1822,6 @@ function updateEngine(skipSliderUpdate = false) {
       let isStraight = (!isBroken) && (L <= minL + 0.001); 
       let calcL = isStraight ? minL : (isBroken ? L : L);
 
-      /* 💡 終極防空領域：縮小畫布佔用，將整體影像往下推，並讓出上方 80px 的戰術 HUD 空間 */
       let maxCanvasH = 460 - 80; 
       scale = Math.min((400 - 80) / Math.max(10, S), maxCanvasH / Math.max(10, Math.abs(H) + Math.max(minL, calcL)*0.5));
       offsetY = 60 + (H < 0 ? Math.abs(H)*scale : 0); 
@@ -1820,6 +1851,7 @@ function updateEngine(skipSliderUpdate = false) {
           els.floatLoad.style.display = 'none';
           els.angleArc.style.display = 'none';
           els.angleText.style.display = 'none';
+          els.anglePointer.style.display = 'none';
           els.tagLineA.style.display = 'none'; 
           els.tagLineB.style.display = 'none'; 
           els.tagBadgeA.style.display = 'none';
@@ -1835,7 +1867,7 @@ function updateEngine(skipSliderUpdate = false) {
           els.txtTenB.innerHTML = `--`;
           els.txtVertB.innerHTML = `--`;
           els.hudA.style.borderLeftColor = 'var(--bad)';
-          els.hudB.style.borderLeftColor = 'var(--bad)'; /* 💡 A/B 皆維持左側邊框，更加統一俐落 */
+          els.hudB.style.borderLeftColor = 'var(--bad)'; 
 
           els.sagText.textContent = `${t('sagCalc')}: ${t('sagFail')}`;
 
@@ -1891,8 +1923,20 @@ function updateEngine(skipSliderUpdate = false) {
       els.angleText.textContent = interiorAngle.toFixed(1) + "°";
       els.angleText.setAttribute('fill', color);
       els.angleText.setAttribute('x', s_px); 
-      /* 💡 稍微往上拉，保證不跟紅色擔架互撞 */
-      els.angleText.setAttribute('y', s_py - 45);
+      
+      /* 💡 精確導引箭頭：當小於 50 度時，強制把文字彈射到更高處，並用箭頭指引 */
+      if (interiorAngle < 50 && !isStraight && !isBroken) {
+          els.angleText.setAttribute('y', s_py - 85);
+          els.anglePointer.setAttribute('x1', s_px);
+          els.anglePointer.setAttribute('y1', s_py - 80);
+          els.anglePointer.setAttribute('x2', s_px);
+          els.anglePointer.setAttribute('y2', s_py - 30);
+          els.anglePointer.setAttribute('stroke', color);
+          els.anglePointer.style.display = 'block';
+      } else {
+          els.angleText.setAttribute('y', s_py - 48); 
+          els.anglePointer.style.display = 'none';
+      }
 
       if (isStraight) {
           maControl.style.display = "none"; 
@@ -1937,7 +1981,6 @@ function updateEngine(skipSliderUpdate = false) {
 
               let safeMarginX = 55; 
               
-              /* 💡 牽引力標籤「往上彈射」：放在滑輪的上面，避免往下壓到擔架 */
               let badgeXA = pulleyHtmlX - 85; 
               let badgeYA = pulleyHtmlY - 15; 
 
@@ -1977,7 +2020,6 @@ function updateEngine(skipSliderUpdate = false) {
       let nRad = needleAngle * Math.PI / 180;
       els.pulleyNeedle.setAttribute('x1', 0); els.pulleyNeedle.setAttribute('y1', 0); els.pulleyNeedle.setAttribute('x2', 12 * Math.sin(nRad)); els.pulleyNeedle.setAttribute('y2', -12 * Math.cos(nRad));
       
-      /* 💡 延長擔架懸吊距離，給中央角度留出絕佳視野 */
       let loadDrop = 75; 
       els.suspL.setAttribute('x1', s_px); els.suspL.setAttribute('y1', s_py + 5); els.suspL.setAttribute('x2', s_px - 35); els.suspL.setAttribute('y2', s_py + loadDrop - 2);
       els.suspR.setAttribute('x1', s_px); els.suspR.setAttribute('y1', s_py + 5); els.suspR.setAttribute('x2', s_px + 35); els.suspR.setAttribute('y2', s_py + loadDrop - 2);
@@ -2282,16 +2324,27 @@ window.addEventListener('beforeinstallprompt', (e) => {
     }
 });
 
+// 💡 更新 V6.3：呼叫 HTML 更新防護艙
 function checkForUpdates() {
-    showToast(t('menu4'), "warn");
-    setTimeout(() => {
-        if ('caches' in window) {
-          caches.keys().then((names) => {
-            names.forEach(name => caches.delete(name));
-          });
-        }
-        window.location.href = window.location.href.split('?')[0] + '?v=' + new Date().getTime(); 
-    }, 1500);
+    const msg = t('updateMsg').replace(/\n/g, '<br>');
+    document.getElementById('updateMsgText').innerHTML = msg;
+    document.getElementById('updateModal').style.display = 'flex';
+}
+
+function executeUpdate() {
+    document.getElementById('updateModal').style.display = 'none';
+    showToast("🔄 ...", "warn");
+    if ('caches' in window) {
+        caches.keys().then((names) => {
+            Promise.all(names.map(name => caches.delete(name))).then(() => {
+                window.location.href = window.location.href.split('?')[0] + '?v=' + new Date().getTime();
+            });
+        }).catch(() => {
+            window.location.href = window.location.href.split('?')[0] + '?v=' + new Date().getTime();
+        });
+    } else {
+        window.location.href = window.location.href.split('?')[0] + '?v=' + new Date().getTime();
+    }
 }
 
 const shareBtnAction = document.getElementById('shareBtnAction');
