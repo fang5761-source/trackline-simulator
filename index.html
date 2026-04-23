@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="zh-Hant-TW">
 <head>
@@ -294,7 +293,7 @@
 
 <div class="safe-area-blocker"></div>
 
-<!-- 💡 動態 VIP Modal：將內容預先寫死在 HTML，並加入 max-height，絕不切頭切尾 -->
+<!-- 💡 動態 VIP Modal -->
 <div id="vipModal" class="modal-overlay">
   <div class="modal-box" id="vipModalBox">
     <div id="vipNormalContent">
@@ -313,7 +312,7 @@
           <button class="primary-btn" style="padding: 8px;" onclick="verifyVip()" data-i18n="vipUnlock">立即解鎖 🔓</button>
         </div>
     </div>
-    <!-- 💡 最高機密控制台：獨立區塊，只有打出密碼才會顯示 -->
+    <!-- 💡 最高機密控制台 -->
     <div id="vipCommanderContent" style="display:none;">
         <h3 style="color: var(--warn); margin-top:0;" data-i18n="cmdTitle">👑 指揮官控制台</h3>
         <div style="background:rgba(0,0,0,0.3); padding:12px; border-radius:8px; margin-bottom:10px; text-align:left; border-left: 4px solid var(--safe);">
@@ -372,8 +371,9 @@
 
     <div class="card" id="mainCard">
       <!-- 影像層與網格 -->
-      <video id="bg-video" autoplay playsinline muted></video>
-      <img id="bg-image" alt="" />
+      <!-- 💡 V6 截圖修正：對相機影像加上 data-html2canvas-ignore，防止截圖軟體抓取錯誤的透明度而產生黑幕遮罩 -->
+      <video id="bg-video" autoplay playsinline muted data-html2canvas-ignore="true"></video>
+      <img id="bg-image" alt="" data-html2canvas-ignore="true" />
       <div id="grid-overlay"></div>
 
       <div class="topbar">
@@ -423,7 +423,8 @@
       </div>
 
       <div class="svgWrap" id="svgWrap">
-        <svg id="canvas" viewBox="0 0 400 460" preserveAspectRatio="xMidYMid meet">
+        <!-- 💡 V6 截圖修正：加入 xmlns 命名空間，防止 iOS Safari 在截圖時無法渲染 SVG 導致全黑 -->
+        <svg id="canvas" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 460" preserveAspectRatio="xMidYMid meet">
           <line id="tagLineA" stroke="var(--tagline)" stroke-width="4" stroke-dasharray="6 4" stroke-linecap="round" />
           <line id="tagLineB" stroke="var(--tagline)" stroke-width="4" stroke-dasharray="6 4" stroke-linecap="round" />
 
@@ -433,7 +434,6 @@
           <path id="angleArc" fill="none" stroke="var(--warn)" stroke-width="2" style="transition: stroke 0.3s ease;" />
           <text id="angleText" fill="var(--warn)" font-size="15" font-weight="bold" text-anchor="middle" style="transition: fill 0.3s ease;"></text>
           
-          <!-- 💡 智慧導引實線段與完美箭頭 -->
           <path id="anglePointer" fill="none" stroke="var(--warn)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="display:none; transition: stroke 0.3s ease;" />
 
           <g id="pulleyGroup" class="draggable-pulley">
@@ -1039,7 +1039,6 @@ const MASTER_KEY = "SUNMOONBOSS";
 
 function getDailyKey(offsetDays = 0) {
     const d = new Date(); 
-    // 強制使用台灣時區(UTC+8)計算，保證日期不會跳掉
     const utc = d.getTime() + (d.getTimezoneOffset() * 60000);
     const twTime = new Date(utc + (3600000 * 8));
     twTime.setDate(twTime.getDate() + offsetDays);
@@ -1067,7 +1066,6 @@ if (isUserVip) {
 
 let pendingFeatureCallback = null;
 
-// 💡 終極壓縮解鎖視窗，保證任何螢幕都不切頭切尾
 const defaultVipModalHtml = `
     <h3 style="margin: 0 0 5px 0;"><span data-i18n="vipTitle">🔒 專業版功能解鎖</span> <span class="vip-badge" style="display:inline-block; margin-left:4px;">PRO</span></h3>
     <p style="margin-bottom:6px; font-size:13px;"><span data-i18n="vipEnable1">您即將啟用「</span><span id="vipFeatureName" style="color:var(--vip); font-weight:bold;"></span><span data-i18n="vipEnable2">」！</span></p>
@@ -1098,8 +1096,6 @@ function attemptFeature(featureKey, callback) {
     }
 }
 
-// 💡 絕對機密防護：即使拿到體驗碼，點擊 PRO 也不會透漏任何關於控制台的資訊！
-// 只有在輸入框親手敲入 SUNMOONBOSS 才會觸發！
 const mainTitleEl = document.getElementById('mainTitleText');
 if (mainTitleEl) {
     mainTitleEl.addEventListener('click', () => {
@@ -1227,7 +1223,6 @@ const els = {
   sagText: document.getElementById('sagText'),
   angleArc: document.getElementById('angleArc'), angleText: document.getElementById('angleText'),
   anglePointer: document.getElementById('anglePointer'), 
-  anglePointerArrow: document.getElementById('anglePointerArrow'), 
   tagLineA: document.getElementById('tagLineA'), tagLineB: document.getElementById('tagLineB'),
   tagBadgeA: document.getElementById('tagBadgeA'), tagBadgeB: document.getElementById('tagBadgeB'),
   svgWrap: document.getElementById('svgWrap'), floatLoad: document.getElementById('floatLoad'),
@@ -1238,7 +1233,7 @@ const svgW = 400, svgH = 460;
 let scale = 10, offsetX = 50, offsetY = 100; 
 let currentSliderPct = 0.5;
 let currentMA = 1; 
-let userOffsetX = 0, userOffsetY = 0; // 💡 確保平移變數存在
+let userOffsetX = 0, userOffsetY = 0; 
 
 const maBtns = document.querySelectorAll('.ma-btn');
 maBtns.forEach(btn => {
@@ -1433,12 +1428,10 @@ function updateEngine(skipSliderUpdate = false) {
       els.angleText.textContent = interiorAngle.toFixed(1) + "°";
       els.angleText.setAttribute('fill', color);
       
-      /* 💡 終極角度脫逃雷達：一體成型的精準箭頭指引 */
       if (interiorAngle < 65 && !isStraight && !isBroken) {
           let isLeft = (currentSliderPct > 0.5); 
           let sideOffset = isLeft ? -95 : 95; 
           
-          /* 文字位置拉至高空 */
           els.angleText.setAttribute('x', s_px + sideOffset);
           els.angleText.setAttribute('y', s_py - 60);
           
@@ -1447,7 +1440,6 @@ function updateEngine(skipSliderUpdate = false) {
           let endX = s_px + (isLeft ? -15 : 15);
           let endY = s_py - 30;
 
-          /* 繪製包含箭頭的連續路徑 */
           let arrowD = isLeft ? 
               `M ${startX} ${startY} L ${endX} ${endY} L ${endX - 5} ${endY - 10} M ${endX} ${endY} L ${endX + 8} ${endY - 5}` : 
               `M ${startX} ${startY} L ${endX} ${endY} L ${endX + 5} ${endY - 10} M ${endX} ${endY} L ${endX - 8} ${endY - 5}`;
@@ -1638,7 +1630,6 @@ els.svgWrap.addEventListener('mousedown', (e) => {
     startDrag(e, null);
 });
 els.svgWrap.addEventListener('touchstart', (e) => {
-    // 如果點到的是可拖曳元件，讓元件自己的事件處理，svgWrap 不介入
     if (e.target.closest('.anchor-dot') || e.target.closest('.draggable-pulley') || e.target.closest('.stretcher-tag')) return;
     startDrag(e, null);
 }, {passive: false});
@@ -1651,10 +1642,13 @@ function processDrag(e) {
   let clientY = e.touches ? e.touches[0].clientY : e.clientY;
   
   if (isDragging === 'PAN') {
+      // 💡 V6.3 修正：拖曳比例改為 1:1，不再受系統米數放大縮小的影響
+      let wrap = els.svgWrap.getBoundingClientRect();
+      let s = Math.min(wrap.width / 400, wrap.height / 460);
       let dxScreen = clientX - dragStartX;
       let dyScreen = clientY - dragStartY;
-      userOffsetX = initialUserOffsetX + (dxScreen / scale);
-      userOffsetY = initialUserOffsetY + (dyScreen / scale);
+      userOffsetX = initialUserOffsetX + (dxScreen / s);
+      userOffsetY = initialUserOffsetY + (dyScreen / s);
       updateEngine(true);
       return;
   }
@@ -1841,7 +1835,6 @@ function resetEngine() {
   adjustLForAngle(120);
 }
 
-// 💡 繪製原生的影像底圖
 function drawCover(ctx, source, sW, sH, dW, dH) {
     const sRatio = sW / sH;
     const dRatio = dW / dH;
@@ -1856,20 +1849,10 @@ function drawCover(ctx, source, sW, sH, dW, dH) {
     ctx.drawImage(source, drawX, drawY, drawW, drawH);
 }
 
-// 💡 戰術截圖防暴衝 (雙層疊加技術)
+// 💡 V6 截圖防護機制：簡化影像合成邏輯，防堵截圖軟體雙重渲染產生黑幕
 async function takeScreenshot() {
   const target = document.getElementById('mainCard'); 
   target.classList.add('capture-mode');
-
-  // 截圖前將 bg-layer 暫移進 mainCard，讓 html2canvas 捕捉到相機/照片底圖
-  const bgLayer = document.getElementById('bg-layer');
-  const bgLayerParent = bgLayer ? bgLayer.parentNode : null;
-  const bgLayerNext   = bgLayer ? bgLayer.nextSibling : null;
-  if (bgLayer) {
-      bgLayer.style.position = 'absolute';
-      bgLayer.style.zIndex   = '0';
-      target.insertBefore(bgLayer, target.firstChild);
-  }
   
   const inputs = target.querySelectorAll('input[type="number"]');
   const placeholders = [];
@@ -1902,9 +1885,11 @@ async function takeScreenshot() {
   compositeCanvas.height = targetRect.height * scaleVal;
   const ctx = compositeCanvas.getContext('2d');
 
+  // 將底色塗黑，做為安全底層
   ctx.fillStyle = '#0f1623';
   ctx.fillRect(0, 0, compositeCanvas.width, compositeCanvas.height);
 
+  // 手動將相機或相片畫入最底層
   if (stream && video.videoWidth && video.style.opacity === "1") {
       drawCover(ctx, video, video.videoWidth, video.videoHeight, compositeCanvas.width, compositeCanvas.height);
   } else if (image.style.opacity === "1") {
@@ -1915,6 +1900,7 @@ async function takeScreenshot() {
   await new Promise(r => setTimeout(r, 100));
   
   try {
+    // 讓 html2canvas 只抓取介面與張力線，並設定背景透明 (無視實境圖層)
     const uiCanvas = await html2canvas(target, { 
         backgroundColor: null, 
         scale: scaleVal, 
@@ -1924,6 +1910,7 @@ async function takeScreenshot() {
         ignoreElements: (el) => el.hasAttribute('data-html2canvas-ignore') || el.classList.contains('capture-hide') 
     });
     
+    // 將抓取到的張力資料蓋在底圖上
     ctx.drawImage(uiCanvas, 0, 0);
 
     const link = document.createElement('a'); 
@@ -1940,14 +1927,6 @@ async function takeScreenshot() {
   });
   target.classList.remove('capture-mode');
   huds.forEach(el => { el.style.backdropFilter = ''; el.style.webkitBackdropFilter = ''; });
-
-  // 截圖後把 bg-layer 移回原位
-  if (bgLayer && bgLayerParent) {
-      bgLayer.style.position = 'fixed';
-      bgLayer.style.zIndex   = '-2';
-      if (bgLayerNext) { bgLayerParent.insertBefore(bgLayer, bgLayerNext); }
-      else             { bgLayerParent.appendChild(bgLayer); }
-  }
 }
 
 const supportBtnAction = document.getElementById('supportBtnAction');
@@ -1985,7 +1964,6 @@ function executeUpdate() {
     document.getElementById('updateModal').style.display = 'none';
     showToast("🔄 戰術系統重置中...", "warn");
     
-    // 💡 強制絕對置頂四連發
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); 
     document.body.scrollTop = 0;
     document.documentElement.scrollTop = 0;
