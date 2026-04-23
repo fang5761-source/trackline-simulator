@@ -2025,7 +2025,7 @@ document.getElementById('btn-reset').addEventListener('click', resetEngine);
 
 if ('serviceWorker' in navigator) { 
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').then(reg => {
+    navigator.serviceWorker.register('./sw.js?v=3').then(reg => {
       reg.update();
     }).catch(err => console.error(err));
   }); 
