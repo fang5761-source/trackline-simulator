@@ -1633,8 +1633,15 @@ attachDragEvents(els.anchorB, 'B');
 attachDragEvents(els.pulleyGroup, 'P');
 attachDragEvents(els.floatLoad, 'P'); 
 
-els.svgWrap.addEventListener('mousedown', (e) => { startDrag(e, null); });
-els.svgWrap.addEventListener('touchstart', (e) => { startDrag(e, null); }, {passive: false});
+els.svgWrap.addEventListener('mousedown', (e) => {
+    if (e.target.closest('.anchor-dot') || e.target.closest('.draggable-pulley') || e.target.closest('.stretcher-tag')) return;
+    startDrag(e, null);
+});
+els.svgWrap.addEventListener('touchstart', (e) => {
+    // 如果點到的是可拖曳元件，讓元件自己的事件處理，svgWrap 不介入
+    if (e.target.closest('.anchor-dot') || e.target.closest('.draggable-pulley') || e.target.closest('.stretcher-tag')) return;
+    startDrag(e, null);
+}, {passive: false});
 
 function processDrag(e) {
   if(!isDragging) return;
@@ -2025,7 +2032,7 @@ document.getElementById('btn-reset').addEventListener('click', resetEngine);
 
 if ('serviceWorker' in navigator) { 
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js?v=3').then(reg => {
+    navigator.serviceWorker.register('./sw.js').then(reg => {
       reg.update();
     }).catch(err => console.error(err));
   }); 

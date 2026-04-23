@@ -1,4 +1,4 @@
-const CACHE_NAME = 'trackline-v3-network-first';
+const CACHE_NAME = 'trackline-v4-network-first';
 const ASSETS = [
   './index.html',
   './manifest.json',
