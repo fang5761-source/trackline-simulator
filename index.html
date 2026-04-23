@@ -58,7 +58,8 @@
     padding-right: env(safe-area-inset-right);
   }
   
-  body.camera-mode { background-color: transparent !important; }
+  /* 💡 V7.1: 讓 HTML 跟 BODY 一起變透明，才能透視到底層的影像 */
+  html.camera-mode, body.camera-mode { background-color: transparent !important; }
 
   .safe-area-blocker {
     position: fixed; top: 0; left: 0; right: 0;
@@ -80,8 +81,10 @@
   input, textarea { -webkit-user-select: auto; user-select: auto; box-sizing: border-box; }
   *{box-sizing:border-box}
 
+  /* 💡 V7.1: 全螢幕背景層設定 */
   #bg-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; background-color: var(--bg); overflow: hidden; }
   #bg-video, #bg-image { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; opacity: 0; transition: opacity 0.3s; z-index: 0; pointer-events: none;}
+  
   #grid-overlay {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;
     background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
@@ -104,7 +107,7 @@
     transition: border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
     position: relative; overflow: hidden;
   }
-  .card > *:not(#bg-video):not(#bg-image):not(#grid-overlay) { position: relative; z-index: 2; }
+  .card > *:not(#grid-overlay) { position: relative; z-index: 2; }
 
   .card.camera-mode {
     background: transparent !important; border-color: rgba(255,255,255,0.2) !important;
@@ -291,6 +294,12 @@
 
 <div class="safe-area-blocker"></div>
 
+<!-- 💡 V7.1 修正：全螢幕疊圖層 -->
+<div id="bg-layer">
+  <video id="bg-video" autoplay playsinline muted data-html2canvas-ignore="true"></video>
+  <img id="bg-image" alt="" data-html2canvas-ignore="true" />
+</div>
+
 <div id="vipModal" class="modal-overlay">
   <div class="modal-box" id="vipModalBox">
     <div id="vipNormalContent">
@@ -366,8 +375,6 @@
   <div class="app-container" id="capture-area">
 
     <div class="card" id="mainCard">
-      <video id="bg-video" autoplay playsinline muted data-html2canvas-ignore="true"></video>
-      <img id="bg-image" alt="" data-html2canvas-ignore="true" />
       <div id="grid-overlay"></div>
 
       <div class="topbar">
@@ -1687,13 +1694,13 @@ function showCommanderConsole() {
     document.getElementById('vipModalBox').innerHTML = `
       <h3 style="color: var(--warn); margin-top:0;">${t('cmdTitle')}</h3>
       <div style="background:rgba(0,0,0,0.3); padding:12px; border-radius:8px; margin-bottom:10px; text-align:left; border-left: 4px solid var(--safe);">
-        <span style="color:var(--muted); font-size:12px;">${t('cmdExpToday')}</span><br><strong id="cmdTodayKey" style="color:var(--safe); font-size:22px; letter-spacing:1px;">${todayKey}</strong>
+        <span style="color:var(--muted); font-size:12px;" data-i18n="cmdExpToday">👉 今天的體驗碼</span><br><strong id="cmdTodayKey" style="color:var(--safe); font-size:22px; letter-spacing:1px;">${todayKey}</strong>
       </div>
       <div style="background:rgba(0,0,0,0.3); padding:12px; border-radius:8px; margin-bottom:10px; text-align:left; border-left: 4px solid var(--warn);">
-        <span style="color:var(--muted); font-size:12px;">${t('cmdExpTmrw')}</span><br><strong id="cmdTmrwKey" style="color:var(--warn); font-size:22px; letter-spacing:1px;">${tmrwKey}</strong>
+        <span style="color:var(--muted); font-size:12px;" data-i18n="cmdExpTmrw">👉 明天的體驗碼</span><br><strong id="cmdTmrwKey" style="color:var(--warn); font-size:22px; letter-spacing:1px;">${tmrwKey}</strong>
       </div>
       <div style="background:rgba(0,0,0,0.3); padding:12px; border-radius:8px; margin-bottom:20px; text-align:left; border-left: 4px solid var(--vip);">
-        <span style="color:var(--muted); font-size:12px;">${t('cmdPerm')}</span><br><strong id="cmdPermKey" style="color:var(--vip); font-size:18px; letter-spacing:1px;">${permKey}</strong>
+        <span style="color:var(--muted); font-size:12px;" data-i18n="cmdPerm">👉 🌟 總部專屬配發碼</span><br><strong id="cmdPermKey" style="color:var(--vip); font-size:18px; letter-spacing:1px;">${permKey}</strong>
       </div>
       <div class="modal-btn-group" style="margin-top: 15px;">
         <button class="primary-btn" style="background:transparent; border:1px solid var(--bad); color:var(--bad);" onclick="logoutVip()" data-i18n="cmdLogout">清除授權</button>
@@ -2211,7 +2218,6 @@ function processDrag(e) {
   let clientY = e.touches ? e.touches[0].clientY : e.clientY;
   
   if (isDragging === 'PAN') {
-      // 💡 修復實境拖曳失效：重新校正螢幕座標轉換回 SVG 座標的比例尺
       let wrap = els.svgWrap.getBoundingClientRect();
       let s = Math.min(wrap.width / 400, wrap.height / 460);
       let dxScreen = clientX - dragStartX;
@@ -2307,20 +2313,22 @@ function requestUserAgreement() {
 
 function setMediaMode(isOn) {
     if(isOn) {
-        mainCard.classList.add('camera-mode');
+        document.documentElement.classList.add('camera-mode');
         document.body.classList.add('camera-mode');
+        mainCard.classList.add('camera-mode');
         els.svgWrap.style.touchAction = 'none'; 
         els.svgWrap.style.cursor = 'move';
         showToast('📍 戰術提示：現在可「滑動空白處」將張力儀對齊實境影像！', 'safe');
     } else {
-        mainCard.classList.remove('camera-mode');
+        document.documentElement.classList.remove('camera-mode');
         document.body.classList.remove('camera-mode');
+        mainCard.classList.remove('camera-mode');
         els.svgWrap.style.touchAction = 'auto'; 
         els.svgWrap.style.cursor = 'default';
     }
 }
 
-// 💡 新增：集中管理退出媒體模式的功能，關閉鏡頭與照片
+// 💡 集中管理退出媒體模式的功能，安全關閉鏡頭與照片
 function exitMediaMode() {
     if (stream) {
         stream.getTracks().forEach(track => track.stop());
@@ -2334,7 +2342,7 @@ function exitMediaMode() {
     image.src = "";
     document.getElementById('btn-photo').classList.remove('active');
     setMediaMode(false);
-    document.getElementById('upload-image').value = ""; // 清空輸入，讓同一張照片可以再次選取
+    document.getElementById('upload-image').value = ""; 
 }
 
 async function toggleCamera() { 
@@ -2379,7 +2387,7 @@ async function toggleFlashlight() {
 }
 
 function handlePhotoUpload(event) {
-    event.preventDefault(); // 攔截預設的點擊行為
+    event.preventDefault(); 
     if (image.style.opacity === "1") {
         exitMediaMode(); // 如果照片已經開啟，就當作關閉鍵
         showToast('📍 已退出照片疊圖模式，恢復淨空', 'safe');
@@ -2391,7 +2399,15 @@ function handlePhotoUpload(event) {
 function loadImage(event) { 
   const file = event.target.files[0]; 
   if (file) { 
-    exitMediaMode(); // 載入新照片前先確保關閉相機或其他疊圖
+    // 💡 修正：載入新照片時不呼叫 exitMediaMode() 避免中斷 FileReader
+    if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        stream = null; videoTrack = null;
+        video.style.opacity = "0";
+        btnCamera.classList.remove('active');
+        torchOn = false;
+        btnFlashlight.classList.remove('active');
+    }
     const reader = new FileReader(); 
     reader.onload = function(e) { 
       image.src = e.target.result; 
@@ -2425,37 +2441,33 @@ function resetEngine() {
   
   angleSlider.value = 120;
   adjustLForAngle(120);
-  
-  // 💡 重置沙盤時，一併清空底圖與相機
   exitMediaMode();
 }
 
-function drawCover(ctx, source, sW, sH, dW, dH) {
+// 💡 針對全螢幕背景精準計算擷取範圍的渲染引擎
+function drawCoverAligned(ctx, source, sW, sH, cardRect, scaleVal) {
+    const screenW = window.innerWidth;
+    const screenH = window.innerHeight;
     const sRatio = sW / sH;
-    const dRatio = dW / dH;
+    const screenRatio = screenW / screenH;
     let drawW, drawH, drawX, drawY;
-    if (sRatio > dRatio) {
-        drawH = dH; drawW = dH * sRatio;
-        drawX = (dW - drawW) / 2; drawY = 0;
+    if (sRatio > screenRatio) {
+        drawH = screenH; drawW = screenH * sRatio;
+        drawX = (screenW - drawW) / 2; drawY = 0;
     } else {
-        drawW = dW; drawH = dW / sRatio;
-        drawX = 0; drawY = (dH - drawH) / 2;
+        drawW = screenW; drawH = screenW / sRatio;
+        drawX = 0; drawY = (screenH - drawH) / 2;
     }
-    ctx.drawImage(source, drawX, drawY, drawW, drawH);
+    const finalX = (drawX - cardRect.left) * scaleVal;
+    const finalY = (drawY - cardRect.top) * scaleVal;
+    const finalW = drawW * scaleVal;
+    const finalH = drawH * scaleVal;
+    ctx.drawImage(source, finalX, finalY, finalW, finalH);
 }
 
 async function takeScreenshot() {
   const target = document.getElementById('mainCard'); 
   target.classList.add('capture-mode');
-
-  const bgLayer = document.getElementById('bg-layer');
-  const bgLayerParent = bgLayer ? bgLayer.parentNode : null;
-  const bgLayerNext   = bgLayer ? bgLayer.nextSibling : null;
-  if (bgLayer) {
-      bgLayer.style.position = 'absolute';
-      bgLayer.style.zIndex   = '0';
-      target.insertBefore(bgLayer, target.firstChild);
-  }
   
   const inputs = target.querySelectorAll('input[type="number"]');
   const placeholders = [];
@@ -2491,9 +2503,9 @@ async function takeScreenshot() {
   ctx.fillRect(0, 0, compositeCanvas.width, compositeCanvas.height);
 
   if (stream && video.videoWidth && video.style.opacity === "1") {
-      drawCover(ctx, video, video.videoWidth, video.videoHeight, compositeCanvas.width, compositeCanvas.height);
+      drawCoverAligned(ctx, video, video.videoWidth, video.videoHeight, targetRect, scaleVal);
   } else if (image.style.opacity === "1") {
-      drawCover(ctx, image, image.naturalWidth, image.naturalHeight, compositeCanvas.width, compositeCanvas.height);
+      drawCoverAligned(ctx, image, image.naturalWidth, image.naturalHeight, targetRect, scaleVal);
   }
 
   window.scrollTo(0, 0);
@@ -2516,8 +2528,8 @@ async function takeScreenshot() {
     link.href = compositeCanvas.toDataURL('image/png'); 
     link.click();
     
-    // 💡 截圖完成後，顯示提示並自動退出相機/照片模式，清空戰場！
-    showToast("📸 戰術截圖已匯出！已為您自動關閉實境/疊圖模式。", "safe");
+    // 💡 截圖完成後，顯示提示並自動退出媒體模式，清空戰場！
+    showToast("📸 戰術截圖已匯出！已為您自動關閉疊圖模式。", "safe");
     setTimeout(exitMediaMode, 500);
 
   } catch(e) { 
@@ -2530,13 +2542,6 @@ async function takeScreenshot() {
   });
   target.classList.remove('capture-mode');
   huds.forEach(el => { el.style.backdropFilter = ''; el.style.webkitBackdropFilter = ''; });
-
-  if (bgLayer && bgLayerParent) {
-      bgLayer.style.position = 'fixed';
-      bgLayer.style.zIndex   = '-2';
-      if (bgLayerNext) { bgLayerParent.insertBefore(bgLayer, bgLayerNext); }
-      else             { bgLayerParent.appendChild(bgLayer); }
-  }
 }
 
 const supportBtnAction = document.getElementById('supportBtnAction');
