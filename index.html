@@ -81,7 +81,7 @@
   input, textarea { -webkit-user-select: auto; user-select: auto; box-sizing: border-box; }
   *{box-sizing:border-box}
 
-  /* 影像層調整 */
+  /* 影像層調整：修復背景消失問題 */
   #bg-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; background-color: var(--bg); overflow: hidden; }
   #bg-video, #bg-image { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; opacity: 0; transition: opacity 0.3s; z-index: 0; pointer-events: none;}
   #grid-overlay {
@@ -113,7 +113,7 @@
     backdrop-filter: none !important; -webkit-backdrop-filter: none !important; box-shadow: none !important;
   }
   .card.capture-mode {
-    background-color: transparent !important; 
+    background-color: transparent !important; background: transparent !important;
     border-color: var(--line) !important; box-shadow: none !important; border-radius: 0 !important; 
     backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
   }
@@ -212,6 +212,7 @@
   .ma-btn.active { background: var(--tagline); color: var(--bg); border-color: var(--tagline); }
   .ma-btn .lock-icon { bottom: 2px; right: 2px; font-size: 8px; }
 
+  /* 💡 Modals - 加入 max-height 彈性滾動，防止切頭切尾 */
   .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); }
   .modal-box { 
     background: var(--card); border: 2px solid var(--vip); border-radius: 16px; 
@@ -231,7 +232,7 @@
 
   .menu-list { display: flex; flex-direction: column; width: 100%; margin-top: 5px; }
   
-  details.main-accordion { margin-top: 12px; }
+  details.main-accordion { margin-top: 12px; margin-bottom: 16px; }
   details.main-accordion > summary {
     font-size: 15px; font-weight: bold; color: var(--warn); padding: 14px 16px; 
     background: rgba(150,150,150,0.1); border-radius: 8px; letter-spacing: 0.5px; 
@@ -272,7 +273,7 @@
   .footer-disclaimer { margin-top: 20px; padding: 15px; font-size: 12px; color: var(--muted); line-height: 1.6; text-align: justify; background: rgba(150,150,150,0.05); border-radius: 10px; border-left: 4px solid var(--bad); }
 
   .action-block {
-    background: var(--card); border-radius: 14px; border: 1px solid var(--line); margin-top: 12px;
+    background: var(--card); border-radius: 14px; border: 1px solid var(--line); margin-top: 16px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1); overflow: hidden; display: flex; flex-direction: column;
   }
 
@@ -293,15 +294,15 @@
 
 <div class="safe-area-blocker"></div>
 
-<!-- 💡 動態 VIP Modal：將內容預先寫死在 HTML，並加入 max-height，絕不切頭切尾 -->
+<!-- 💡 動態 VIP Modal：極致壓縮版，內容寫死保證不破圖 -->
 <div id="vipModal" class="modal-overlay">
   <div class="modal-box" id="vipModalBox">
     <div id="vipNormalContent">
-        <h3 style="margin: 0 0 5px 0;"><span data-i18n="vipTitle">🔒 專業版功能解鎖</span> <span class="vip-badge" style="display:inline-block; margin-left:8px;">PRO</span></h3>
-        <p style="margin-bottom:6px; font-size:14px;"><span data-i18n="vipEnable1">您即將啟用「</span><span id="vipFeatureName" style="color:var(--vip); font-weight:bold;"></span><span data-i18n="vipEnable2">」！</span></p>
-        <p id="vipFeatureDesc" style="font-size:12px; color:var(--safe); font-weight:bold; margin-bottom: 8px;"></p>
-        <div style="background:rgba(0,0,0,0.3); padding:8px; border-radius:8px; border-left:4px solid var(--bad); margin-bottom:10px; text-align:left;">
-          <span style="color:var(--bad); font-size:11px; font-weight:bold; line-height:1.3; display:block;" data-i18n="vipDisclaimer">⚠️ 系統採單機授權，遺失密碼或更換設備請重新購買，恕無提供補發。</span>
+        <h3 style="margin: 0 0 5px 0;"><span data-i18n="vipTitle">🔒 專業版功能解鎖</span> <span class="vip-badge" style="display:inline-block; margin-left:4px;">PRO</span></h3>
+        <p style="margin-bottom:4px; font-size:13px;"><span data-i18n="vipEnable1">您即將啟用「</span><span id="vipFeatureName" style="color:var(--vip); font-weight:bold;"></span><span data-i18n="vipEnable2">」！</span></p>
+        <p id="vipFeatureDesc" style="font-size:12px; color:var(--safe); font-weight:bold; margin-bottom: 6px;"></p>
+        <div style="background:rgba(0,0,0,0.3); padding:6px; border-radius:6px; border-left:4px solid var(--bad); margin-bottom:6px; text-align:left;">
+          <span style="color:var(--bad); font-size:11px; font-weight:bold; line-height:1.2; display:block;" data-i18n="vipDisclaimer">⚠️ 單機授權，遺失或換機需重買，無補發服務。</span>
         </div>
         <button class="primary-btn" style="background:var(--vip); margin-bottom:5px; padding: 10px;" onclick="window.open('https://gumroad.com', '_blank')" data-i18n="vipStoreBtn">🛒 前往專業版自動販賣機</button>
         <hr style="border:0; border-top:1px dashed var(--line); margin: 10px 0;">
@@ -315,18 +316,18 @@
     <!-- 💡 最高機密控制台：獨立區塊，只有打出密碼才會顯示 -->
     <div id="vipCommanderContent" style="display:none;">
         <h3 style="color: var(--warn); margin-top:0;" data-i18n="cmdTitle">👑 指揮官控制台</h3>
-        <div style="background:rgba(0,0,0,0.3); padding:12px; border-radius:8px; margin-bottom:10px; text-align:left; border-left: 4px solid var(--safe);">
-          <span style="color:var(--muted); font-size:12px;" data-i18n="cmdExpToday">👉 今天的體驗碼</span><br><strong id="cmdTodayKey" style="color:var(--safe); font-size:22px; letter-spacing:1px;"></strong>
+        <div style="background:rgba(0,0,0,0.3); padding:10px; border-radius:8px; margin-bottom:8px; text-align:left; border-left: 4px solid var(--safe);">
+          <span style="color:var(--muted); font-size:11px;" data-i18n="cmdExpToday">👉 今天的體驗碼</span><br><strong id="cmdTodayKey" style="color:var(--safe); font-size:20px; letter-spacing:1px;"></strong>
         </div>
-        <div style="background:rgba(0,0,0,0.3); padding:12px; border-radius:8px; margin-bottom:10px; text-align:left; border-left: 4px solid var(--warn);">
-          <span style="color:var(--muted); font-size:12px;" data-i18n="cmdExpTmrw">👉 明天的體驗碼</span><br><strong id="cmdTmrwKey" style="color:var(--warn); font-size:22px; letter-spacing:1px;"></strong>
+        <div style="background:rgba(0,0,0,0.3); padding:10px; border-radius:8px; margin-bottom:8px; text-align:left; border-left: 4px solid var(--warn);">
+          <span style="color:var(--muted); font-size:11px;" data-i18n="cmdExpTmrw">👉 明天的體驗碼</span><br><strong id="cmdTmrwKey" style="color:var(--warn); font-size:20px; letter-spacing:1px;"></strong>
         </div>
-        <div style="background:rgba(0,0,0,0.3); padding:12px; border-radius:8px; margin-bottom:20px; text-align:left; border-left: 4px solid var(--vip);">
-          <span style="color:var(--muted); font-size:12px;" data-i18n="cmdPerm">👉 🌟 總部專屬配發碼</span><br><strong id="cmdPermKey" style="color:var(--vip); font-size:18px; letter-spacing:1px;"></strong>
+        <div style="background:rgba(0,0,0,0.3); padding:10px; border-radius:8px; margin-bottom:12px; text-align:left; border-left: 4px solid var(--vip);">
+          <span style="color:var(--muted); font-size:11px;" data-i18n="cmdPerm">👉 🌟 總部專屬配發碼</span><br><strong id="cmdPermKey" style="color:var(--vip); font-size:16px; letter-spacing:1px;"></strong>
         </div>
-        <div class="modal-btn-group" style="margin-top: 15px;">
-          <button class="primary-btn" style="background:transparent; border:1px solid var(--bad); color:var(--bad);" onclick="logoutVip()" data-i18n="cmdLogout">清除授權</button>
-          <button class="primary-btn" style="background:var(--warn); color:#000;" onclick="closeVipModal()" data-i18n="cmdClose">關閉</button>
+        <div class="modal-btn-group" style="margin-top: 10px;">
+          <button class="primary-btn" style="background:transparent; border:1px solid var(--bad); color:var(--bad); padding:8px;" onclick="logoutVip()" data-i18n="cmdLogout">清除授權</button>
+          <button class="primary-btn" style="background:var(--warn); color:#000; padding:8px;" onclick="closeVipModal()" data-i18n="cmdClose">關閉</button>
         </div>
     </div>
   </div>
@@ -384,11 +385,12 @@
         </div>
       </div>
 
+      <!-- 💡 將所有 icon-btn 統一改為 button 避免 id 判斷崩潰 -->
       <div class="icon-bar" data-html2canvas-ignore="true">
         <button class="icon-btn" id="btn-camera" title="實境相機">📷<span class="lock-icon">🔒</span></button>
         <button class="icon-btn" id="btn-flashlight" title="手電筒">🔦</button>
-        <label class="icon-btn" id="btn-photo" onclick="handleImageUploadClick(event)" title="載入照片" style="margin:0;">📁<span class="lock-icon">🔒</span></label>
-        <input type="file" id="upload-image" accept="image/*" onchange="loadImage(event)">
+        <button class="icon-btn" id="btn-photo" title="載入照片">📁<span class="lock-icon">🔒</span></button>
+        <input type="file" id="upload-image" accept="image/*" style="display:none;" onchange="loadImage(event)">
         <button class="icon-btn" id="btn-grid" title="工程網格">🌐</button>
         <button class="icon-btn" id="btn-hud" title="專注/淨空模式">👁️</button>
         <button class="icon-btn" id="btn-shock" title="動態震動衝擊">📳<span class="lock-icon">🔒</span></button>
@@ -421,8 +423,9 @@
         </div>
       </div>
 
+      <!-- 💡 SVG 畫布：加上 xMidYMin 保證頂部座標絕對貼齊，不被截掉 -->
       <div class="svgWrap" id="svgWrap">
-        <svg id="canvas" viewBox="0 0 400 460" preserveAspectRatio="xMidYMid meet">
+        <svg id="canvas" viewBox="0 0 400 460" preserveAspectRatio="xMidYMin meet">
           <line id="tagLineA" stroke="var(--tagline)" stroke-width="4" stroke-dasharray="6 4" stroke-linecap="round" />
           <line id="tagLineB" stroke="var(--tagline)" stroke-width="4" stroke-dasharray="6 4" stroke-linecap="round" />
 
@@ -432,8 +435,8 @@
           <path id="angleArc" fill="none" stroke="var(--warn)" stroke-width="2" style="transition: stroke 0.3s ease;" />
           <text id="angleText" fill="var(--warn)" font-size="15" font-weight="bold" text-anchor="middle" style="transition: fill 0.3s ease;"></text>
           
-          <!-- 💡 智慧導引實線段與完美箭頭 -->
-          <path id="anglePointer" fill="none" stroke="var(--warn)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="display:none; transition: stroke 0.3s ease;" />
+          <!-- 💡 智慧導引實線段與完美箭頭 (合一) -->
+          <path id="anglePointerArrow" fill="none" stroke="var(--warn)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="display:none; transition: stroke 0.3s ease;" />
 
           <g id="pulleyGroup" class="draggable-pulley">
               <circle cx="0" cy="0" r="50" fill="transparent" />
@@ -735,7 +738,7 @@ const i18n = {
     pwaStep7: "往下滑，選擇「加入主畫面」",
     pwaStep8: "點選「加入」，即可將捷徑加到主畫面",
     installBtn: "📥 點擊一鍵安裝 APP",
-    disclaimer: "<strong style='color: var(--bad); font-size: 14px;'>⚠️ 軟體免責聲明：</strong><br>本軟體為理論物理運算輔助工具，不包含繩索材質疲勞、極端摩擦力等環境變數。實際救援操作之系統架設與安全確保，均須由專業教官與指揮官實地判定，開發團隊不負任何實地操作之法律與賠償責任。<br><br><span style='color:var(--warn);'>※ 本系統採單機授權，為保障研發團隊權益，遺失密碼或更換設備請重新購買，恕無提供補發。</span>",
+    disclaimer: "<strong style='color: var(--bad); font-size: 14px;'>⚠️ 軟體免責聲明：</strong><br>本軟體為理論物理運算輔助工具，不包含繩索材質疲勞、極端摩擦力等環境變數。實際救援操作之系統架設與安全確保，均須由專業教官與指揮官實地判定，開發團隊不負任何實地操作之法律與賠償責任。<br><br><span style='color:var(--warn);'>※ 本系統採單機授權，為保障研發團隊權益，遺失密碼或更換設備請重新購買，恕無提供補發與人工客服。</span>",
     vipTitle: "🔒 專業版功能解鎖",
     vipEnable1: "您即將啟用「",
     vipEnable2: "」！",
@@ -1017,9 +1020,6 @@ function applyTranslations() {
     });
     const langSelect = document.getElementById('langSelect');
     if (langSelect) langSelect.value = currentLang;
-    if (typeof updateEngine === 'function' && document.getElementById('inRope')) {
-        updateEngine(true);
-    }
 }
 
 function changeLang(selectedLang) {
@@ -1029,16 +1029,12 @@ function changeLang(selectedLang) {
         applyTranslations();
     }
 }
-</script>
 
-<script>
-// 💡 V6.3 金鑰與防護 (最高機密指揮所絕對防護)
 const PERMANENT_KEYS = ["SMT-A7K9-X2M4", "SMT-B3Q8-P9Y1", "SMT-C5R2-W6Z7"];
 const MASTER_KEY = "SUNMOONBOSS"; 
 
 function getDailyKey(offsetDays = 0) {
     const d = new Date(); 
-    // 強制使用台灣時區(UTC+8)計算，保證日期不會跳掉
     const utc = d.getTime() + (d.getTimezoneOffset() * 60000);
     const twTime = new Date(utc + (3600000 * 8));
     twTime.setDate(twTime.getDate() + offsetDays);
@@ -1061,26 +1057,45 @@ try {
 
 if (isUserVip) { 
     document.body.classList.add('is-vip'); 
-    document.getElementById('inHeight').removeAttribute('readonly'); 
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('inHeight').removeAttribute('readonly'); 
+    });
 }
 
 let pendingFeatureCallback = null;
 
-// 💡 終極壓縮解鎖視窗，保證任何螢幕都不切頭切尾
 const defaultVipModalHtml = `
-    <h3 style="margin: 0 0 5px 0;"><span data-i18n="vipTitle">🔒 專業版功能解鎖</span> <span class="vip-badge" style="display:inline-block; margin-left:4px;">PRO</span></h3>
-    <p style="margin-bottom:6px; font-size:13px;"><span data-i18n="vipEnable1">您即將啟用「</span><span id="vipFeatureName" style="color:var(--vip); font-weight:bold;"></span><span data-i18n="vipEnable2">」！</span></p>
-    <p id="vipFeatureDesc" style="font-size:12px; color:var(--safe); font-weight:bold; margin-bottom: 6px;"></p>
-    <div style="background:rgba(0,0,0,0.3); padding:6px; border-radius:6px; border-left:4px solid var(--bad); margin-bottom:8px; text-align:left;">
-      <span style="color:var(--bad); font-size:11px; font-weight:bold; line-height:1.3; display:block;" data-i18n="vipDisclaimer">⚠️ 系統採單機授權，遺失密碼或更換設備請重新購買，恕無提供補發。</span>
+    <div id="vipNormalContent">
+        <h3 style="margin: 0 0 5px 0;"><span data-i18n="vipTitle">🔒 專業版功能解鎖</span> <span class="vip-badge" style="display:inline-block; margin-left:4px;">PRO</span></h3>
+        <p style="margin-bottom:4px; font-size:13px;"><span data-i18n="vipEnable1">您即將啟用「</span><span id="vipFeatureName" style="color:var(--vip); font-weight:bold;"></span><span data-i18n="vipEnable2">」！</span></p>
+        <p id="vipFeatureDesc" style="font-size:12px; color:var(--safe); font-weight:bold; margin-bottom: 6px;"></p>
+        <div style="background:rgba(0,0,0,0.3); padding:6px; border-radius:6px; border-left:4px solid var(--bad); margin-bottom:6px; text-align:left;">
+          <span style="color:var(--bad); font-size:11px; font-weight:bold; line-height:1.2; display:block;" data-i18n="vipDisclaimer">⚠️ 單機授權，遺失或換機需重買，無補發服務。</span>
+        </div>
+        <button class="primary-btn" style="background:var(--vip); margin-bottom:4px; padding: 8px;" onclick="window.open('https://gumroad.com', '_blank')" data-i18n="vipStoreBtn">🛒 前往專業版自動販賣機</button>
+        <hr style="border:0; border-top:1px dashed var(--line); margin: 8px 0;">
+        <input type="text" id="vipPwdInput" data-i18n-plh="vipPwdPlh" placeholder="請輸入密碼" style="width: 100%; padding: 8px; font-size: 15px; text-align: center; border-radius: 8px; border: 1px solid var(--line); background: rgba(0,0,0,0.3); color: #fff; margin-bottom: 4px; letter-spacing: 2px; font-family: monospace;" autocomplete="off">
+        <div id="vipErrorMsg" style="color:var(--bad); font-size:11px; height:12px; margin-bottom:4px;"></div>
+        <div class="modal-btn-group" style="margin-top:0;">
+          <button class="primary-btn" style="background:transparent; border:1px solid var(--line); color:var(--text); padding: 8px;" onclick="closeVipModal()" data-i18n="cancel">取消</button>
+          <button class="primary-btn" style="padding: 8px;" onclick="verifyVip()" data-i18n="vipUnlock">立即解鎖 🔓</button>
+        </div>
     </div>
-    <button class="primary-btn" style="background:var(--vip); margin-bottom:4px; padding: 10px;" onclick="window.open('https://gumroad.com', '_blank')" data-i18n="vipStoreBtn">🛒 前往專業版自動販賣機</button>
-    <hr style="border:0; border-top:1px dashed var(--line); margin: 8px 0;">
-    <input type="text" id="vipPwdInput" data-i18n-plh="vipPwdPlh" placeholder="請輸入密碼" style="width: 100%; padding: 8px; font-size: 15px; text-align: center; border-radius: 8px; border: 1px solid var(--line); background: rgba(0,0,0,0.3); color: #fff; margin-bottom: 4px; letter-spacing: 2px; font-family: monospace;" autocomplete="off">
-    <div id="vipErrorMsg" style="color:var(--bad); font-size:11px; height:14px; margin-bottom:4px;"></div>
-    <div class="modal-btn-group" style="margin-top:0;">
-      <button class="primary-btn" style="background:transparent; border:1px solid var(--line); color:var(--text); padding: 8px;" onclick="closeVipModal()" data-i18n="cancel">取消</button>
-      <button class="primary-btn" style="padding: 8px;" onclick="verifyVip()" data-i18n="vipUnlock">立即解鎖 🔓</button>
+    <div id="vipCommanderContent" style="display:none;">
+        <h3 style="color: var(--warn); margin-top:0;" data-i18n="cmdTitle">👑 指揮官控制台</h3>
+        <div style="background:rgba(0,0,0,0.3); padding:10px; border-radius:8px; margin-bottom:8px; text-align:left; border-left: 4px solid var(--safe);">
+          <span style="color:var(--muted); font-size:11px;" data-i18n="cmdExpToday">👉 今天的體驗碼</span><br><strong id="cmdTodayKey" style="color:var(--safe); font-size:20px; letter-spacing:1px;"></strong>
+        </div>
+        <div style="background:rgba(0,0,0,0.3); padding:10px; border-radius:8px; margin-bottom:8px; text-align:left; border-left: 4px solid var(--warn);">
+          <span style="color:var(--muted); font-size:11px;" data-i18n="cmdExpTmrw">👉 明天的體驗碼</span><br><strong id="cmdTmrwKey" style="color:var(--warn); font-size:20px; letter-spacing:1px;"></strong>
+        </div>
+        <div style="background:rgba(0,0,0,0.3); padding:10px; border-radius:8px; margin-bottom:12px; text-align:left; border-left: 4px solid var(--vip);">
+          <span style="color:var(--muted); font-size:11px;" data-i18n="cmdPerm">👉 🌟 總部專屬配發碼</span><br><strong id="cmdPermKey" style="color:var(--vip); font-size:16px; letter-spacing:1px;"></strong>
+        </div>
+        <div class="modal-btn-group" style="margin-top: 10px;">
+          <button class="primary-btn" style="background:transparent; border:1px solid var(--bad); color:var(--bad); padding:8px;" onclick="logoutVip()" data-i18n="cmdLogout">清除授權</button>
+          <button class="primary-btn" style="background:var(--warn); color:#000; padding:8px;" onclick="closeVipModal()" data-i18n="cmdClose">關閉</button>
+        </div>
     </div>
 `;
 
@@ -1097,49 +1112,37 @@ function attemptFeature(featureKey, callback) {
     }
 }
 
-// 💡 絕對機密防護：即使拿到體驗碼，點擊 PRO 也不會透漏任何關於控制台的資訊！
-// 只有在輸入框親手敲入 SUNMOONBOSS 才會觸發！
-const mainTitleEl = document.getElementById('mainTitleText');
-if (mainTitleEl) {
-    mainTitleEl.addEventListener('click', () => {
-        pendingFeatureCallback = null;
-        document.getElementById('vipModalBox').innerHTML = defaultVipModalHtml;
-        applyTranslations();
-        
-        if (isUserVip) {
-            document.getElementById('vipFeatureName').parentElement.innerHTML = t('vipStateDesc');
-            document.getElementById('vipFeatureDesc').textContent = "";
-            document.querySelector('[data-i18n="vipTitle"]').textContent = t('vipStateUnlocked');
-        } else {
-            document.getElementById('vipFeatureName').parentElement.innerHTML = `<span data-i18n="vipEnable1">${t('vipEnable1')}</span><span id="vipFeatureName" style="color:var(--vip); font-weight:bold; font-size:16px;">${t('appTitle')}</span><span data-i18n="vipEnable2">${t('vipEnable2')}</span>`;
-            document.getElementById('vipFeatureDesc').textContent = "";
-            document.querySelector('[data-i18n="vipTitle"]').textContent = t('vipTitle');
-        }
-        
-        document.getElementById('vipModal').style.display = 'flex';
-        setTimeout(() => document.getElementById('vipPwdInput').focus(), 100);
-    });
-}
+document.addEventListener('DOMContentLoaded', () => {
+    const mainTitleEl = document.getElementById('mainTitleText');
+    if (mainTitleEl) {
+        mainTitleEl.addEventListener('click', () => {
+            pendingFeatureCallback = null;
+            document.getElementById('vipModalBox').innerHTML = defaultVipModalHtml;
+            applyTranslations();
+            
+            if (isUserVip) {
+                document.getElementById('vipFeatureName').parentElement.innerHTML = t('vipStateDesc');
+                document.getElementById('vipFeatureDesc').textContent = "";
+                document.querySelector('[data-i18n="vipTitle"]').textContent = t('vipStateUnlocked');
+            } else {
+                document.getElementById('vipFeatureName').parentElement.innerHTML = `<span data-i18n="vipEnable1">${t('vipEnable1')}</span><span id="vipFeatureName" style="color:var(--vip); font-weight:bold; font-size:16px;">${t('appTitle')}</span><span data-i18n="vipEnable2">${t('vipEnable2')}</span>`;
+                document.getElementById('vipFeatureDesc').textContent = "";
+                document.querySelector('[data-i18n="vipTitle"]').textContent = t('vipTitle');
+            }
+            
+            document.getElementById('vipModal').style.display = 'flex';
+            setTimeout(() => document.getElementById('vipPwdInput').focus(), 100);
+        });
+    }
+});
 
 function showCommanderConsole() {
     const todayKey = getDailyKey(0); const tmrwKey = getDailyKey(1); const permKey = PERMANENT_KEYS[0];
-    document.getElementById('vipModalBox').innerHTML = `
-      <h3 style="color: var(--warn); margin-top:0;">${t('cmdTitle')}</h3>
-      <div style="background:rgba(0,0,0,0.3); padding:12px; border-radius:8px; margin-bottom:10px; text-align:left; border-left: 4px solid var(--safe);">
-        <span style="color:var(--muted); font-size:12px;">${t('cmdExpToday')}</span><br><strong id="cmdTodayKey" style="color:var(--safe); font-size:22px; letter-spacing:1px;">${todayKey}</strong>
-      </div>
-      <div style="background:rgba(0,0,0,0.3); padding:12px; border-radius:8px; margin-bottom:10px; text-align:left; border-left: 4px solid var(--warn);">
-        <span style="color:var(--muted); font-size:12px;">${t('cmdExpTmrw')}</span><br><strong id="cmdTmrwKey" style="color:var(--warn); font-size:22px; letter-spacing:1px;">${tmrwKey}</strong>
-      </div>
-      <div style="background:rgba(0,0,0,0.3); padding:12px; border-radius:8px; margin-bottom:20px; text-align:left; border-left: 4px solid var(--vip);">
-        <span style="color:var(--muted); font-size:12px;">${t('cmdPerm')}</span><br><strong id="cmdPermKey" style="color:var(--vip); font-size:18px; letter-spacing:1px;">${permKey}</strong>
-      </div>
-      <div class="modal-btn-group" style="margin-top: 15px;">
-        <button class="primary-btn" style="background:transparent; border:1px solid var(--bad); color:var(--bad);" onclick="logoutVip()">${t('cmdLogout')}</button>
-        <button class="primary-btn" style="background:var(--warn); color:#000;" onclick="closeVipModal()">${t('cmdClose')}</button>
-      </div>
-    `;
-    document.getElementById('vipModal').style.display = 'flex';
+    document.getElementById('vipNormalContent').style.display = 'none';
+    document.getElementById('cmdTodayKey').textContent = todayKey;
+    document.getElementById('cmdTmrwKey').textContent = tmrwKey;
+    document.getElementById('cmdPermKey').textContent = permKey;
+    document.getElementById('vipCommanderContent').style.display = 'block';
 }
 
 function logoutVip() {
@@ -1203,48 +1206,78 @@ function showToast(msg, type = 'safe') {
 
 <script>
 // 💡 SVG 物理引擎與畫布控制
-const inSpan = document.getElementById('inSpan'), inHeight = document.getElementById('inHeight'),
-      inLoad = document.getElementById('inLoad'), inRope = document.getElementById('inRope'),
-      inShock = document.getElementById('inShock'), angleSlider = document.getElementById('angleSlider'), 
-      taglineInfo = document.getElementById('taglineInfo'), maControl = document.getElementById('maControl');
-
-const svgEl = document.getElementById('canvas');
-const mainCard = document.getElementById('mainCard');
-const els = {
-  ropeL: document.getElementById('ropeL'), ropeR: document.getElementById('ropeR'),
-  pulleyGroup: document.getElementById('pulleyGroup'), pulleyNeedle: document.getElementById('pulleyNeedle'),
-  suspL: document.getElementById('suspL'), suspR: document.getElementById('suspR'),
-  anchorA: document.getElementById('anchorGroupA'), anchorB: document.getElementById('anchorGroupB'), 
-  dotA: document.getElementById('dotA'), dotB: document.getElementById('dotB'),
-  txtTenA: document.getElementById('txtTenA'), txtVertA: document.getElementById('txtVertA'),
-  txtTenB: document.getElementById('txtTenB'), txtVertB: document.getElementById('txtVertB'),
-  sagText: document.getElementById('sagText'),
-  angleArc: document.getElementById('angleArc'), angleText: document.getElementById('angleText'),
-  anglePointer: document.getElementById('anglePointer'), 
-  anglePointerArrow: document.getElementById('anglePointerArrow'), 
-  tagLineA: document.getElementById('tagLineA'), tagLineB: document.getElementById('tagLineB'),
-  tagBadgeA: document.getElementById('tagBadgeA'), tagBadgeB: document.getElementById('tagBadgeB'),
-  svgWrap: document.getElementById('svgWrap'), floatLoad: document.getElementById('floatLoad'),
-  hudA: document.getElementById('hudA'), hudB: document.getElementById('hudB')
-};
-
-const svgW = 400, svgH = 460; 
+let inSpan, inHeight, inLoad, inRope, inShock, angleSlider, taglineInfo, maControl, svgEl, mainCard, els;
+let svgW = 400, svgH = 460; 
 let scale = 10, offsetX = 50, offsetY = 100; 
 let currentSliderPct = 0.5;
 let currentMA = 1; 
-let userOffsetX = 0, userOffsetY = 0; // 💡 確保平移變數存在
+let userOffsetX = 0, userOffsetY = 0; 
 
-const maBtns = document.querySelectorAll('.ma-btn');
-maBtns.forEach(btn => {
-  btn.addEventListener('click', (e) => {
-    let targetMA = parseInt(e.target.dataset.ma);
-    if (targetMA === 1) { setMA(e.target, targetMA); } 
-    else { attemptFeature('featMA', () => { setMA(e.target, targetMA); }); }
-  });
+document.addEventListener('DOMContentLoaded', () => {
+    inSpan = document.getElementById('inSpan');
+    inHeight = document.getElementById('inHeight');
+    inLoad = document.getElementById('inLoad');
+    inRope = document.getElementById('inRope');
+    inShock = document.getElementById('inShock');
+    angleSlider = document.getElementById('angleSlider');
+    taglineInfo = document.getElementById('taglineInfo');
+    maControl = document.getElementById('maControl');
+    svgEl = document.getElementById('canvas');
+    mainCard = document.getElementById('mainCard');
+    
+    els = {
+      ropeL: document.getElementById('ropeL'), ropeR: document.getElementById('ropeR'),
+      pulleyGroup: document.getElementById('pulleyGroup'), pulleyNeedle: document.getElementById('pulleyNeedle'),
+      suspL: document.getElementById('suspL'), suspR: document.getElementById('suspR'),
+      anchorA: document.getElementById('anchorGroupA'), anchorB: document.getElementById('anchorGroupB'), 
+      dotA: document.getElementById('dotA'), dotB: document.getElementById('dotB'),
+      txtTenA: document.getElementById('txtTenA'), txtVertA: document.getElementById('txtVertA'),
+      txtTenB: document.getElementById('txtTenB'), txtVertB: document.getElementById('txtVertB'),
+      sagText: document.getElementById('sagText'),
+      angleArc: document.getElementById('angleArc'), angleText: document.getElementById('angleText'),
+      anglePointer: document.getElementById('anglePointer'), 
+      anglePointerArrow: document.getElementById('anglePointerArrow'), 
+      tagLineA: document.getElementById('tagLineA'), tagLineB: document.getElementById('tagLineB'),
+      tagBadgeA: document.getElementById('tagBadgeA'), tagBadgeB: document.getElementById('tagBadgeB'),
+      svgWrap: document.getElementById('svgWrap'), floatLoad: document.getElementById('floatLoad'),
+      hudA: document.getElementById('hudA'), hudB: document.getElementById('hudB')
+    };
+
+    const maBtns = document.querySelectorAll('.ma-btn');
+    maBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        let targetMA = parseInt(e.target.dataset.ma);
+        if (targetMA === 1) { setMA(e.target, targetMA); } 
+        else { attemptFeature('featMA', () => { setMA(e.target, targetMA); }); }
+      });
+    });
+
+    inRope.addEventListener('change', () => { updateEngine(true); });
+    [inSpan, inHeight, inLoad, inShock].forEach(el => el.addEventListener('input', () => updateEngine(true)));
+    inRope.addEventListener('input', () => updateEngine(true));
+    
+    angleSlider.addEventListener('change', () => { updateEngine(false); });
+    angleSlider.addEventListener('input', (e) => {
+        let targetAngle = parseFloat(e.target.value);
+        adjustLForAngle(targetAngle);
+    });
+
+    attachDragEvents(els.anchorA, 'A');
+    attachDragEvents(els.anchorB, 'B');
+    attachDragEvents(els.pulleyGroup, 'P');
+    attachDragEvents(els.floatLoad, 'P'); 
+    
+    els.svgWrap.addEventListener('mousedown', (e) => { startDrag(e, null); });
+    els.svgWrap.addEventListener('touchstart', (e) => { startDrag(e, null); }, {passive: false});
+
+    // 💡 瞬間啟動！無延遲、絕不白畫面！
+    applyTranslations();
+    resetEngine();
+    updateEngine(true);
 });
 
 function setMA(btnElement, targetMA) {
-    maBtns.forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.ma-btn').forEach(b => b.classList.remove('active'));
     btnElement.classList.add('active');
     currentMA = targetMA;
     updateEngine();
@@ -1351,7 +1384,11 @@ function updateEngine(skipSliderUpdate = false) {
           els.floatLoad.style.display = 'none';
           els.angleArc.style.display = 'none';
           els.angleText.style.display = 'none';
-          els.anglePointer.style.display = 'none';
+          els.anglePointerArrow.style.display = 'none';
+          els.tagLineA.style.display = 'none'; 
+          els.tagLineB.style.display = 'none'; 
+          els.tagBadgeA.style.display = 'none';
+          els.tagBadgeB.style.display = 'none';
           
           maControl.style.display = 'none';
 
@@ -1419,33 +1456,33 @@ function updateEngine(skipSliderUpdate = false) {
       els.angleText.textContent = interiorAngle.toFixed(1) + "°";
       els.angleText.setAttribute('fill', color);
       
-      /* 💡 終極角度脫逃雷達：一體成型的精準箭頭指引 */
+      /* 💡 終極一體成型箭頭：<65度時高空彈射，並用完美連續實線指引 */
       if (interiorAngle < 65 && !isStraight && !isBroken) {
           let isLeft = (currentSliderPct > 0.5); 
-          let sideOffset = isLeft ? -95 : 95; 
+          let sideOffset = isLeft ? -110 : 110; 
           
-          /* 文字位置拉至高空 */
           els.angleText.setAttribute('x', s_px + sideOffset);
-          els.angleText.setAttribute('y', s_py - 60);
+          els.angleText.setAttribute('y', s_py - 100);
           
-          let startX = s_px + sideOffset * 0.7;
-          let startY = s_py - 55;
-          let endX = s_px + (isLeft ? -15 : 15);
-          let endY = s_py - 30;
-
-          /* 繪製包含箭頭的連續路徑 */
-          let arrowD = isLeft ? 
-              `M ${startX} ${startY} L ${endX} ${endY} L ${endX - 5} ${endY - 10} M ${endX} ${endY} L ${endX + 8} ${endY - 5}` : 
-              `M ${startX} ${startY} L ${endX} ${endY} L ${endX + 5} ${endY - 10} M ${endX} ${endY} L ${endX - 8} ${endY - 5}`;
+          let startX = s_px + sideOffset * 0.75;
+          let startY = s_py - 90;
+          let targetX = s_px + (isLeft ? -15 : 15);
+          let targetY = s_py - 35;
           
-          els.anglePointer.setAttribute('d', arrowD);
-          els.anglePointer.setAttribute('stroke', color);
-          els.anglePointer.style.display = 'block';
-
+          let arrowPath = `M ${startX} ${startY} L ${targetX} ${targetY}`;
+          if (isLeft) { 
+               arrowPath += ` M ${targetX - 8} ${targetY - 2} L ${targetX} ${targetY} L ${targetX - 2} ${targetY - 8}`;
+          } else { 
+               arrowPath += ` M ${targetX + 8} ${targetY - 2} L ${targetX} ${targetY} L ${targetX + 2} ${targetY - 8}`;
+          }
+          
+          els.anglePointerArrow.setAttribute('d', arrowPath);
+          els.anglePointerArrow.setAttribute('stroke', color);
+          els.anglePointerArrow.style.display = 'block';
       } else {
           els.angleText.setAttribute('x', s_px); 
           els.angleText.setAttribute('y', s_py - 48); 
-          els.anglePointer.style.display = 'none';
+          els.anglePointerArrow.style.display = 'none';
       }
 
       if (isStraight) {
@@ -1483,28 +1520,29 @@ function updateEngine(skipSliderUpdate = false) {
           els.tagLineA.setAttribute('stroke', pullA > 0.05 ? 'var(--tagline)' : 'rgba(168, 179, 197, 0.4)');
           els.tagLineB.setAttribute('stroke', pullB > 0.05 ? 'var(--tagline)' : 'rgba(168, 179, 197, 0.4)');
 
-          let ctm = svgEl.getScreenCTM();
-          if (ctm) {
-              let wrapRect = els.svgWrap.getBoundingClientRect();
-              let pulleyHtmlX = (s_px * ctm.a + ctm.e) - wrapRect.left;
-              let pulleyHtmlY = (s_py * ctm.d + ctm.f) - wrapRect.top;
-
-              let safeMarginX = 55; 
-              
-              let badgeXA = pulleyHtmlX - 85; 
-              let badgeYA = pulleyHtmlY - 15; 
-
-              if (badgeXA < safeMarginX) badgeXA = safeMarginX;
-              els.tagBadgeA.style.left = `${badgeXA}px`;
-              els.tagBadgeA.style.top = `${badgeYA}px`;
-
-              let badgeXB = pulleyHtmlX + 85;
-              let badgeYB = pulleyHtmlY - 15;
-
-              if (badgeXB > wrapRect.width - safeMarginX) badgeXB = wrapRect.width - safeMarginX; 
-              els.tagBadgeB.style.left = `${badgeXB}px`;
-              els.tagBadgeB.style.top = `${badgeYB}px`;
-          }
+          try {
+              let ctm = svgEl.getScreenCTM();
+              if (ctm) {
+                  let wrapRect = els.svgWrap.getBoundingClientRect();
+                  let pulleyHtmlX = (s_px * ctm.a + ctm.e) - wrapRect.left;
+                  let pulleyHtmlY = (s_py * ctm.d + ctm.f) - wrapRect.top;
+    
+                  let safeMarginX = 55; 
+                  let badgeXA = pulleyHtmlX - 95; 
+                  let badgeYA = pulleyHtmlY - 35; 
+    
+                  if (badgeXA < safeMarginX) badgeXA = safeMarginX;
+                  els.tagBadgeA.style.left = `${badgeXA}px`;
+                  els.tagBadgeA.style.top = `${badgeYA}px`;
+    
+                  let badgeXB = pulleyHtmlX + 95;
+                  let badgeYB = pulleyHtmlY - 35;
+    
+                  if (badgeXB > wrapRect.width - safeMarginX) badgeXB = wrapRect.width - safeMarginX; 
+                  els.tagBadgeB.style.left = `${badgeXB}px`;
+                  els.tagBadgeB.style.top = `${badgeYB}px`;
+              }
+          } catch(e) {}
 
           if (pullA < 0.05 && pullB < 0.05) {
               taglineInfo.innerHTML = `${t('balSafe')}`;
@@ -1534,18 +1572,20 @@ function updateEngine(skipSliderUpdate = false) {
       els.suspL.setAttribute('x1', s_px); els.suspL.setAttribute('y1', s_py + 5); els.suspL.setAttribute('x2', s_px - 35); els.suspL.setAttribute('y2', s_py + loadDrop - 2);
       els.suspR.setAttribute('x1', s_px); els.suspR.setAttribute('y1', s_py + 5); els.suspR.setAttribute('x2', s_px + 35); els.suspR.setAttribute('y2', s_py + loadDrop - 2);
 
-      let ctm2 = svgEl.getScreenCTM();
-      if (ctm2) {
-          let pt2 = svgEl.createSVGPoint();
-          pt2.x = s_px; pt2.y = s_py + loadDrop;
-          let screenPt = pt2.matrixTransform(ctm2);
-          let wrapRect = els.svgWrap.getBoundingClientRect();
-          let flX = screenPt.x - wrapRect.left; 
-          let flY = screenPt.y - wrapRect.top;
-          if (flY > wrapRect.height - 45) flY = wrapRect.height - 45;
-          els.floatLoad.style.left = `${flX}px`;
-          els.floatLoad.style.top = `${flY}px`;
-      }
+      try {
+          let ctm2 = svgEl.getScreenCTM();
+          if (ctm2) {
+              let pt2 = svgEl.createSVGPoint();
+              pt2.x = s_px; pt2.y = s_py + loadDrop;
+              let screenPt = pt2.matrixTransform(ctm2);
+              let wrapRect = els.svgWrap.getBoundingClientRect();
+              let flX = screenPt.x - wrapRect.left; 
+              let flY = screenPt.y - wrapRect.top;
+              if (flY > wrapRect.height - 45) flY = wrapRect.height - 45;
+              els.floatLoad.style.left = `${flX}px`;
+              els.floatLoad.style.top = `${flY}px`;
+          }
+      } catch(e) {}
 
       let tText = (isStraight || tension > 9999) ? t('deadLineShort') : tension.toFixed(1);
       let vAText = (isStraight || verticalA > 9999) ? t('deadLineShort') : verticalA.toFixed(1);
@@ -1567,29 +1607,17 @@ function updateEngine(skipSliderUpdate = false) {
       let sagBaseY = ay + (by - ay) * currentSliderPct;
       let actualSag = isStraight ? 0 : py - sagBaseY; 
       els.sagText.textContent = `${t('sagCalc')}: ${actualSag.toFixed(2)}m (${(actualSag/S*100).toFixed(1)}%)`;
+
   } catch (err) {
       console.error("引擎運算錯誤:", err);
   }
 }
 
-inRope.addEventListener('change', () => { updateEngine(true); });
-[inSpan, inHeight, inLoad, inShock].forEach(el => el.addEventListener('input', () => updateEngine(true)));
-inRope.addEventListener('input', () => updateEngine(true));
-
-angleSlider.addEventListener('change', () => { updateEngine(false); });
-angleSlider.addEventListener('input', (e) => {
-    let targetAngle = parseFloat(e.target.value);
-    adjustLForAngle(targetAngle);
-});
-
-let pt = svgEl.createSVGPoint();
 function getSVGPos(e) {
+  let pt = svgEl.createSVGPoint();
   pt.x = e.touches ? e.touches[0].clientX : e.clientX; pt.y = e.touches ? e.touches[0].clientY : e.clientY;
   return pt.matrixTransform(svgEl.getScreenCTM().inverse());
 }
-
-let isDragging = null, dragStartX, dragStartY, startSpan, startHeight;
-let initialUserOffsetX = 0, initialUserOffsetY = 0;
 
 function startDrag(e, node) { 
   if(e.target.tagName.toLowerCase() === 'input') return; 
@@ -1623,13 +1651,6 @@ function attachDragEvents(el, nodeType) {
     el.addEventListener('mousedown', (e) => startDrag(e, nodeType));
     el.addEventListener('touchstart', (e) => startDrag(e, nodeType), {passive: false});
 }
-attachDragEvents(els.anchorA, 'A');
-attachDragEvents(els.anchorB, 'B');
-attachDragEvents(els.pulleyGroup, 'P');
-attachDragEvents(els.floatLoad, 'P'); 
-
-els.svgWrap.addEventListener('mousedown', (e) => { startDrag(e, null); });
-els.svgWrap.addEventListener('touchstart', (e) => { startDrag(e, null); }, {passive: false});
 
 function processDrag(e) {
   if(!isDragging) return;
@@ -1696,7 +1717,6 @@ window.addEventListener('touchend', () => isDragging = null);
 window.addEventListener('mouseup', () => isDragging = null);
 
 let stream = null, videoTrack = null, torchOn = false; 
-const video = document.getElementById('bg-video'), image = document.getElementById('bg-image'), btnCamera = document.getElementById('btn-camera'), btnFlashlight = document.getElementById('btn-flashlight'), gridOverlay = document.getElementById('grid-overlay'); 
 let gridVisible = true, hudVisible = true;
 
 function toggleShock() {
@@ -1745,6 +1765,11 @@ function setMediaMode(isOn) {
 }
 
 async function toggleCamera() { 
+  const video = document.getElementById('bg-video');
+  const image = document.getElementById('bg-image');
+  const btnCamera = document.getElementById('btn-camera');
+  const btnFlashlight = document.getElementById('btn-flashlight');
+
   if (stream) { 
     stream.getTracks().forEach(track => track.stop()); stream = null; videoTrack = null; 
     video.style.opacity = "0"; btnCamera.classList.remove('active'); 
@@ -1760,7 +1785,9 @@ async function toggleCamera() {
       image.style.opacity = "0"; 
       stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }); 
       videoTrack = stream.getVideoTracks()[0];
-      video.srcObject = stream; video.style.opacity = "1"; btnCamera.classList.add('active'); 
+      video.srcObject = stream; 
+      video.style.opacity = "1"; 
+      btnCamera.classList.add('active'); 
       setMediaMode(true);
     } catch (err) { 
       showToast("⚠️ 相機啟動失敗：請確認是否允許權限，或改用原生瀏覽器開啟！", "bad"); 
@@ -1769,6 +1796,7 @@ async function toggleCamera() {
 }
 
 async function toggleFlashlight() {
+  const btnFlashlight = document.getElementById('btn-flashlight');
   if (!videoTrack) { 
     showToast("⚠️ 請先開啟 📷 實境鏡頭！", "warn"); 
     return; 
@@ -1793,6 +1821,7 @@ function handlePhotoUpload(event) {
 
 function loadImage(event) { 
   const file = event.target.files[0]; 
+  const image = document.getElementById('bg-image');
   if (file) { 
     if(stream) toggleCamera(); 
     const reader = new FileReader(); 
@@ -1804,7 +1833,7 @@ function loadImage(event) {
     reader.readAsDataURL(file); 
   } 
 }
-function toggleGrid() { gridVisible = !gridVisible; gridOverlay.style.opacity = gridVisible ? "0.5" : "0"; }
+function toggleGrid() { gridVisible = !gridVisible; document.getElementById('grid-overlay').style.opacity = gridVisible ? "0.5" : "0"; }
 
 function toggleHUD() {
   hudVisible = !hudVisible;
@@ -1822,14 +1851,13 @@ function resetEngine() {
   inSpan.value = 20; inHeight.value = 0; inLoad.value = 100; currentSliderPct = 0.5;
   userOffsetX = 0; userOffsetY = 0; 
   if(mainCard.classList.contains('shock-mode')) toggleShock(); 
-  currentMA = 1; maBtns.forEach(b => b.classList.remove('active'));
+  currentMA = 1; document.querySelectorAll('.ma-btn').forEach(b => b.classList.remove('active'));
   document.querySelector('.ma-btn[data-ma="1"]').classList.add('active');
   
   angleSlider.value = 120;
   adjustLForAngle(120);
 }
 
-// 💡 繪製原生的影像底圖
 function drawCover(ctx, source, sW, sH, dW, dH) {
     const sRatio = sW / sH;
     const dRatio = dW / dH;
@@ -1844,7 +1872,7 @@ function drawCover(ctx, source, sW, sH, dW, dH) {
     ctx.drawImage(source, drawX, drawY, drawW, drawH);
 }
 
-// 💡 戰術截圖防暴衝 (雙層疊加技術)
+// 💡 戰術截圖：單一畫布背景注入法 (免除 iOS 毛玻璃崩潰)
 async function takeScreenshot() {
   const target = document.getElementById('mainCard'); 
   target.classList.add('capture-mode');
@@ -1868,7 +1896,7 @@ async function takeScreenshot() {
       placeholders.push({ span, inp });
   });
 
-  // 暫時移除毛玻璃，避免 iOS 渲染失敗
+  // 暫時關閉 iOS 易引發透明 Bug 的毛玻璃效果
   const huds = document.querySelectorAll('.hud-panel, .stretcher-tag, .tagline-wrap');
   huds.forEach(el => { el.style.backdropFilter = 'none'; el.style.webkitBackdropFilter = 'none'; });
 
@@ -1877,24 +1905,32 @@ async function takeScreenshot() {
   
   const compositeCanvas = document.createElement('canvas');
   compositeCanvas.width = targetRect.width * scaleVal;
-  compositeCanvas.height = targetRect.height * scaleVal;
+  compositeCanvas.height = targetRect.height * scaleVal; // 鎖定長寬比例，不截過長
   const ctx = compositeCanvas.getContext('2d');
 
   ctx.fillStyle = '#0f1623';
   ctx.fillRect(0, 0, compositeCanvas.width, compositeCanvas.height);
 
+  let isCamWasOn = false;
+  const video = document.getElementById('bg-video');
+  const image = document.getElementById('bg-image');
+
   if (stream && video.videoWidth && video.style.opacity === "1") {
       drawCover(ctx, video, video.videoWidth, video.videoHeight, compositeCanvas.width, compositeCanvas.height);
+      isCamWasOn = true;
   } else if (image.style.opacity === "1") {
       drawCover(ctx, image, image.naturalWidth, image.naturalHeight, compositeCanvas.width, compositeCanvas.height);
+      isCamWasOn = true;
   }
 
   window.scrollTo(0, 0);
   await new Promise(r => setTimeout(r, 100));
   
   try {
+    // 若開啟實境，直接讓截圖引擎背景變透明，完美印上剛繪製好的相機/相簿影像
+    const bgColor = isCamWasOn ? null : '#0f1623';
     const uiCanvas = await html2canvas(target, { 
-        backgroundColor: null, 
+        backgroundColor: bgColor, 
         scale: scaleVal, 
         useCORS: true, 
         width: targetRect.width,  
@@ -1920,13 +1956,6 @@ async function takeScreenshot() {
   huds.forEach(el => { el.style.backdropFilter = ''; el.style.webkitBackdropFilter = ''; });
 }
 
-const supportBtnAction = document.getElementById('supportBtnAction');
-if(supportBtnAction) {
-    supportBtnAction.addEventListener('click', () => {
-        document.getElementById('supportModal').style.display = 'flex';
-    });
-}
-
 let deferredPrompt;
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
@@ -1945,6 +1974,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
     }
 });
 
+// 💡 絕對置頂的系統更新指令
 function checkForUpdates() {
     const msg = t('updateMsg').replace(/\n/g, '<br>');
     document.getElementById('updateMsgText').innerHTML = msg;
@@ -1955,7 +1985,6 @@ function executeUpdate() {
     document.getElementById('updateModal').style.display = 'none';
     showToast("🔄 戰術系統重置中...", "warn");
     
-    // 💡 強制絕對置頂四連發
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); 
     document.body.scrollTop = 0;
     document.documentElement.scrollTop = 0;
@@ -1977,29 +2006,21 @@ function executeUpdate() {
     }, 400);
 }
 
-const shareBtnAction = document.getElementById('shareBtnAction');
-if(shareBtnAction) {
-    shareBtnAction.addEventListener('click', async () => {
-      const shareData = { title: '索道張力儀 (動態滑行版)', text: '推薦這套散木團隊專屬的特戰沙盤！結合實境相機與動態張力計算，快來試試！', url: window.location.href };
-      try {
-        if (navigator.share) { await navigator.share(shareData); } 
-        else {
-          const dummy = document.createElement('input'); document.body.appendChild(dummy); dummy.value = window.location.href;
-          dummy.select(); document.execCommand('copy'); document.body.removeChild(dummy);
-          showToast('🔗 系統回報：網址已複製，您可以貼上分享給其他人囉！', 'safe');
-        }
-      } catch (err) { console.error('分享失敗', err); }
-    });
-}
+document.getElementById('supportBtnAction').addEventListener('click', () => {
+    document.getElementById('supportModal').style.display = 'flex';
+});
 
-document.getElementById('btn-camera').addEventListener('click', () => attemptFeature('featCam', toggleCamera));
-document.getElementById('btn-flashlight').addEventListener('click', toggleFlashlight);
-document.getElementById('btn-photo').addEventListener('click', handlePhotoUpload);
-document.getElementById('btn-grid').addEventListener('click', toggleGrid);
-document.getElementById('btn-hud').addEventListener('click', toggleHUD);
-document.getElementById('btn-shock').addEventListener('click', () => attemptFeature('featShock', toggleShock));
-document.getElementById('btn-screenshot').addEventListener('click', () => attemptFeature('featShot', takeScreenshot));
-document.getElementById('btn-reset').addEventListener('click', resetEngine);
+document.getElementById('shareBtnAction').addEventListener('click', async () => {
+  const shareData = { title: '索道張力儀 (動態滑行版)', text: '推薦這套散木團隊專屬的特戰沙盤！結合實境相機與動態張力計算，快來試試！', url: window.location.href };
+  try {
+    if (navigator.share) { await navigator.share(shareData); } 
+    else {
+      const dummy = document.createElement('input'); document.body.appendChild(dummy); dummy.value = window.location.href;
+      dummy.select(); document.execCommand('copy'); document.body.removeChild(dummy);
+      showToast('🔗 系統回報：網址已複製，您可以貼上分享給其他人囉！', 'safe');
+    }
+  } catch (err) { console.error('分享失敗', err); }
+});
 
 if ('serviceWorker' in navigator) { 
   window.addEventListener('load', () => {
@@ -2010,10 +2031,6 @@ if ('serviceWorker' in navigator) {
 }
 
 window.addEventListener('resize', () => updateEngine(true));
-document.addEventListener('DOMContentLoaded', () => {
-    applyTranslations();
-    setTimeout(resetEngine, 150);
-});
 </script>
 </body>
 </html>
