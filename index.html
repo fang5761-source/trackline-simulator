@@ -168,7 +168,7 @@
   .hud-tl { border-left: 4px solid var(--safe); } 
   .hud-tr { border-right: 4px solid var(--safe); } 
 
-  .svgWrap { position:relative; width:100%; height: 42vh; min-height: 280px; max-height: 460px; background: transparent; border-radius: 12px; border: 1px dashed var(--line); overflow: hidden; }
+  .svgWrap { position:relative; width:100%; height: 42vh; min-height: 280px; max-height: 460px; background: transparent; border-radius: 12px; border: 1px dashed var(--line); overflow: hidden; touch-action: none; }
   svg { display: block; width: 100%; height: 100%; }
 
   .anchor-dot, .draggable-pulley, .stretcher-tag { cursor: grab; touch-action: none; }
@@ -1584,10 +1584,17 @@ angleSlider.addEventListener('input', (e) => {
     adjustLForAngle(targetAngle);
 });
 
-let pt = svgEl.createSVGPoint();
 function getSVGPos(e) {
-  pt.x = e.touches ? e.touches[0].clientX : e.clientX; pt.y = e.touches ? e.touches[0].clientY : e.clientY;
-  return pt.matrixTransform(svgEl.getScreenCTM().inverse());
+  let clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  let clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  let wrap = els.svgWrap.getBoundingClientRect();
+  let s = Math.min(wrap.width / 400, wrap.height / 460);
+  let offX = (wrap.width  - s * 400) / 2;
+  let offY = (wrap.height - s * 460) / 2;
+  return {
+    x: (clientX - wrap.left - offX) / s,
+    y: (clientY - wrap.top  - offY) / s
+  };
 }
 
 let isDragging = null, dragStartX, dragStartY, startSpan, startHeight;
@@ -1597,11 +1604,8 @@ function startDrag(e, node) {
   if(e.target.tagName.toLowerCase() === 'input') return; 
   
   if (!e.target.closest('.anchor-dot') && !e.target.closest('.draggable-pulley') && !e.target.closest('.stretcher-tag')) {
-      if (mainCard.classList.contains('camera-mode')) {
-          node = 'PAN';
-      } else {
-          return; 
-      }
+      // 空白畫布一律允許 PAN（AR模式、一般模式皆可自由拖曳疊圖）
+      node = 'PAN';
   }
 
   isDragging = node; 
@@ -1851,6 +1855,16 @@ async function takeScreenshot() {
   const target = document.getElementById('mainCard'); 
   target.classList.add('capture-mode');
   
+  // 截圖前將 bg-layer 暫時移進 mainCard，讓 html2canvas 能捕捉到相機/照片底圖
+  const bgLayer = document.getElementById('bg-layer');
+  const bgLayerParent = bgLayer ? bgLayer.parentNode : null;
+  const bgLayerNext = bgLayer ? bgLayer.nextSibling : null;
+  if (bgLayer) {
+      bgLayer.style.position = 'absolute';
+      bgLayer.style.zIndex = '0';
+      target.insertBefore(bgLayer, target.firstChild);
+  }
+  
   const inputs = target.querySelectorAll('input[type="number"]');
   const placeholders = [];
   
@@ -1920,6 +1934,17 @@ async function takeScreenshot() {
   });
   target.classList.remove('capture-mode');
   huds.forEach(el => { el.style.backdropFilter = ''; el.style.webkitBackdropFilter = ''; });
+  
+  // 截圖後把 bg-layer 移回原位
+  if (bgLayer && bgLayerParent) {
+      bgLayer.style.position = 'fixed';
+      bgLayer.style.zIndex = '-2';
+      if (bgLayerNext) {
+          bgLayerParent.insertBefore(bgLayer, bgLayerNext);
+      } else {
+          bgLayerParent.appendChild(bgLayer);
+      }
+  }
 }
 
 const supportBtnAction = document.getElementById('supportBtnAction');
