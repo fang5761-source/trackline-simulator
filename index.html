@@ -537,14 +537,14 @@
           <div class="menu-action-btn" style="border-bottom: 1px solid var(--line); justify-content: space-between; cursor: default;">
             <div class="menu-header-left"><span class="menu-icon">🌍</span><span data-i18n="menuLang">語言設定 / Language</span></div>
             <select id="langSelect" onchange="changeLang(this.value)">
-              <option value="zh">🇹🇼 繁中</option>
-              <option value="en">🇺🇸 EN</option>
-              <option value="ja">🇯🇵 日本語</option>
-              <option value="ko">🇰🇷 한국어</option>
-              <option value="fr">🇫🇷 Français</option>
-              <option value="de">🇩🇪 Deutsch</option>
-              <option value="es">🇪🇸 Español</option>
-              <option value="pt">🇵🇹 Português</option>
+              <option value="zh">繁體中文</option>
+              <option value="en">English</option>
+              <option value="ja">日本語</option>
+              <option value="ko">한국어</option>
+              <option value="fr">Français</option>
+              <option value="de">Deutsch</option>
+              <option value="es">Español</option>
+              <option value="pt">Português</option>
             </select>
           </div>
 
@@ -639,7 +639,6 @@
 </div>
 
 <script>
-// 💡 V7.0 軍規防護核心：防竄改與本地端封鎖
 (function(){
   const _href = window.location.href;
   const _protocol = window.location.protocol;
@@ -668,11 +667,9 @@
         if(_href.indexOf(_whitelist[i]) !== -1) { _isOk = true; break; }
     }
     
-    // 💡 姊姊專屬預覽通道：允許在 AI 對話的預覽視窗 (iframe) 中執行，避免預覽畫面被誤殺變成惡夢
     try {
         if (window.self !== window.top) { _isOk = true; }
     } catch(e) {
-        // 若遇到跨網域 iframe 限制無法存取 window.top，預設放行
         _isOk = true;
     }
 
@@ -1699,8 +1696,8 @@ function showCommanderConsole() {
         <span style="color:var(--muted); font-size:12px;">${t('cmdPerm')}</span><br><strong id="cmdPermKey" style="color:var(--vip); font-size:18px; letter-spacing:1px;">${permKey}</strong>
       </div>
       <div class="modal-btn-group" style="margin-top: 15px;">
-        <button class="primary-btn" style="background:transparent; border:1px solid var(--bad); color:var(--bad);" onclick="logoutVip()">${t('cmdLogout')}</button>
-        <button class="primary-btn" style="background:var(--warn); color:#000;" onclick="closeVipModal()">${t('cmdClose')}</button>
+        <button class="primary-btn" style="background:transparent; border:1px solid var(--bad); color:var(--bad);" onclick="logoutVip()" data-i18n="cmdLogout">清除授權</button>
+        <button class="primary-btn" style="background:var(--warn); color:#000;" onclick="closeVipModal()" data-i18n="cmdClose">關閉</button>
       </div>
     `;
     document.getElementById('vipModal').style.display = 'flex';
@@ -2214,10 +2211,13 @@ function processDrag(e) {
   let clientY = e.touches ? e.touches[0].clientY : e.clientY;
   
   if (isDragging === 'PAN') {
+      // 💡 修復實境拖曳失效：重新校正螢幕座標轉換回 SVG 座標的比例尺
+      let wrap = els.svgWrap.getBoundingClientRect();
+      let s = Math.min(wrap.width / 400, wrap.height / 460);
       let dxScreen = clientX - dragStartX;
       let dyScreen = clientY - dragStartY;
-      userOffsetX = initialUserOffsetX + (dxScreen / scale);
-      userOffsetY = initialUserOffsetY + (dyScreen / scale);
+      userOffsetX = initialUserOffsetX + (dxScreen / s);
+      userOffsetY = initialUserOffsetY + (dyScreen / s);
       updateEngine(true);
       return;
   }
@@ -2320,12 +2320,27 @@ function setMediaMode(isOn) {
     }
 }
 
+// 💡 新增：集中管理退出媒體模式的功能，關閉鏡頭與照片
+function exitMediaMode() {
+    if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        stream = null; videoTrack = null;
+        video.style.opacity = "0";
+        btnCamera.classList.remove('active');
+        torchOn = false;
+        btnFlashlight.classList.remove('active');
+    }
+    image.style.opacity = "0";
+    image.src = "";
+    document.getElementById('btn-photo').classList.remove('active');
+    setMediaMode(false);
+    document.getElementById('upload-image').value = ""; // 清空輸入，讓同一張照片可以再次選取
+}
+
 async function toggleCamera() { 
   if (stream) { 
-    stream.getTracks().forEach(track => track.stop()); stream = null; videoTrack = null; 
-    video.style.opacity = "0"; btnCamera.classList.remove('active'); 
-    torchOn = false; btnFlashlight.classList.remove('active');
-    setMediaMode(false);
+    exitMediaMode();
+    showToast('📍 已關閉實境鏡頭，恢復淨空', 'safe');
   } else { 
     await requestUserAgreement();
     try { 
@@ -2333,7 +2348,7 @@ async function toggleCamera() {
           showToast("⚠️ 您的瀏覽器不支援相機功能，請改用原生 Safari 或 Chrome 開啟！", "bad");
           return;
       }
-      image.style.opacity = "0"; 
+      exitMediaMode(); // 開啟相機前先清除可能存在的照片
       stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }); 
       videoTrack = stream.getVideoTracks()[0];
       video.srcObject = stream; video.style.opacity = "1"; btnCamera.classList.add('active'); 
@@ -2364,17 +2379,24 @@ async function toggleFlashlight() {
 }
 
 function handlePhotoUpload(event) {
-    attemptFeature('featPhoto', () => { document.getElementById('upload-image').click(); });
+    event.preventDefault(); // 攔截預設的點擊行為
+    if (image.style.opacity === "1") {
+        exitMediaMode(); // 如果照片已經開啟，就當作關閉鍵
+        showToast('📍 已退出照片疊圖模式，恢復淨空', 'safe');
+    } else {
+        attemptFeature('featPhoto', () => { document.getElementById('upload-image').click(); });
+    }
 }
 
 function loadImage(event) { 
   const file = event.target.files[0]; 
   if (file) { 
-    if(stream) toggleCamera(); 
+    exitMediaMode(); // 載入新照片前先確保關閉相機或其他疊圖
     const reader = new FileReader(); 
     reader.onload = function(e) { 
       image.src = e.target.result; 
       image.style.opacity = "1"; 
+      document.getElementById('btn-photo').classList.add('active');
       setMediaMode(true);
     }; 
     reader.readAsDataURL(file); 
@@ -2403,6 +2425,9 @@ function resetEngine() {
   
   angleSlider.value = 120;
   adjustLForAngle(120);
+  
+  // 💡 重置沙盤時，一併清空底圖與相機
+  exitMediaMode();
 }
 
 function drawCover(ctx, source, sW, sH, dW, dH) {
@@ -2490,6 +2515,11 @@ async function takeScreenshot() {
     link.download = `散木索道儀_戰術報告_${new Date().getTime()}.png`; 
     link.href = compositeCanvas.toDataURL('image/png'); 
     link.click();
+    
+    // 💡 截圖完成後，顯示提示並自動退出相機/照片模式，清空戰場！
+    showToast("📸 戰術截圖已匯出！已為您自動關閉實境/疊圖模式。", "safe");
+    setTimeout(exitMediaMode, 500);
+
   } catch(e) { 
       showToast("❌ 截圖失敗：" + e, "bad"); 
   }
