@@ -370,8 +370,6 @@
   <div class="app-container" id="capture-area">
 
     <div class="card" id="mainCard">
-      <!-- 影像層與網格 -->
-      <!-- 💡 V6 截圖修正：對相機影像加上 data-html2canvas-ignore，防止截圖軟體抓取錯誤的透明度而產生黑幕遮罩 -->
       <video id="bg-video" autoplay playsinline muted data-html2canvas-ignore="true"></video>
       <img id="bg-image" alt="" data-html2canvas-ignore="true" />
       <div id="grid-overlay"></div>
@@ -423,7 +421,6 @@
       </div>
 
       <div class="svgWrap" id="svgWrap">
-        <!-- 💡 V6 截圖修正：加入 xmlns 命名空間，防止 iOS Safari 在截圖時無法渲染 SVG 導致全黑 -->
         <svg id="canvas" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 460" preserveAspectRatio="xMidYMid meet">
           <line id="tagLineA" stroke="var(--tagline)" stroke-width="4" stroke-dasharray="6 4" stroke-linecap="round" />
           <line id="tagLineB" stroke="var(--tagline)" stroke-width="4" stroke-dasharray="6 4" stroke-linecap="round" />
@@ -541,17 +538,18 @@
         <summary><div style="display:flex; align-items:center; gap:8px;"><span class="menu-icon">⚙️</span> <span data-i18n="menu2">系統工具與說明書</span></div></summary>
         <div class="menu-group">
           
+          <!-- 💡 取消了國旗圖示，改採專業的「當地語言名稱」顯示 -->
           <div class="menu-action-btn" style="border-bottom: 1px solid var(--line); justify-content: space-between; cursor: default;">
             <div class="menu-header-left"><span class="menu-icon">🌍</span><span data-i18n="menuLang">語言設定 / Language</span></div>
             <select id="langSelect" onchange="changeLang(this.value)">
-              <option value="zh">🇹🇼 繁中</option>
-              <option value="en">🇺🇸 EN</option>
-              <option value="ja">🇯🇵 日本語</option>
-              <option value="ko">🇰🇷 한국어</option>
-              <option value="fr">🇫🇷 Français</option>
-              <option value="de">🇩🇪 Deutsch</option>
-              <option value="es">🇪🇸 Español</option>
-              <option value="pt">🇵🇹 Português</option>
+              <option value="zh">繁體中文</option>
+              <option value="en">English</option>
+              <option value="ja">日本語</option>
+              <option value="ko">한국어</option>
+              <option value="fr">Français</option>
+              <option value="de">Deutsch</option>
+              <option value="es">Español</option>
+              <option value="pt">Português</option>
             </select>
           </div>
 
@@ -672,6 +670,7 @@
   })();
 })();
 
+// 💡 已補齊完整 8 國語言翻譯庫
 const i18n = {
   zh: {
     appTitle: "索道張力儀 (動態滑行版)",
@@ -999,10 +998,555 @@ const i18n = {
     permTitle: "🛡️ セキュリティ警告",
     permDesc: "カメラを起動して現場の角度をシミュレーションします。<br>画像処理はすべてスマホの<strong>ローカル</strong>で行われます。録画やデータ送信は一切行いません。",
     permBtn: "許可する"
+  },
+  ko: {
+    appTitle: "트랙라인 시뮬레이터",
+    anchorA: "앵커 A",
+    anchorB: "앵커 B",
+    tension: "장력:",
+    vertical: "수직 하중:",
+    ropeLen: "➰ 총 로프 길이",
+    span: "↔️ 스팬 (폭)",
+    height: "↕️ 높이 차이",
+    angleLoose: "느슨함",
+    angleDrag: "📐 슬라이드하여 각도 조절",
+    angleTight: "팽팽함",
+    sagLabel: "처짐 계산 중...",
+    sagCalc: "처짐",
+    sagFail: "설치 불가",
+    maTitle: "⚙️ 수평 견인 이점(MA)",
+    dragTip: "📍 샌드박스에서 자유롭게 드래그하여 시뮬레이션하세요",
+    warnSpan: "🚨 스팬이 너무 큽니다! 로프 3% 연장 한계 초과.",
+    warnDeath: "🚨 경고: 3% 연장 한계에 근접했습니다 (데드라인)!",
+    balSafe: "📍 자연 균형 상태입니다. 견인력이 필요 없습니다.",
+    pullAction: "당기기/브레이크",
+    slackAction: "느슨하게/풀기",
+    peak: "최대값",
+    deadLineShort: "파단!",
+    menuLang: "언어 설정 / Language",
+    menu1: "전문 용어 및 원리",
+    menu2: "시스템 도구 및 설명서",
+    menu3: "링크 공유",
+    menu4: "최신 버전 확인",
+    menu5: "문제 신고",
+    menuOp: "작동 매뉴얼",
+    menuInfo: "버전 및 개발 정보",
+    menuPWA: "홈 화면에 추가",
+    thTensionT: "🔗 장력 (Tension)",
+    thTensionD: "시스템 내부의 로프가 팽팽한 정도입니다. 너무 큰 장력은 로프 파단을 일으킬 수 있습니다!",
+    thVertT: "⚓ 수직 하중 (Vertical Load)",
+    thVertD: "앵커가 실제로 견디는 '아래로 당기는' 힘입니다. 들것이 가까울수록 해당 앵커의 하중이 커집니다.",
+    thTagT: "↔️ 수평 견인력 (Tagline Force)",
+    thTagD: "들것을 수평으로 움직이는 힘입니다. 파란색 배지는 당기거나 브레이크를 잡아야 함을 의미합니다.",
+    thShockT: "📳 충격 하중 (Shock Load)",
+    thShockD: "견인 중 발생하는 충격은 시스템의 힘을 순간적으로 증폭시킵니다.",
+    collapse: "🔼 설명 접기",
+    op1: "캔버스의 <b>앵커 A/B</b>를 드래그하여 지형을 설정하세요.",
+    op2: "<b>주황색 들것</b>을 드래그하여 장력 변화를 시뮬레이션하세요.",
+    op3: "하단의 <b>⚙️ 수평 견인 이점</b>을 클릭하여 힘을 환산하세요.",
+    op4: "하단의 <b>각도 슬라이더</b>를 움직여 동적으로 조절하세요.",
+    op5: "<b>📷 AR / 📁 사진</b>을 클릭하여 현장 이미지를 오버레이하세요.",
+    devTitle: "트랙라인 시뮬레이터 PRO",
+    devTeam: "개발: <span style='color:var(--warn);'>SunMoon Team</span>",
+    devT1: "아키텍처 및 엔지니어링 / Shih-Feng Hsu",
+    devT2: "UI/UX 디자인 / Pei-Fang Wu",
+    pwaDesc: "몰입형 경험을 위해 홈 화면에 추가하세요:",
+    pwaAnd: "🤖 Android",
+    pwaIOS: "🍎 iOS (iPhone)",
+    pwaStep1: "브라우저에서 링크 열기",
+    pwaStep2: "우측 상단의 '⋮' 탭하기",
+    pwaStep3: "'홈 화면에 추가' 선택하기",
+    pwaStep4: "'추가' 탭하기",
+    pwaStep5: "반드시 <b>Safari</b> 브라우저를 사용하세요",
+    pwaStep6: "하단의 '공유' 아이콘 탭하기",
+    pwaStep7: "아래로 스크롤하여 '홈 화면에 추가' 선택하기",
+    pwaStep8: "'추가' 탭하기",
+    installBtn: "📥 앱 설치하기",
+    disclaimer: "<strong style='color: var(--bad); font-size: 14px;'>⚠️ 면책 조항:</strong><br>본 소프트웨어는 이론적 물리 계산 도구입니다. 실제 구조 작업 및 안전 확보는 현장의 전문 교관이 판단해야 합니다.<br><br><span style='color:var(--warn);'>※ 단일 기기 라이선스입니다. 기기 변경 시 재구매가 필요합니다.</span>",
+    vipTitle: "🔒 PRO 기능 잠금 해제",
+    vipEnable1: "해당 기능 '",
+    vipEnable2: "'을(를) 활성화합니다!",
+    vipProOnly: "PRO 버전 전용 기능입니다.",
+    vipDisclaimer: "⚠️ 단일 기기 라이선스. 분실 또는 기기 변경 시 재발급되지 않습니다.",
+    vipStoreBtn: "🛒 PRO 스토어로 이동",
+    vipHasPwd: "비밀번호가 있습니까?",
+    vipPwdPlh: "비밀번호 입력",
+    vipCancel: "취소",
+    vipUnlock: "잠금 해제 🔓",
+    vipErrPwd: "❌ 비밀번호가 올바르지 않습니다.",
+    vipStateUnlocked: "🛡️ PRO 권한이 활성화되었습니다!",
+    vipStateDesc: "🛡️ PRO 권한이 활성화되었습니다!",
+    cmdTitle: "👑 사령관 콘솔",
+    cmdExpToday: "👉 오늘의 체험 코드",
+    cmdExpTmrw: "👉 내일의 체험 코드",
+    cmdPerm: "👉 🌟 영구 코드",
+    cmdLogout: "로그아웃",
+    cmdClose: "닫기",
+    toastAuthSuccess: "🎉 인증 성공!",
+    toastTrialSuccess: "⏱️ 체험 권한 활성화!",
+    toastLogout: "🔄 로그아웃 되었습니다.",
+    updateMsg: "시스템 보고: 캐시를 지우고 최신 버전을 다시 로드합니다!\n\n계속하시겠습니까?",
+    supTitle: "💬 문제 신고",
+    supDesc: "버그나 개선 사항이 있나요?<br><br>아래 버튼을 클릭하여 양식을 작성해 주시면 신속히 처리하겠습니다!",
+    supLater: "나중에",
+    supGo: "신고 양식으로 이동",
+    featCam: "📷 AR 카메라 오버레이",
+    featCamDesc: "실제 구조 현장에 샌드박스를 겹쳐서 시뮬레이션하세요!",
+    featPhoto: "📁 사진 오버레이",
+    featPhotoDesc: "현장 사진을 가져와 사실적인 하중 시뮬레이션을 진행하세요!",
+    featShock: "📳 동적 충격 시스템",
+    featShockDesc: "충격 비율을 사용자 정의하여 극한의 최대 하중을 예측하세요!",
+    featShot: "📸 전술 스크린샷",
+    featShotDesc: "노이즈를 제거하고 고해상도 전술 보고서를 한 번에 내보내세요!",
+    featHeight: "↕️ 높이 차이 시뮬레이션",
+    featHeightDesc: "고도 제한을 해제하고 극한의 물리적 장력 변화를 시뮬레이션하세요!",
+    featMA: "⚙️ 수평 견인 환산",
+    featMADesc: "고급 MA(기계적 이점) 계산을 잠금 해제하세요!",
+    cancel: "취소",
+    confirmUpdate: "업데이트 확인",
+    permTitle: "🛡️ 보안 알림",
+    permDesc: "현장의 각도를 시뮬레이션하기 위해 카메라를 켭니다.<br><br>모든 영상 처리는 기기 <strong>로컬</strong>에서만 이루어지며, 절대로 녹화되거나 외부로 유출되지 않습니다.",
+    permBtn: "허용 및 시작"
+  },
+  fr: {
+    appTitle: "Simulateur de Tyrolienne",
+    anchorA: "Ancrage A",
+    anchorB: "Ancrage B",
+    tension: "Tension:",
+    vertical: "Charge Vert.:",
+    ropeLen: "➰ Longueur de corde",
+    span: "↔️ Portée",
+    height: "↕️ Diff de hauteur",
+    angleLoose: "Lâche",
+    angleDrag: "📐 Glisser pour ajuster",
+    angleTight: "Tendu",
+    sagLabel: "Calcul de la flèche...",
+    sagCalc: "Flèche",
+    sagFail: "Montage impossible",
+    maTitle: "⚙️ Avantage Mécanique (AM)",
+    dragTip: "📍 Glissez librement dans le bac à sable pour simuler",
+    warnSpan: "🚨 Portée trop grande! Dépasse 3% d'étirement.",
+    warnDeath: "🚨 Attention : Limite d'étirement de 3% approchée!",
+    balSafe: "📍 Équilibre naturel. Aucune force de traction requise.",
+    pullAction: "Tirer/Freiner",
+    slackAction: "Mou",
+    peak: "Max",
+    deadLineShort: "Rupture!",
+    menuLang: "Langue / Language",
+    menu1: "Théorie et Principes",
+    menu2: "Manuel du Système",
+    menu3: "Partager le lien",
+    menu4: "Vérifier les mises à jour",
+    menu5: "Signaler un problème",
+    menuOp: "Manuel d'utilisation",
+    menuInfo: "Infos de version",
+    menuPWA: "Ajouter à l'écran d'accueil",
+    thTensionT: "🔗 Tension",
+    thTensionD: "Tension à l'intérieur de la corde principale. Une tension excessive entraînera la rupture !",
+    thVertT: "⚓ Charge Verticale",
+    thVertD: "La force s'exerçant vers le bas sur les ancrages. Plus la civière est proche, plus la charge est élevée.",
+    thTagT: "↔️ Force de traction",
+    thTagD: "Force requise pour déplacer la civière horizontalement. Le badge bleu indique le côté à tirer/freiner.",
+    thShockT: "📳 Charge de choc",
+    thShockD: "Les secousses soudaines amplifient instantanément la force du système.",
+    collapse: "🔼 Réduire",
+    op1: "Glissez les <b>Ancrages A/B</b> pour définir le terrain.",
+    op2: "Glissez la <b>civière orange</b> pour simuler la tension.",
+    op3: "Cliquez sur <b>⚙️ Avantage Mécanique</b> pour convertir la force.",
+    op4: "Utilisez le <b>curseur d'angle</b> en bas pour ajuster dynamiquement.",
+    op5: "Cliquez sur <b>📷 Caméra AR / 📁 Photo</b> pour superposer des images réelles.",
+    devTitle: "Simulateur de Tyrolienne PRO",
+    devTeam: "Développé par <span style='color:var(--warn);'>SunMoon Team</span>",
+    devT1: "Ingénierie / Shih-Feng Hsu",
+    devT2: "Design UI/UX / Pei-Fang Wu",
+    pwaDesc: "Ajoutez à l'écran d'accueil pour une expérience immersive :",
+    pwaAnd: "🤖 Android",
+    pwaIOS: "🍎 iOS (iPhone)",
+    pwaStep1: "Ouvrez le lien dans votre navigateur",
+    pwaStep2: "Appuyez sur '⋮' en haut à droite",
+    pwaStep3: "Sélectionnez 'Ajouter à l'écran d'accueil'",
+    pwaStep4: "Appuyez sur 'Ajouter'",
+    pwaStep5: "Vous devez utiliser le navigateur <b>Safari</b>",
+    pwaStep6: "Appuyez sur l'icône 'Partager' en bas",
+    pwaStep7: "Faites défiler et sélectionnez 'Ajouter sur l'écran d'accueil'",
+    pwaStep8: "Appuyez sur 'Ajouter'",
+    installBtn: "📥 Installer l'Application",
+    disclaimer: "<strong style='color: var(--bad); font-size: 14px;'>⚠️ Avertissement :</strong><br>Ceci est un outil théorique. La sécurité réelle DOIT être déterminée par des instructeurs professionnels sur place.<br><br><span style='color:var(--warn);'>* Licence pour appareil unique. Veuillez racheter en cas de changement d'appareil.</span>",
+    vipTitle: "🔒 Déverrouiller PRO",
+    vipEnable1: "Activer '",
+    vipEnable2: "'",
+    vipProOnly: "Fonctionnalité PRO exclusive.",
+    vipDisclaimer: "⚠️ Licence pour appareil unique. Aucun remplacement fourni.",
+    vipStoreBtn: "🛒 Aller à la boutique PRO",
+    vipHasPwd: "Vous avez un mot de passe ?",
+    vipPwdPlh: "Entrer le mot de passe",
+    vipCancel: "Annuler",
+    vipUnlock: "Déverrouiller 🔓",
+    vipErrPwd: "❌ Mot de passe incorrect.",
+    vipStateUnlocked: "🛡️ Fonctionnalités PRO activées !",
+    vipStateDesc: "🛡️ Fonctionnalités PRO activées !",
+    cmdTitle: "👑 Console du Commandant",
+    cmdExpToday: "👉 Code d'essai d'aujourd'hui",
+    cmdExpTmrw: "👉 Code d'essai de demain",
+    cmdPerm: "👉 🌟 Code permanent",
+    cmdLogout: "Déconnexion",
+    cmdClose: "Fermer",
+    toastAuthSuccess: "🎉 Authentification réussie !",
+    toastTrialSuccess: "⏱️ Essai activé !",
+    toastLogout: "🔄 Déconnecté.",
+    updateMsg: "Rapport système : Effacement du cache et rechargement de la dernière version !\n\nContinuer ?",
+    supTitle: "💬 Signaler un problème",
+    supDesc: "Vous avez trouvé un bug ou avez une suggestion ?<br><br>Remplissez le formulaire pour nous aider à améliorer le système !",
+    supLater: "Plus tard",
+    supGo: "Aller au formulaire",
+    featCam: "📷 Superposition Caméra AR",
+    featCamDesc: "Superposez le système sur la scène de sauvetage réelle !",
+    featPhoto: "📁 Superposition Photo",
+    featPhotoDesc: "Importez des photos du site pour une simulation réaliste !",
+    featShock: "📳 Système de Choc Dynamique",
+    featShockDesc: "Personnalisez le pourcentage de choc pour prédire les forces extrêmes !",
+    featShot: "📸 Capture Tactique",
+    featShotDesc: "Exportez des rapports tactiques haute résolution sans filigrane !",
+    featHeight: "↕️ Simulation de dénivelé",
+    featHeightDesc: "Débloquez les limites de dénivelé pour simuler des variations de tension extrêmes !",
+    featMA: "⚙️ Calcul de l'AM Horizontal",
+    featMADesc: "Débloquez le calcul de l'Avantage Mécanique avancé !",
+    cancel: "Annuler",
+    confirmUpdate: "Mettre à jour",
+    permTitle: "🛡️ Accès Caméra",
+    permDesc: "L'accès à la caméra est requis pour l'AR. Le traitement est 100% local. Aucune donnée n'est enregistrée.",
+    permBtn: "Autoriser l'accès"
+  },
+  de: {
+    appTitle: "Seilbahn Simulator",
+    anchorA: "Anker A",
+    anchorB: "Anker B",
+    tension: "Spannung:",
+    vertical: "Vertikallast:",
+    ropeLen: "➰ Seillänge",
+    span: "↔️ Spannweite",
+    height: "↕️ Höhenunterschied",
+    angleLoose: "Locker",
+    angleDrag: "📐 Winkel anpassen",
+    angleTight: "Straff",
+    sagLabel: "Durchhang berechnen...",
+    sagCalc: "Durchhang",
+    sagFail: "Nicht möglich",
+    maTitle: "⚙️ Horizontaler Flaschenzug",
+    dragTip: "📍 Frei im Sandbox-Modus ziehen",
+    warnSpan: "🚨 Spannweite zu groß! 3% Dehnungsgrenze überschritten.",
+    warnDeath: "🚨 Warnung: 3% Dehnungsgrenze erreicht (Dead Line)!",
+    balSafe: "📍 Natürliches Gleichgewicht. Keine Zugkraft nötig.",
+    pullAction: "Ziehen/Bremsen",
+    slackAction: "Locker",
+    peak: "Spitze",
+    deadLineShort: "Bruch!",
+    menuLang: "Sprache / Language",
+    menu1: "Theorie & Prinzipien",
+    menu2: "Systemwerkzeuge",
+    menu3: "Link teilen",
+    menu4: "Auf Updates prüfen",
+    menu5: "Problem melden",
+    menuOp: "Bedienungsanleitung",
+    menuInfo: "Versionsinfo",
+    menuPWA: "Zum Startbildschirm hinzufügen",
+    thTensionT: "🔗 Spannung (Tension)",
+    thTensionD: "Die Spannung im Hauptseil. Zu hohe Spannung führt zum Seilbruch!",
+    thVertT: "⚓ Vertikallast (Vertical Load)",
+    thVertD: "Die nach unten gerichtete Kraft an den Ankern. Je näher die Trage, desto höher die Last.",
+    thTagT: "↔️ Zugkraft (Tagline Force)",
+    thTagD: "Benötigte Kraft, um die Trage horizontal zu bewegen.",
+    thShockT: "📳 Schockbelastung (Shock Load)",
+    thShockD: "Plötzliche Ruckbewegungen verstärken die Kraft im System sofort.",
+    collapse: "🔼 Einklappen",
+    op1: "<b>Anker A/B</b> ziehen, um das Gelände festzulegen.",
+    op2: "<b>Die orange Trage</b> ziehen, um die Spannung zu simulieren.",
+    op3: "Klicken Sie auf <b>⚙️ Horizontaler Flaschenzug</b>, um die Kraft umzurechnen.",
+    op4: "Verwenden Sie den unteren <b>Winkel-Schieberegler</b> für dynamische Anpassungen.",
+    op5: "Klicken Sie auf <b>📷 AR-Kamera / 📁 Foto</b>, um echte Bilder zu überlagern.",
+    devTitle: "Seilbahn Simulator PRO",
+    devTeam: "Entwickelt von <span style='color:var(--warn);'>SunMoon Team</span>",
+    devT1: "Architektur / Shih-Feng Hsu",
+    devT2: "UI/UX Design / Pei-Fang Wu",
+    pwaDesc: "Für ein immersives Erlebnis zum Startbildschirm hinzufügen:",
+    pwaAnd: "🤖 Android",
+    pwaIOS: "🍎 iOS (iPhone)",
+    pwaStep1: "Link im Browser öffnen",
+    pwaStep2: "Tippen Sie oben rechts auf '⋮'",
+    pwaStep3: "Wählen Sie 'Zum Startbildschirm hinzufügen'",
+    pwaStep4: "Tippen Sie auf 'Hinzufügen'",
+    pwaStep5: "Verwenden Sie unbedingt <b>Safari</b>",
+    pwaStep6: "Tippen Sie unten auf das 'Teilen'-Symbol",
+    pwaStep7: "Scrollen Sie nach unten und wählen Sie 'Zum Home-Bildschirm'",
+    pwaStep8: "Tippen Sie auf 'Hinzufügen'",
+    installBtn: "📥 App installieren",
+    disclaimer: "<strong style='color: var(--bad); font-size: 14px;'>⚠️ Haftungsausschluss:</strong><br>Dies ist ein theoretisches Werkzeug. Echte Sicherheit MUSS von Profis vor Ort beurteilt werden.<br><br><span style='color:var(--warn);'>* Einzellizenz. Bitte bei Gerätewechsel neu kaufen.</span>",
+    vipTitle: "🔒 PRO freischalten",
+    vipEnable1: "'",
+    vipEnable2: "' aktivieren!",
+    vipProOnly: "Exklusive PRO-Funktion.",
+    vipDisclaimer: "⚠️ Einzellizenz. Kein Ersatz bei Gerätewechsel.",
+    vipStoreBtn: "🛒 Zum PRO-Store",
+    vipHasPwd: "Haben Sie ein Passwort?",
+    vipPwdPlh: "Passwort eingeben",
+    vipCancel: "Abbrechen",
+    vipUnlock: "Freischalten 🔓",
+    vipErrPwd: "❌ Falsches Passwort.",
+    vipStateUnlocked: "🛡️ PRO-Funktionen aktiviert!",
+    vipStateDesc: "🛡️ PRO-Funktionen aktiviert!",
+    cmdTitle: "👑 Commander-Konsole",
+    cmdExpToday: "👉 Testcode für heute",
+    cmdExpTmrw: "👉 Testcode für morgen",
+    cmdPerm: "👉 🌟 Permanenter Code",
+    cmdLogout: "Abmelden",
+    cmdClose: "Schließen",
+    toastAuthSuccess: "🎉 Authentifizierung erfolgreich!",
+    toastTrialSuccess: "⏱️ Testversion aktiviert!",
+    toastLogout: "🔄 Abgemeldet.",
+    updateMsg: "Systembericht: Cache leeren und neueste Version neu laden!\n\nFortfahren?",
+    supTitle: "💬 Problem melden",
+    supDesc: "Fehler gefunden oder Vorschlag?<br><br>Füllen Sie das Formular aus, um das System zu verbessern!",
+    supLater: "Später",
+    supGo: "Zum Formular",
+    featCam: "📷 AR-Kamera-Overlay",
+    featCamDesc: "Überlagern Sie das System mit der echten Rettungsszene!",
+    featPhoto: "📁 Foto-Overlay",
+    featPhotoDesc: "Importieren Sie Standortfotos für realistische Simulationen!",
+    featShock: "📳 Dynamisches Schocksystem",
+    featShockDesc: "Passen Sie den Schockprozentsatz an, um extreme Kräfte vorherzusagen!",
+    featShot: "📸 Taktischer Screenshot",
+    featShotDesc: "Exportieren Sie hochauflösende Berichte ohne Wasserzeichen!",
+    featHeight: "↕️ Höhendifferenz simulieren",
+    featHeightDesc: "Schalten Sie die Höhenbegrenzung für extreme Spannungssimulationen frei!",
+    featMA: "⚙️ Flaschenzug-Berechnung",
+    featMADesc: "Schalten Sie die erweiterte Berechnung des mechanischen Vorteils frei!",
+    cancel: "Abbrechen",
+    confirmUpdate: "Aktualisieren",
+    permTitle: "🛡️ Kamerazugriff",
+    permDesc: "Kamera wird für AR benötigt. Die Verarbeitung erfolgt 100% lokal. Es werden keine Daten aufgezeichnet.",
+    permBtn: "Zugriff erlauben"
+  },
+  es: {
+    appTitle: "Simulador de Tirolina",
+    anchorA: "Anclaje A",
+    anchorB: "Anclaje B",
+    tension: "Tensión:",
+    vertical: "Carga Vert.:",
+    ropeLen: "➰ Longitud total",
+    span: "↔️ Luz (Distancia)",
+    height: "↕️ Desnivel",
+    angleLoose: "Flojo",
+    angleDrag: "📐 Ajustar ángulo",
+    angleTight: "Tenso",
+    sagLabel: "Calculando flecha...",
+    sagCalc: "Flecha",
+    sagFail: "No viable",
+    maTitle: "⚙️ Ventaja Mecánica (VM)",
+    dragTip: "📍 Arrastra libremente en la pantalla para simular",
+    warnSpan: "🚨 ¡Distancia muy larga! Supera el límite del 3%.",
+    warnDeath: "🚨 ¡Advertencia: Límite del 3% (Línea de la muerte)!",
+    balSafe: "📍 Equilibrio natural. No se requiere tracción.",
+    pullAction: "Tirar/Frenar",
+    slackAction: "Aflojar",
+    peak: "Pico",
+    deadLineShort: "¡Rotura!",
+    menuLang: "Idioma / Language",
+    menu1: "Teoría y Principios",
+    menu2: "Herramientas",
+    menu3: "Compartir enlace",
+    menu4: "Comprobar actualizaciones",
+    menu5: "Reportar un problema",
+    menuOp: "Manual de Uso",
+    menuInfo: "Info. de Versión",
+    menuPWA: "Añadir a la pantalla de inicio",
+    thTensionT: "🔗 Tensión",
+    thTensionD: "Tensión dentro de la cuerda principal. ¡Una tensión excesiva romperá la cuerda!",
+    thVertT: "⚓ Carga Vertical",
+    thVertD: "La fuerza hacia abajo en los anclajes. Cuanto más cerca esté la camilla, mayor será la carga.",
+    thTagT: "↔️ Fuerza de tracción",
+    thTagD: "Fuerza para mover la camilla horizontalmente. El emblema azul indica el lado a tirar o frenar.",
+    thShockT: "📳 Carga de impacto",
+    thShockD: "Los movimientos bruscos amplifican la fuerza del sistema al instante.",
+    collapse: "🔼 Contraer",
+    op1: "Arrastra los <b>Anclajes A/B</b> para definir el terreno.",
+    op2: "Arrastra la <b>camilla naranja</b> para simular la tensión.",
+    op3: "Haz clic en <b>⚙️ Ventaja Mecánica</b> para convertir la fuerza.",
+    op4: "Usa el <b>control de ángulo</b> para ajustar dinámicamente.",
+    op5: "Usa <b>📷 AR / 📁 Foto</b> para superponer imágenes reales.",
+    devTitle: "Simulador de Tirolina PRO",
+    devTeam: "Desarrollado por <span style='color:var(--warn);'>SunMoon Team</span>",
+    devT1: "Arquitectura / Shih-Feng Hsu",
+    devT2: "Diseño UI/UX / Pei-Fang Wu",
+    pwaDesc: "Añadir a la pantalla de inicio para una experiencia inmersiva:",
+    pwaAnd: "🤖 Android",
+    pwaIOS: "🍎 iOS (iPhone)",
+    pwaStep1: "Abre el enlace en el navegador",
+    pwaStep2: "Toca '⋮' en el menú",
+    pwaStep3: "Selecciona 'Añadir a la pantalla de inicio'",
+    pwaStep4: "Toca 'Añadir'",
+    pwaStep5: "Debes usar el navegador <b>Safari</b>",
+    pwaStep6: "Toca el icono 'Compartir' abajo",
+    pwaStep7: "Desplázate y selecciona 'Añadir a la pantalla de inicio'",
+    pwaStep8: "Toca 'Añadir'",
+    installBtn: "📥 Instalar App",
+    disclaimer: "<strong style='color: var(--bad); font-size: 14px;'>⚠️ Aviso Legal:</strong><br>Esta es una herramienta teórica. La seguridad real DEBE ser evaluada por instructores profesionales en el lugar.<br><br><span style='color:var(--warn);'>* Licencia para un solo dispositivo. Vuelve a comprar si cambias de móvil.</span>",
+    vipTitle: "🔒 Desbloqueo PRO",
+    vipEnable1: "¡Activar '",
+    vipEnable2: "'!",
+    vipProOnly: "Función exclusiva PRO.",
+    vipDisclaimer: "⚠️ Licencia de un solo dispositivo. No hay reemplazos.",
+    vipStoreBtn: "🛒 Ir a la Tienda PRO",
+    vipHasPwd: "¿Tienes contraseña?",
+    vipPwdPlh: "Ingresa tu contraseña",
+    vipCancel: "Cancelar",
+    vipUnlock: "Desbloquear 🔓",
+    vipErrPwd: "❌ Contraseña incorrecta.",
+    vipStateUnlocked: "🛡️ ¡Funciones PRO activadas!",
+    vipStateDesc: "🛡️ ¡Funciones PRO activadas!",
+    cmdTitle: "👑 Consola del Comandante",
+    cmdExpToday: "👉 Código de prueba (Hoy)",
+    cmdExpTmrw: "👉 Código de prueba (Mañana)",
+    cmdPerm: "👉 🌟 Código permanente",
+    cmdLogout: "Cerrar sesión",
+    cmdClose: "Cerrar",
+    toastAuthSuccess: "🎉 ¡Autenticación exitosa!",
+    toastTrialSuccess: "⏱️ ¡Prueba activada!",
+    toastLogout: "🔄 Sesión cerrada.",
+    updateMsg: "Reporte del sistema: ¡Se borrará el caché para recargar la última versión!\n\n¿Continuar?",
+    supTitle: "💬 Reportar problema",
+    supDesc: "¿Encontraste un error o tienes sugerencias?<br><br>¡Rellena el formulario para ayudarnos a mejorar!",
+    supLater: "Más tarde",
+    supGo: "Ir al formulario",
+    featCam: "📷 Superposición de Cámara AR",
+    featCamDesc: "¡Superpón el sistema en la escena real de rescate!",
+    featPhoto: "📁 Superposición de Fotos",
+    featPhotoDesc: "¡Importa fotos del lugar para simular las cargas!",
+    featShock: "📳 Sistema de Impacto Dinámico",
+    featShockDesc: "¡Personaliza el porcentaje de impacto para predecir fuerzas pico!",
+    featShot: "📸 Captura Táctica",
+    featShotDesc: "¡Exporta informes tácticos de alta resolución sin marcas de agua!",
+    featHeight: "↕️ Simulación de Desnivel",
+    featHeightDesc: "¡Desbloquea límites de altura para simulaciones extremas!",
+    featMA: "⚙️ Cálculo de Ventaja Mecánica",
+    featMADesc: "¡Desbloquea el cálculo avanzado de ventaja mecánica!",
+    cancel: "Cancelar",
+    confirmUpdate: "Actualizar",
+    permTitle: "🛡️ Acceso a la Cámara",
+    permDesc: "Se necesita cámara para AR. El procesamiento es 100% local. No se guardan datos.",
+    permBtn: "Permitir Acceso"
+  },
+  pt: {
+    appTitle: "Simulador de Tirolesa",
+    anchorA: "Âncora A",
+    anchorB: "Âncora B",
+    tension: "Tensão:",
+    vertical: "Carga Vert.:",
+    ropeLen: "➰ Comp. da Corda",
+    span: "↔️ Vão",
+    height: "↕️ Desnível",
+    angleLoose: "Frouxo",
+    angleDrag: "📐 Deslize para ajustar",
+    angleTight: "Tenso",
+    sagLabel: "Calculando flecha...",
+    sagCalc: "Flecha",
+    sagFail: "Não é possível",
+    maTitle: "⚙️ Vantagem Mecânica (VM)",
+    dragTip: "📍 Arraste livremente para simular",
+    warnSpan: "🚨 Vão muito grande! Excede 3% de limite elástico.",
+    warnDeath: "🚨 Aviso: Limite de 3% atingido (Linha da morte)!",
+    balSafe: "📍 Equilíbrio natural. Força de tração desnecessária.",
+    pullAction: "Puxar/Frear",
+    slackAction: "Folgar",
+    peak: "Pico",
+    deadLineShort: "Ruptura!",
+    menuLang: "Idioma / Language",
+    menu1: "Teoria e Princípios",
+    menu2: "Ferramentas",
+    menu3: "Compartilhar link",
+    menu4: "Verificar atualizações",
+    menu5: "Relatar problema",
+    menuOp: "Manual de Operação",
+    menuInfo: "Info. de Versão",
+    menuPWA: "Adicionar à tela inicial",
+    thTensionT: "🔗 Tensão",
+    thTensionD: "Tensão na corda principal. O excesso de tensão romperá a corda!",
+    thVertT: "⚓ Carga Vertical",
+    thVertD: "A força para baixo nas âncoras. Quanto mais perto a maca, maior a carga.",
+    thTagT: "↔️ Força de Tração",
+    thTagD: "Força para mover a maca horizontalmente.",
+    thShockT: "📳 Carga de Choque",
+    thShockD: "Movimentos bruscos amplificam a força do sistema instantaneamente.",
+    collapse: "🔼 Recolher",
+    op1: "Arraste as <b>Âncoras A/B</b> para definir o terreno.",
+    op2: "Arraste a <b>maca laranja</b> para simular a tensão.",
+    op3: "Clique em <b>⚙️ Vantagem Mecânica</b> para converter a força.",
+    op4: "Use o <b>controle de ângulo</b> abaixo para ajustar dinamicamente.",
+    op5: "Clique em <b>📷 AR / 📁 Foto</b> para sobrepor imagens reais.",
+    devTitle: "Simulador de Tirolesa PRO",
+    devTeam: "Desenvolvido por <span style='color:var(--warn);'>SunMoon Team</span>",
+    devT1: "Arquitetura / Shih-Feng Hsu",
+    devT2: "Design UI/UX / Pei-Fang Wu",
+    pwaDesc: "Adicione à tela inicial para uma experiência imersiva:",
+    pwaAnd: "🤖 Android",
+    pwaIOS: "🍎 iOS (iPhone)",
+    pwaStep1: "Abra o link no navegador",
+    pwaStep2: "Toque em '⋮' no menu",
+    pwaStep3: "Selecione 'Adicionar à tela inicial'",
+    pwaStep4: "Toque em 'Adicionar'",
+    pwaStep5: "Você deve usar o navegador <b>Safari</b>",
+    pwaStep6: "Toque no ícone 'Compartilhar' abaixo",
+    pwaStep7: "Role para baixo e selecione 'Adicionar à Tela de Início'",
+    pwaStep8: "Toque em 'Adicionar'",
+    installBtn: "📥 Instalar App",
+    disclaimer: "<strong style='color: var(--bad); font-size: 14px;'>⚠️ Aviso Legal:</strong><br>Esta é uma ferramenta teórica. A segurança real DEVE ser determinada por instrutores profissionais.<br><br><span style='color:var(--warn);'>* Licença para dispositivo único. Compre novamente ao trocar de aparelho.</span>",
+    vipTitle: "🔒 Desbloqueio PRO",
+    vipEnable1: "Ativar '",
+    vipEnable2: "'!",
+    vipProOnly: "Recurso exclusivo PRO.",
+    vipDisclaimer: "⚠️ Licença de dispositivo único. Não há substituições.",
+    vipStoreBtn: "🛒 Ir para Loja PRO",
+    vipHasPwd: "Tem uma senha?",
+    vipPwdPlh: "Digite a senha",
+    vipCancel: "Cancelar",
+    vipUnlock: "Desbloquear 🔓",
+    vipErrPwd: "❌ Senha incorreta.",
+    vipStateUnlocked: "🛡️ Recursos PRO ativados!",
+    vipStateDesc: "🛡️ Recursos PRO ativados!",
+    cmdTitle: "👑 Console do Comandante",
+    cmdExpToday: "👉 Código de teste de hoje",
+    cmdExpTmrw: "👉 Código de teste de amanhã",
+    cmdPerm: "👉 🌟 Código permanente",
+    cmdLogout: "Sair",
+    cmdClose: "Fechar",
+    toastAuthSuccess: "🎉 Autenticação bem-sucedida!",
+    toastTrialSuccess: "⏱️ Teste ativado!",
+    toastLogout: "🔄 Sessão encerrada.",
+    updateMsg: "Relatório do Sistema: Limpando cache e recarregando a última versão!\n\nContinuar?",
+    supTitle: "💬 Relatar um problema",
+    supDesc: "Encontrou um erro ou tem sugestões?<br><br>Preencha o formulário para nos ajudar a melhorar!",
+    supLater: "Mais tarde",
+    supGo: "Ir para o formulário",
+    featCam: "📷 Sobreposição de Câmera AR",
+    featCamDesc: "Sobreponha o sistema na cena real de resgate!",
+    featPhoto: "📁 Sobreposição de Foto",
+    featPhotoDesc: "Importe fotos do local para simulação realista!",
+    featShock: "📳 Sistema de Choque Dinâmico",
+    featShockDesc: "Personalize a % de choque para prever forças de pico!",
+    featShot: "📸 Captura Tática",
+    featShotDesc: "Exporte relatórios táticos de alta resolução sem marca d'água!",
+    featHeight: "↕️ Simulação de Desnível",
+    featHeightDesc: "Desbloqueie limites de altura para simulações extremas!",
+    featMA: "⚙️ Cálculo de Vantagem Mecânica",
+    featMADesc: "Desbloqueie o cálculo avançado de VM!",
+    cancel: "Cancelar",
+    confirmUpdate: "Atualizar",
+    permTitle: "🛡️ Acesso à Câmera",
+    permDesc: "Câmera necessária para AR. O processamento é 100% local. Nenhum dado é gravado.",
+    permBtn: "Permitir Acesso"
   }
 };
 
-const availableLangs = ['zh', 'en', 'ja'];
+const availableLangs = ['zh', 'en', 'ja', 'ko', 'fr', 'de', 'es', 'pt'];
 let currentLang = localStorage.getItem('sunmoon_lang') || 'zh';
 
 function t(key) { return i18n[currentLang][key] || i18n['zh'][key] || key; }
@@ -1596,11 +2140,10 @@ function startDrag(e, node) {
   if(e.target.tagName.toLowerCase() === 'input') return; 
   
   if (!e.target.closest('.anchor-dot') && !e.target.closest('.draggable-pulley') && !e.target.closest('.stretcher-tag')) {
-      // 💡 V6.4 智慧判定：只有在相機或照片疊圖模式下，才允許拖曳整個畫布
       if (document.body.classList.contains('camera-mode')) {
           node = 'PAN';
       } else {
-          return; // 正常模式下，放棄攔截，把畫面上下滾動權還給手機瀏覽器！
+          return; 
       }
   }
 
@@ -1647,7 +2190,6 @@ function processDrag(e) {
   let clientY = e.touches ? e.touches[0].clientY : e.clientY;
   
   if (isDragging === 'PAN') {
-      // 💡 V6.3 修正：拖曳比例改為 1:1，不再受系統米數放大縮小的影響
       let wrap = els.svgWrap.getBoundingClientRect();
       let s = Math.min(wrap.width / 400, wrap.height / 460);
       let dxScreen = clientX - dragStartX;
@@ -1855,7 +2397,6 @@ function drawCover(ctx, source, sW, sH, dW, dH) {
     ctx.drawImage(source, drawX, drawY, drawW, drawH);
 }
 
-// 💡 V6 截圖防護機制：簡化影像合成邏輯，防堵截圖軟體雙重渲染產生黑幕
 async function takeScreenshot() {
   const target = document.getElementById('mainCard'); 
   target.classList.add('capture-mode');
@@ -1879,7 +2420,6 @@ async function takeScreenshot() {
       placeholders.push({ span, inp });
   });
 
-  // 暫時移除毛玻璃，避免 iOS 渲染失敗
   const huds = document.querySelectorAll('.hud-panel, .stretcher-tag, .tagline-wrap');
   huds.forEach(el => { el.style.backdropFilter = 'none'; el.style.webkitBackdropFilter = 'none'; });
 
@@ -1891,11 +2431,9 @@ async function takeScreenshot() {
   compositeCanvas.height = targetRect.height * scaleVal;
   const ctx = compositeCanvas.getContext('2d');
 
-  // 將底色塗黑，做為安全底層
   ctx.fillStyle = '#0f1623';
   ctx.fillRect(0, 0, compositeCanvas.width, compositeCanvas.height);
 
-  // 手動將相機或相片畫入最底層
   if (stream && video.videoWidth && video.style.opacity === "1") {
       drawCover(ctx, video, video.videoWidth, video.videoHeight, compositeCanvas.width, compositeCanvas.height);
   } else if (image.style.opacity === "1") {
@@ -1906,7 +2444,6 @@ async function takeScreenshot() {
   await new Promise(r => setTimeout(r, 100));
   
   try {
-    // 讓 html2canvas 只抓取介面與張力線，並設定背景透明 (無視實境圖層)
     const uiCanvas = await html2canvas(target, { 
         backgroundColor: null, 
         scale: scaleVal, 
@@ -1916,7 +2453,6 @@ async function takeScreenshot() {
         ignoreElements: (el) => el.hasAttribute('data-html2canvas-ignore') || el.classList.contains('capture-hide') 
     });
     
-    // 將抓取到的張力資料蓋在底圖上
     ctx.drawImage(uiCanvas, 0, 0);
 
     const link = document.createElement('a'); 
