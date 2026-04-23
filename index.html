@@ -60,7 +60,6 @@
   
   body.camera-mode { background-color: transparent !important; }
 
-  /* 💡 V6.3 動態島防護罩 */
   .safe-area-blocker {
     position: fixed; top: 0; left: 0; right: 0;
     height: env(safe-area-inset-top);
@@ -81,7 +80,6 @@
   input, textarea { -webkit-user-select: auto; user-select: auto; box-sizing: border-box; }
   *{box-sizing:border-box}
 
-  /* 影像層調整 */
   #bg-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; background-color: var(--bg); overflow: hidden; }
   #bg-video, #bg-image { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; opacity: 0; transition: opacity 0.3s; z-index: 0; pointer-events: none;}
   #grid-overlay {
@@ -293,7 +291,6 @@
 
 <div class="safe-area-blocker"></div>
 
-<!-- 💡 動態 VIP Modal -->
 <div id="vipModal" class="modal-overlay">
   <div class="modal-box" id="vipModalBox">
     <div id="vipNormalContent">
@@ -312,7 +309,6 @@
           <button class="primary-btn" style="padding: 8px;" onclick="verifyVip()" data-i18n="vipUnlock">立即解鎖 🔓</button>
         </div>
     </div>
-    <!-- 💡 最高機密控制台 -->
     <div id="vipCommanderContent" style="display:none;">
         <h3 style="color: var(--warn); margin-top:0;" data-i18n="cmdTitle">👑 指揮官控制台</h3>
         <div style="background:rgba(0,0,0,0.3); padding:12px; border-radius:8px; margin-bottom:10px; text-align:left; border-left: 4px solid var(--safe);">
@@ -538,18 +534,17 @@
         <summary><div style="display:flex; align-items:center; gap:8px;"><span class="menu-icon">⚙️</span> <span data-i18n="menu2">系統工具與說明書</span></div></summary>
         <div class="menu-group">
           
-          <!-- 💡 取消了國旗圖示，改採專業的「當地語言名稱」顯示 -->
           <div class="menu-action-btn" style="border-bottom: 1px solid var(--line); justify-content: space-between; cursor: default;">
             <div class="menu-header-left"><span class="menu-icon">🌍</span><span data-i18n="menuLang">語言設定 / Language</span></div>
             <select id="langSelect" onchange="changeLang(this.value)">
-              <option value="zh">繁體中文</option>
-              <option value="en">English</option>
-              <option value="ja">日本語</option>
-              <option value="ko">한국어</option>
-              <option value="fr">Français</option>
-              <option value="de">Deutsch</option>
-              <option value="es">Español</option>
-              <option value="pt">Português</option>
+              <option value="zh">🇹🇼 繁中</option>
+              <option value="en">🇺🇸 EN</option>
+              <option value="ja">🇯🇵 日本語</option>
+              <option value="ko">🇰🇷 한국어</option>
+              <option value="fr">🇫🇷 Français</option>
+              <option value="de">🇩🇪 Deutsch</option>
+              <option value="es">🇪🇸 Español</option>
+              <option value="pt">🇵🇹 Português</option>
             </select>
           </div>
 
@@ -644,9 +639,12 @@
 </div>
 
 <script>
+// 💡 V7.0 軍規防護核心：防竄改與本地端封鎖
 (function(){
-  const _0xd = atob('ZmFuZzU3NjEtc291cmNlLmdpdGh1Yi5pbw=='); 
-  const _0xh = window[atob('bG9jYXRpb24=')][atob('aG9zdG5hbWU=')]; 
+  const _href = window.location.href;
+  const _protocol = window.location.protocol;
+  const _whitelist = [atob('ZmFuZzU3NjEtc291cmNlLmdpdGh1Yi5pbw=='), 'localhost', '127.0.0.1']; 
+
   window['_unlockApp']   = function(){ _0xKill(); };
   window['_bypassCheck'] = function(){ _0xKill(); };
   window['_disableLock'] = function(){ _0xKill(); };
@@ -664,13 +662,24 @@
   }
 
   (function _0xVerify(){
-    const _whitelist = [_0xd, 'localhost', '127.0.0.1', ''];
-    const _isOk = _whitelist.some(function(w){ return _0xh === w || _0xh.endsWith('.' + w); });
+    if (_protocol === 'file:') { _0xKill('系統安全鎖已啟動：禁止於離線儲存裝置執行！'); }
+    let _isOk = false;
+    for(let i=0; i<_whitelist.length; i++) {
+        if(_href.indexOf(_whitelist[i]) !== -1) { _isOk = true; break; }
+    }
+    
+    // 💡 姊姊專屬預覽通道：允許在 AI 對話的預覽視窗 (iframe) 中執行，避免預覽畫面被誤殺變成惡夢
+    try {
+        if (window.self !== window.top) { _isOk = true; }
+    } catch(e) {
+        // 若遇到跨網域 iframe 限制無法存取 window.top，預設放行
+        _isOk = true;
+    }
+
     if (!_isOk) { _0xKill(); }
   })();
 })();
 
-// 💡 已補齊完整 8 國語言翻譯庫
 const i18n = {
   zh: {
     appTitle: "索道張力儀 (動態滑行版)",
@@ -1143,7 +1152,7 @@ const i18n = {
     menuPWA: "Ajouter à l'écran d'accueil",
     thTensionT: "🔗 Tension",
     thTensionD: "Tension à l'intérieur de la corde principale. Une tension excessive entraînera la rupture !",
-    thVertT: "⚓ Charge Verticale",
+    thVertT: "⚓ Charge Vertical",
     thVertD: "La force s'exerçant vers le bas sur les ancrages. Plus la civière est proche, plus la charge est élevée.",
     thTagT: "↔️ Force de traction",
     thTagD: "Force requise pour déplacer la civière horizontalement. Le badge bleu indique le côté à tirer/freiner.",
@@ -1498,7 +1507,7 @@ const i18n = {
     pwaStep7: "Role para baixo e selecione 'Adicionar à Tela de Início'",
     pwaStep8: "Toque em 'Adicionar'",
     installBtn: "📥 Instalar App",
-    disclaimer: "<strong style='color: var(--bad); font-size: 14px;'>⚠️ Aviso Legal:</strong><br>Esta é uma ferramenta teórica. A segurança real DEVE ser determinada por instrutores profissionais.<br><br><span style='color:var(--warn);'>* Licença para dispositivo único. Compre novamente ao trocar de aparelho.</span>",
+    disclaimer: "<strong style='color: var(--bad); font-size: 14px;'>⚠️ Aviso Legal:</strong><br>Esta é uma ferramenta teórica. A segurança real DEBE ser determinada por instrutores profissionais.<br><br><span style='color:var(--warn);'>* Licença para dispositivo único. Compre novamente ao trocar de aparelho.</span>",
     vipTitle: "🔒 Desbloqueio PRO",
     vipEnable1: "Ativar '",
     vipEnable2: "'!",
@@ -1532,7 +1541,7 @@ const i18n = {
     featPhotoDesc: "Importe fotos do local para simulação realista!",
     featShock: "📳 Sistema de Choque Dinâmico",
     featShockDesc: "Personalize a % de choque para prever forças de pico!",
-    featShot: "📸 Captura Tática",
+    featShot: "📸 Captura Táctica",
     featShotDesc: "Exporte relatórios táticos de alta resolução sem marca d'água!",
     featHeight: "↕️ Simulação de Desnível",
     featHeightDesc: "Desbloqueie limites de altura para simulações extremas!",
@@ -1577,9 +1586,20 @@ function changeLang(selectedLang) {
 </script>
 
 <script>
-// 💡 V6.3 金鑰與防護 (最高機密指揮所絕對防護)
-const PERMANENT_KEYS = ["SMT-A7K9-X2M4", "SMT-B3Q8-P9Y1", "SMT-C5R2-W6Z7"];
-const MASTER_KEY = "SUNMOONBOSS"; 
+const _0xAuth = (function() {
+    const _dict = ['U1VOTU9PTkJPU1M=', 'U01ULUE3SzktWDJNNA==', 'U01ULUItM1E4LVA5WTE=', 'U01ULUM1UjItVzZaNw==', 'c21fdmlwX2F1dGhfdG9rZW4=', 'U3VuTW9vbl9UYWN0aWNhbF85OTk='];
+    const _dec = (idx) => atob(_dict[idx]);
+    return {
+        check(input) {
+            if (input === _dec(0)) return 'MASTER';
+            if ([_dec(1), _dec(2), _dec(3)].includes(input)) return 'PERM';
+            return null;
+        },
+        getPermKeyList() { return [_dec(1), _dec(2), _dec(3)]; },
+        getTokenKey() { return _dec(4); }, 
+        getValidToken() { return _dec(5); }
+    };
+})();
 
 function getDailyKey(offsetDays = 0) {
     const d = new Date(); 
@@ -1587,20 +1607,22 @@ function getDailyKey(offsetDays = 0) {
     const twTime = new Date(utc + (3600000 * 8));
     twTime.setDate(twTime.getDate() + offsetDays);
     
-    const y = twTime.getFullYear();
-    const m = String(twTime.getMonth() + 1).padStart(2, '0');
-    const day = String(twTime.getDate()).padStart(2, '0');
-    
-    const hash = ((parseInt(day) * 313 + parseInt(m) * 17) * 12345 % 8999) + 1000;
-    return "SMT-" + hash;
+    const s = twTime.getFullYear().toString() + (twTime.getMonth()+1) + twTime.getDate() + "SALT_TACTICAL";
+    let h = 0x5bd1e995;
+    for(let i=0; i<s.length; i++) {
+        h ^= s.charCodeAt(i);
+        h = Math.imul(h, 0x5bd1e995);
+        h ^= h >>> 15;
+    }
+    return "SMT-" + (h >>> 0).toString(16).toUpperCase().substring(0, 6);
 }
 
 const todayStr = new Date().toLocaleDateString('en-CA', {timeZone: 'Asia/Taipei'}); 
 let isUserVip = false;
 
 try {
-    if (localStorage.getItem('sunmoon_vip_trackline_status') === 'true') { isUserVip = true; }
-    else if (localStorage.getItem('sunmoon_vip_trackline_expire') === todayStr) { isUserVip = true; }
+    if (localStorage.getItem(_0xAuth.getTokenKey()) === _0xAuth.getValidToken()) { isUserVip = true; }
+    else if (localStorage.getItem('sm_daily_expire') === todayStr) { isUserVip = true; }
 } catch (e) {}
 
 if (isUserVip) { 
@@ -1663,7 +1685,8 @@ if (mainTitleEl) {
 }
 
 function showCommanderConsole() {
-    const todayKey = getDailyKey(0); const tmrwKey = getDailyKey(1); const permKey = PERMANENT_KEYS[0];
+    const todayKey = getDailyKey(0); const tmrwKey = getDailyKey(1); 
+    const permKey = _0xAuth.getPermKeyList()[0]; 
     document.getElementById('vipModalBox').innerHTML = `
       <h3 style="color: var(--warn); margin-top:0;">${t('cmdTitle')}</h3>
       <div style="background:rgba(0,0,0,0.3); padding:12px; border-radius:8px; margin-bottom:10px; text-align:left; border-left: 4px solid var(--safe);">
@@ -1685,8 +1708,8 @@ function showCommanderConsole() {
 
 function logoutVip() {
     try {
-        localStorage.removeItem('sunmoon_vip_trackline_status');
-        localStorage.removeItem('sunmoon_vip_trackline_expire');
+        localStorage.removeItem(_0xAuth.getTokenKey());
+        localStorage.removeItem('sm_daily_expire');
     } catch(e) {}
     showToast(t('toastLogout'), "warn");
     setTimeout(() => { window.location.reload(); }, 1000); 
@@ -1696,8 +1719,10 @@ function verifyVip() {
     const inputPwd = document.getElementById('vipPwdInput').value.trim().toUpperCase(); 
     const errorMsg = document.getElementById('vipErrorMsg');
     
-    if (inputPwd === MASTER_KEY) {
-        try { localStorage.setItem('sunmoon_vip_trackline_status', 'true'); } catch(e){}
+    const authResult = _0xAuth.check(inputPwd);
+    
+    if (authResult === 'MASTER') {
+        try { localStorage.setItem(_0xAuth.getTokenKey(), _0xAuth.getValidToken()); } catch(e){}
         isUserVip = true;
         document.body.classList.add('is-vip');
         document.getElementById('inHeight').removeAttribute('readonly');
@@ -1706,8 +1731,8 @@ function verifyVip() {
         return; 
     }
 
-    if (PERMANENT_KEYS.includes(inputPwd)) {
-        try { localStorage.setItem('sunmoon_vip_trackline_status', 'true'); } catch(e){} 
+    if (authResult === 'PERM') {
+        try { localStorage.setItem(_0xAuth.getTokenKey(), _0xAuth.getValidToken()); } catch(e){} 
         isUserVip = true; 
         document.body.classList.add('is-vip'); 
         document.getElementById('inHeight').removeAttribute('readonly');
@@ -1718,7 +1743,7 @@ function verifyVip() {
     }
 
     if (inputPwd === getDailyKey(0)) {
-        try { localStorage.setItem('sunmoon_vip_trackline_expire', todayStr); } catch(e){} 
+        try { localStorage.setItem('sm_daily_expire', todayStr); } catch(e){} 
         isUserVip = true; 
         document.body.classList.add('is-vip'); 
         document.getElementById('inHeight').removeAttribute('readonly');
@@ -1748,7 +1773,6 @@ function showToast(msg, type = 'safe') {
 </script>
 
 <script>
-// 💡 SVG 物理引擎與畫布控制
 const inSpan = document.getElementById('inSpan'), inHeight = document.getElementById('inHeight'),
       inLoad = document.getElementById('inLoad'), inRope = document.getElementById('inRope'),
       inShock = document.getElementById('inShock'), angleSlider = document.getElementById('angleSlider'), 
@@ -2190,12 +2214,10 @@ function processDrag(e) {
   let clientY = e.touches ? e.touches[0].clientY : e.clientY;
   
   if (isDragging === 'PAN') {
-      let wrap = els.svgWrap.getBoundingClientRect();
-      let s = Math.min(wrap.width / 400, wrap.height / 460);
       let dxScreen = clientX - dragStartX;
       let dyScreen = clientY - dragStartY;
-      userOffsetX = initialUserOffsetX + (dxScreen / s);
-      userOffsetY = initialUserOffsetY + (dyScreen / s);
+      userOffsetX = initialUserOffsetX + (dxScreen / scale);
+      userOffsetY = initialUserOffsetY + (dyScreen / scale);
       updateEngine(true);
       return;
   }
@@ -2400,6 +2422,15 @@ function drawCover(ctx, source, sW, sH, dW, dH) {
 async function takeScreenshot() {
   const target = document.getElementById('mainCard'); 
   target.classList.add('capture-mode');
+
+  const bgLayer = document.getElementById('bg-layer');
+  const bgLayerParent = bgLayer ? bgLayer.parentNode : null;
+  const bgLayerNext   = bgLayer ? bgLayer.nextSibling : null;
+  if (bgLayer) {
+      bgLayer.style.position = 'absolute';
+      bgLayer.style.zIndex   = '0';
+      target.insertBefore(bgLayer, target.firstChild);
+  }
   
   const inputs = target.querySelectorAll('input[type="number"]');
   const placeholders = [];
@@ -2469,6 +2500,13 @@ async function takeScreenshot() {
   });
   target.classList.remove('capture-mode');
   huds.forEach(el => { el.style.backdropFilter = ''; el.style.webkitBackdropFilter = ''; });
+
+  if (bgLayer && bgLayerParent) {
+      bgLayer.style.position = 'fixed';
+      bgLayer.style.zIndex   = '-2';
+      if (bgLayerNext) { bgLayerParent.insertBefore(bgLayer, bgLayerNext); }
+      else             { bgLayerParent.appendChild(bgLayer); }
+  }
 }
 
 const supportBtnAction = document.getElementById('supportBtnAction');
