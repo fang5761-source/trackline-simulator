@@ -81,7 +81,7 @@
   input, textarea { -webkit-user-select: auto; user-select: auto; box-sizing: border-box; }
   *{box-sizing:border-box}
 
-  /* 影像層調整：修復截圖過長與背景消失問題 */
+  /* 影像層調整 */
   #bg-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; background-color: var(--bg); overflow: hidden; }
   #bg-video, #bg-image { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; opacity: 0; transition: opacity 0.3s; z-index: 0; pointer-events: none;}
   #grid-overlay {
@@ -113,7 +113,7 @@
     backdrop-filter: none !important; -webkit-backdrop-filter: none !important; box-shadow: none !important;
   }
   .card.capture-mode {
-    background-color: var(--bg) !important;
+    background-color: transparent !important; 
     border-color: var(--line) !important; box-shadow: none !important; border-radius: 0 !important; 
     backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
   }
@@ -168,11 +168,9 @@
   .hud-tl { border-left: 4px solid var(--safe); } 
   .hud-tr { border-right: 4px solid var(--safe); } 
 
-  /* 💡 畫布區域 */
-  .svgWrap { position:relative; width:100%; height: 42vh; min-height: 280px; max-height: 420px; background: transparent; border-radius: 12px; border: 1px dashed var(--line); overflow: hidden; }
+  .svgWrap { position:relative; width:100%; height: 42vh; min-height: 280px; max-height: 460px; background: transparent; border-radius: 12px; border: 1px dashed var(--line); overflow: hidden; }
   svg { display: block; width: 100%; height: 100%; }
 
-  /* 僅特定元素禁止預設手勢，空白處可滑動 */
   .anchor-dot, .draggable-pulley, .stretcher-tag { cursor: grab; touch-action: none; }
   .anchor-dot:active, .draggable-pulley:active, .stretcher-tag:active { cursor: grabbing; }
 
@@ -214,7 +212,6 @@
   .ma-btn.active { background: var(--tagline); color: var(--bg); border-color: var(--tagline); }
   .ma-btn .lock-icon { bottom: 2px; right: 2px; font-size: 8px; }
 
-  /* 💡 Modals - 加入 max-height 彈性滾動，防止切頭切尾 */
   .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); }
   .modal-box { 
     background: var(--card); border: 2px solid var(--vip); border-radius: 16px; 
@@ -235,7 +232,6 @@
   .menu-list { display: flex; flex-direction: column; width: 100%; margin-top: 5px; }
   
   details.main-accordion { margin-top: 12px; }
-  /* 💡 移除大黃色塊，僅保留特戰黃色文字，展現低調專業感 */
   details.main-accordion > summary {
     font-size: 15px; font-weight: bold; color: var(--warn); padding: 14px 16px; 
     background: rgba(150,150,150,0.1); border-radius: 8px; letter-spacing: 0.5px; 
@@ -391,8 +387,8 @@
       <div class="icon-bar" data-html2canvas-ignore="true">
         <button class="icon-btn" id="btn-camera" title="實境相機">📷<span class="lock-icon">🔒</span></button>
         <button class="icon-btn" id="btn-flashlight" title="手電筒">🔦</button>
-        <button class="icon-btn" id="btn-photo" title="載入照片">📁<span class="lock-icon">🔒</span></button>
-        <input type="file" id="upload-image" accept="image/*" style="display:none;">
+        <label class="icon-btn" onclick="handleImageUploadClick(event)" title="載入照片" style="margin:0;">📁<span class="lock-icon">🔒</span></label>
+        <input type="file" id="upload-image" accept="image/*" onchange="loadImage(event)">
         <button class="icon-btn" id="btn-grid" title="工程網格">🌐</button>
         <button class="icon-btn" id="btn-hud" title="專注/淨空模式">👁️</button>
         <button class="icon-btn" id="btn-shock" title="動態震動衝擊">📳<span class="lock-icon">🔒</span></button>
@@ -436,8 +432,8 @@
           <path id="angleArc" fill="none" stroke="var(--warn)" stroke-width="2" style="transition: stroke 0.3s ease;" />
           <text id="angleText" fill="var(--warn)" font-size="15" font-weight="bold" text-anchor="middle" style="transition: fill 0.3s ease;"></text>
           
-          <line id="anglePointer" stroke="var(--warn)" stroke-width="1.5" stroke-dasharray="2 2" style="display:none; transition: stroke 0.3s ease;" />
-          <path id="anglePointerArrow" fill="none" stroke="var(--warn)" stroke-width="1.5" style="display:none; transition: stroke 0.3s ease;" />
+          <!-- 💡 智慧導引實線段與完美箭頭 -->
+          <path id="anglePointer" fill="none" stroke="var(--warn)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="display:none; transition: stroke 0.3s ease;" />
 
           <g id="pulleyGroup" class="draggable-pulley">
               <circle cx="0" cy="0" r="50" fill="transparent" />
@@ -649,7 +645,6 @@
 </div>
 
 <script>
-// 散木團隊 · 多層次防盜保護系統 v6.2
 (function(){
   const _0xd = atob('ZmFuZzU3NjEtc291cmNlLmdpdGh1Yi5pbw=='); 
   const _0xh = window[atob('bG9jYXRpb24=')][atob('aG9zdG5hbWU=')]; 
@@ -676,7 +671,6 @@
   })();
 })();
 
-// 💡 V6.3 多國語言精簡化
 const i18n = {
   zh: {
     appTitle: "索道張力儀 (動態滑行版)",
@@ -741,7 +735,7 @@ const i18n = {
     pwaStep7: "往下滑，選擇「加入主畫面」",
     pwaStep8: "點選「加入」，即可將捷徑加到主畫面",
     installBtn: "📥 點擊一鍵安裝 APP",
-    disclaimer: "<strong style='color: var(--bad); font-size: 14px;'>⚠️ 軟體免責聲明：</strong><br>本軟體為理論物理運算輔助工具，不包含繩索材質疲勞、極端摩擦力等環境變數。實際救援操作之系統架設與安全確保，均須由專業教官與指揮官實地判定，開發團隊不負任何實地操作之法律與賠償責任。<br><br><span style='color:var(--warn);'>※ 本系統採單機授權，為保障研發團隊權益，遺失密碼或更換設備請重新購買，恕無提供補發與人工客服。</span>",
+    disclaimer: "<strong style='color: var(--bad); font-size: 14px;'>⚠️ 軟體免責聲明：</strong><br>本軟體為理論物理運算輔助工具，不包含繩索材質疲勞、極端摩擦力等環境變數。實際救援操作之系統架設與安全確保，均須由專業教官與指揮官實地判定，開發團隊不負任何實地操作之法律與賠償責任。<br><br><span style='color:var(--warn);'>※ 本系統採單機授權，為保障研發團隊權益，遺失密碼或更換設備請重新購買，恕無提供補發。</span>",
     vipTitle: "🔒 專業版功能解鎖",
     vipEnable1: "您即將啟用「",
     vipEnable2: "」！",
@@ -1044,6 +1038,7 @@ const MASTER_KEY = "SUNMOONBOSS";
 
 function getDailyKey(offsetDays = 0) {
     const d = new Date(); 
+    // 強制使用台灣時區(UTC+8)計算，保證日期不會跳掉
     const utc = d.getTime() + (d.getTimezoneOffset() * 60000);
     const twTime = new Date(utc + (3600000 * 8));
     twTime.setDate(twTime.getDate() + offsetDays);
@@ -1102,7 +1097,8 @@ function attemptFeature(featureKey, callback) {
     }
 }
 
-// 💡 絕對機密防護：只有在輸入框輸入 SUNMOONBOSS 才會開控制台！
+// 💡 絕對機密防護：即使拿到體驗碼，點擊 PRO 也不會透漏任何關於控制台的資訊！
+// 只有在輸入框親手敲入 SUNMOONBOSS 才會觸發！
 const mainTitleEl = document.getElementById('mainTitleText');
 if (mainTitleEl) {
     mainTitleEl.addEventListener('click', () => {
@@ -1236,6 +1232,7 @@ const svgW = 400, svgH = 460;
 let scale = 10, offsetX = 50, offsetY = 100; 
 let currentSliderPct = 0.5;
 let currentMA = 1; 
+let userOffsetX = 0, userOffsetY = 0; // 💡 確保平移變數存在
 
 const maBtns = document.querySelectorAll('.ma-btn');
 maBtns.forEach(btn => {
@@ -1326,7 +1323,8 @@ function updateEngine(skipSliderUpdate = false) {
 
       let maxCanvasH = 460 - 130; 
       scale = Math.min((400 - 80) / Math.max(10, S), maxCanvasH / Math.max(10, Math.abs(H) + Math.max(minL, calcL)*0.5));
-      offsetY = 100 + (H < 0 ? Math.abs(H)*scale : 0); 
+      offsetX = 50 + userOffsetX;
+      offsetY = 100 + (H < 0 ? Math.abs(H)*scale : 0) + userOffsetY; 
 
       let ax = 0, ay = 0, bx = S, by = H, px = S * currentSliderPct;
       let s_ax = toX(ax), s_ay = toY(ay), s_bx = toX(bx), s_by = toY(by);
@@ -1354,11 +1352,6 @@ function updateEngine(skipSliderUpdate = false) {
           els.angleArc.style.display = 'none';
           els.angleText.style.display = 'none';
           els.anglePointer.style.display = 'none';
-          els.anglePointerArrow.style.display = 'none';
-          els.tagLineA.style.display = 'none'; 
-          els.tagLineB.style.display = 'none'; 
-          els.tagBadgeA.style.display = 'none';
-          els.tagBadgeB.style.display = 'none';
           
           maControl.style.display = 'none';
 
@@ -1426,38 +1419,33 @@ function updateEngine(skipSliderUpdate = false) {
       els.angleText.textContent = interiorAngle.toFixed(1) + "°";
       els.angleText.setAttribute('fill', color);
       
-      /* 💡 終極角度脫逃：再往上拉高！小於 65 度時，強制往左上方/右上方遠離擔架空域，並用倒 V 箭頭指向深處 */
+      /* 💡 終極角度脫逃雷達：一體成型的精準箭頭指引 */
       if (interiorAngle < 65 && !isStraight && !isBroken) {
           let isLeft = (currentSliderPct > 0.5); 
-          let sideOffset = isLeft ? -85 : 85; 
+          let sideOffset = isLeft ? -95 : 95; 
           
           /* 文字位置拉至高空 */
           els.angleText.setAttribute('x', s_px + sideOffset);
-          els.angleText.setAttribute('y', s_py - 80);
+          els.angleText.setAttribute('y', s_py - 60);
           
-          let targetX = s_px + (isLeft ? -10 : 10);
-          let targetY = s_py - 40;
+          let startX = s_px + sideOffset * 0.7;
+          let startY = s_py - 55;
+          let endX = s_px + (isLeft ? -15 : 15);
+          let endY = s_py - 30;
 
-          els.anglePointer.setAttribute('x1', s_px + sideOffset * 0.7);
-          els.anglePointer.setAttribute('y1', s_py - 75);
-          els.anglePointer.setAttribute('x2', targetX);
-          els.anglePointer.setAttribute('y2', targetY);
+          /* 繪製包含箭頭的連續路徑 */
+          let arrowD = isLeft ? 
+              `M ${startX} ${startY} L ${endX} ${endY} L ${endX - 5} ${endY - 10} M ${endX} ${endY} L ${endX + 8} ${endY - 5}` : 
+              `M ${startX} ${startY} L ${endX} ${endY} L ${endX + 5} ${endY - 10} M ${endX} ${endY} L ${endX - 8} ${endY - 5}`;
+          
+          els.anglePointer.setAttribute('d', arrowD);
           els.anglePointer.setAttribute('stroke', color);
           els.anglePointer.style.display = 'block';
-
-          let arrowD = isLeft ? 
-              `M ${targetX - 5} ${targetY - 10} L ${targetX} ${targetY} L ${targetX + 8} ${targetY - 5}` : 
-              `M ${targetX + 5} ${targetY - 10} L ${targetX} ${targetY} L ${targetX - 8} ${targetY - 5}`;
-          
-          els.anglePointerArrow.setAttribute('d', arrowD);
-          els.anglePointerArrow.setAttribute('stroke', color);
-          els.anglePointerArrow.style.display = 'block';
 
       } else {
           els.angleText.setAttribute('x', s_px); 
           els.angleText.setAttribute('y', s_py - 48); 
           els.anglePointer.style.display = 'none';
-          els.anglePointerArrow.style.display = 'none';
       }
 
       if (isStraight) {
@@ -1502,6 +1490,7 @@ function updateEngine(skipSliderUpdate = false) {
               let pulleyHtmlY = (s_py * ctm.d + ctm.f) - wrapRect.top;
 
               let safeMarginX = 55; 
+              
               let badgeXA = pulleyHtmlX - 85; 
               let badgeYA = pulleyHtmlY - 15; 
 
@@ -1600,10 +1589,18 @@ function getSVGPos(e) {
 }
 
 let isDragging = null, dragStartX, dragStartY, startSpan, startHeight;
+let initialUserOffsetX = 0, initialUserOffsetY = 0;
+
 function startDrag(e, node) { 
   if(e.target.tagName.toLowerCase() === 'input') return; 
-  /* 💡 只有碰觸到有觸控鎖定的物件，才啟動拖曳 */
-  if(!e.target.closest('.anchor-dot') && !e.target.closest('.draggable-pulley') && !e.target.closest('.stretcher-tag')) return;
+  
+  if (!e.target.closest('.anchor-dot') && !e.target.closest('.draggable-pulley') && !e.target.closest('.stretcher-tag')) {
+      if (mainCard.classList.contains('camera-mode')) {
+          node = 'PAN';
+      } else {
+          return; 
+      }
+  }
 
   isDragging = node; 
   
@@ -1611,8 +1608,13 @@ function startDrag(e, node) {
   let clientY = e.touches ? e.touches[0].clientY : e.clientY;
   dragStartX = clientX; dragStartY = clientY; 
   
-  startSpan = parseFloat(inSpan.value) || 20; 
-  startHeight = parseFloat(inHeight.value) || 0; 
+  if (node === 'PAN') {
+      initialUserOffsetX = userOffsetX;
+      initialUserOffsetY = userOffsetY;
+  } else {
+      startSpan = parseFloat(inSpan.value) || 20; 
+      startHeight = parseFloat(inHeight.value) || 0; 
+  }
   
   if(e.type === 'touchstart' && e.cancelable) { e.preventDefault(); }
 }
@@ -1626,9 +1628,24 @@ attachDragEvents(els.anchorB, 'B');
 attachDragEvents(els.pulleyGroup, 'P');
 attachDragEvents(els.floatLoad, 'P'); 
 
+els.svgWrap.addEventListener('mousedown', (e) => { startDrag(e, null); });
+els.svgWrap.addEventListener('touchstart', (e) => { startDrag(e, null); }, {passive: false});
+
 function processDrag(e) {
   if(!isDragging) return;
   if(e.cancelable) e.preventDefault(); 
+  
+  let clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  let clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  
+  if (isDragging === 'PAN') {
+      let dxScreen = clientX - dragStartX;
+      let dyScreen = clientY - dragStartY;
+      userOffsetX = initialUserOffsetX + (dxScreen / scale);
+      userOffsetY = initialUserOffsetY + (dyScreen / scale);
+      updateEngine(true);
+      return;
+  }
   
   if (isDragging === 'P') {
       let pos = getSVGPos(e);
@@ -1649,8 +1666,6 @@ function processDrag(e) {
       newL = Math.max(minL, Math.min(500, newL));
       inRope.value = newL.toFixed(2);
   } else {
-      let clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      let clientY = e.touches ? e.touches[0].clientY : e.clientY;
       let dxScreen = clientX - dragStartX;
       let dyScreen = clientY - dragStartY;
       
@@ -1715,13 +1730,26 @@ function requestUserAgreement() {
   });
 }
 
+function setMediaMode(isOn) {
+    if(isOn) {
+        mainCard.classList.add('camera-mode');
+        document.body.classList.add('camera-mode');
+        els.svgWrap.style.touchAction = 'none'; 
+        els.svgWrap.style.cursor = 'move';
+    } else {
+        mainCard.classList.remove('camera-mode');
+        document.body.classList.remove('camera-mode');
+        els.svgWrap.style.touchAction = ''; 
+        els.svgWrap.style.cursor = '';
+    }
+}
+
 async function toggleCamera() { 
   if (stream) { 
     stream.getTracks().forEach(track => track.stop()); stream = null; videoTrack = null; 
     video.style.opacity = "0"; btnCamera.classList.remove('active'); 
     torchOn = false; btnFlashlight.classList.remove('active');
-    mainCard.classList.remove('camera-mode');
-    document.body.classList.remove('camera-mode');
+    setMediaMode(false);
   } else { 
     await requestUserAgreement();
     try { 
@@ -1733,8 +1761,7 @@ async function toggleCamera() {
       stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }); 
       videoTrack = stream.getVideoTracks()[0];
       video.srcObject = stream; video.style.opacity = "1"; btnCamera.classList.add('active'); 
-      mainCard.classList.add('camera-mode');
-      document.body.classList.add('camera-mode');
+      setMediaMode(true);
     } catch (err) { 
       showToast("⚠️ 相機啟動失敗：請確認是否允許權限，或改用原生瀏覽器開啟！", "bad"); 
     } 
@@ -1772,8 +1799,7 @@ function loadImage(event) {
     reader.onload = function(e) { 
       image.src = e.target.result; 
       image.style.opacity = "1"; 
-      mainCard.classList.add('camera-mode');
-      document.body.classList.add('camera-mode');
+      setMediaMode(true);
     }; 
     reader.readAsDataURL(file); 
   } 
@@ -1794,6 +1820,7 @@ function toggleHUD() {
 
 function resetEngine() {
   inSpan.value = 20; inHeight.value = 0; inLoad.value = 100; currentSliderPct = 0.5;
+  userOffsetX = 0; userOffsetY = 0; 
   if(mainCard.classList.contains('shock-mode')) toggleShock(); 
   currentMA = 1; maBtns.forEach(b => b.classList.remove('active'));
   document.querySelector('.ma-btn[data-ma="1"]').classList.add('active');
@@ -1802,7 +1829,22 @@ function resetEngine() {
   adjustLForAngle(120);
 }
 
-/* 💡 終極防暴衝截圖引擎：強制鎖死截圖長寬為「目前螢幕大小」，並保留實境背景透出！ */
+// 💡 繪製原生的影像底圖
+function drawCover(ctx, source, sW, sH, dW, dH) {
+    const sRatio = sW / sH;
+    const dRatio = dW / dH;
+    let drawW, drawH, drawX, drawY;
+    if (sRatio > dRatio) {
+        drawH = dH; drawW = dH * sRatio;
+        drawX = (dW - drawW) / 2; drawY = 0;
+    } else {
+        drawW = dW; drawH = dW / sRatio;
+        drawX = 0; drawY = (dH - drawH) / 2;
+    }
+    ctx.drawImage(source, drawX, drawY, drawW, drawH);
+}
+
+// 💡 戰術截圖防暴衝 (雙層疊加技術)
 async function takeScreenshot() {
   const target = document.getElementById('mainCard'); 
   target.classList.add('capture-mode');
@@ -1826,61 +1868,56 @@ async function takeScreenshot() {
       placeholders.push({ span, inp });
   });
 
-  const targetRect = target.getBoundingClientRect();
-  
-  let isCamWasOn = false;
-  let originalImgSrc = image.src;
-  let originalImgOpacity = image.style.opacity;
+  // 暫時移除毛玻璃，避免 iOS 渲染失敗
+  const huds = document.querySelectorAll('.hud-panel, .stretcher-tag, .tagline-wrap');
+  huds.forEach(el => { el.style.backdropFilter = 'none'; el.style.webkitBackdropFilter = 'none'; });
 
-  /* 將影片畫面轉存為照片，讓 html2canvas 能夠捕捉到 */
+  const targetRect = target.getBoundingClientRect();
+  const scaleVal = 2; 
+  
+  const compositeCanvas = document.createElement('canvas');
+  compositeCanvas.width = targetRect.width * scaleVal;
+  compositeCanvas.height = targetRect.height * scaleVal;
+  const ctx = compositeCanvas.getContext('2d');
+
+  ctx.fillStyle = '#0f1623';
+  ctx.fillRect(0, 0, compositeCanvas.width, compositeCanvas.height);
+
   if (stream && video.videoWidth && video.style.opacity === "1") {
-      isCamWasOn = true;
-      const tempCanvas = document.createElement('canvas');
-      tempCanvas.width = video.videoWidth;
-      tempCanvas.height = video.videoHeight;
-      tempCanvas.getContext('2d').drawImage(video, 0, 0, tempCanvas.width, tempCanvas.height);
-      image.src = tempCanvas.toDataURL('image/jpeg');
-      image.style.opacity = '1';
-      video.style.opacity = '0';
+      drawCover(ctx, video, video.videoWidth, video.videoHeight, compositeCanvas.width, compositeCanvas.height);
+  } else if (image.style.opacity === "1") {
+      drawCover(ctx, image, image.naturalWidth, image.naturalHeight, compositeCanvas.width, compositeCanvas.height);
   }
 
   window.scrollTo(0, 0);
   await new Promise(r => setTimeout(r, 100));
   
   try {
-    /* 💡 強制背景色為 transparent，讓截圖引擎可以捕捉到背後的圖片 */
-    const bgColor = (isCamWasOn || image.style.opacity === "1") ? null : '#0f1623';
-    const canvas = await html2canvas(target, { 
-        backgroundColor: bgColor, 
-        scale: 2, 
+    const uiCanvas = await html2canvas(target, { 
+        backgroundColor: null, 
+        scale: scaleVal, 
         useCORS: true, 
-        width: targetRect.width,  /* 💡 嚴格鎖定寬度 */
-        height: targetRect.height, /* 💡 嚴格鎖定高度，拒絕無限延伸的長條截圖 */
-        windowWidth: document.documentElement.offsetWidth,
-        windowHeight: document.documentElement.offsetHeight,
+        width: targetRect.width,  
+        height: targetRect.height, 
         ignoreElements: (el) => el.hasAttribute('data-html2canvas-ignore') || el.classList.contains('capture-hide') 
     });
     
+    ctx.drawImage(uiCanvas, 0, 0);
+
     const link = document.createElement('a'); 
     link.download = `散木索道儀_戰術報告_${new Date().getTime()}.png`; 
-    link.href = canvas.toDataURL('image/png'); 
+    link.href = compositeCanvas.toDataURL('image/png'); 
     link.click();
   } catch(e) { 
       showToast("❌ 截圖失敗：" + e, "bad"); 
   }
   
-  /* 復原畫面 */
   placeholders.forEach(p => {
       p.inp.style.display = '';
       p.span.remove();
   });
   target.classList.remove('capture-mode');
-  
-  if (isCamWasOn) {
-      video.style.opacity = '1';
-      image.src = originalImgSrc;
-      image.style.opacity = originalImgOpacity;
-  }
+  huds.forEach(el => { el.style.backdropFilter = ''; el.style.webkitBackdropFilter = ''; });
 }
 
 const supportBtnAction = document.getElementById('supportBtnAction');
@@ -1908,7 +1945,6 @@ window.addEventListener('beforeinstallprompt', (e) => {
     }
 });
 
-// 💡 絕對置頂的系統更新
 function checkForUpdates() {
     const msg = t('updateMsg').replace(/\n/g, '<br>');
     document.getElementById('updateMsgText').innerHTML = msg;
@@ -1919,8 +1955,8 @@ function executeUpdate() {
     document.getElementById('updateModal').style.display = 'none';
     showToast("🔄 戰術系統重置中...", "warn");
     
-    /* 💡 強制捲動到最上方 (多重保險) */
-    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' }); 
+    // 💡 強制絕對置頂四連發
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); 
     document.body.scrollTop = 0;
     document.documentElement.scrollTop = 0;
     const scroller = document.getElementById('scroll-wrapper');
@@ -1956,7 +1992,6 @@ if(shareBtnAction) {
     });
 }
 
-// 綁定各個獨立按鈕事件
 document.getElementById('btn-camera').addEventListener('click', () => attemptFeature('featCam', toggleCamera));
 document.getElementById('btn-flashlight').addEventListener('click', toggleFlashlight);
 document.getElementById('btn-photo').addEventListener('click', handlePhotoUpload);
@@ -1977,7 +2012,7 @@ if ('serviceWorker' in navigator) {
 window.addEventListener('resize', () => updateEngine(true));
 document.addEventListener('DOMContentLoaded', () => {
     applyTranslations();
-    setTimeout(resetEngine, 150);
+    setTimeout(() => { resetEngine(); setTimeout(() => updateEngine(true), 100); }, 300);
 });
 </script>
 </body>
