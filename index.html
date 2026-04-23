@@ -58,7 +58,6 @@
     padding-right: env(safe-area-inset-right);
   }
   
-  /* 💡 V7.1: 讓 HTML 跟 BODY 一起變透明，才能透視到底層的影像 */
   html.camera-mode, body.camera-mode { background-color: transparent !important; }
 
   .safe-area-blocker {
@@ -81,7 +80,6 @@
   input, textarea { -webkit-user-select: auto; user-select: auto; box-sizing: border-box; }
   *{box-sizing:border-box}
 
-  /* 💡 V7.1: 全螢幕背景層設定 */
   #bg-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; background-color: var(--bg); overflow: hidden; }
   #bg-video, #bg-image { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; opacity: 0; transition: opacity 0.3s; z-index: 0; pointer-events: none;}
   
@@ -141,7 +139,28 @@
   #langSelect:focus { border-color: var(--safe); color: var(--text); }
   #langSelect option { background: var(--bg); color: var(--text); }
 
+  /* 💡 V7.2 戰術工具列分離與底部懸浮設計 */
   .icon-bar { display: flex; justify-content: space-between; align-items: center; gap: 6px; background: rgba(0,0,0,0.4); padding: 6px 8px; border-radius: 12px; margin-bottom: 8px; border: 1px solid var(--line); z-index: 10;}
+  
+  body.camera-mode .icon-bar {
+      position: fixed;
+      bottom: calc(15px + env(safe-area-inset-bottom));
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 24px);
+      max-width: 480px;
+      z-index: 10000;
+      background: rgba(15, 22, 35, 0.95);
+      border: 1px solid var(--safe);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+      margin-bottom: 0;
+      padding: 8px 10px;
+      transition: all 0.3s ease;
+  }
+  body.camera-mode .app-container {
+      padding-bottom: calc(100px + env(safe-area-inset-bottom)); /* 保留底部懸浮按鈕的空間 */
+  }
+
   .icon-btn { flex: 1; aspect-ratio: 1/1; max-height: 38px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid transparent; display: flex; justify-content: center; align-items: center; position: relative; cursor: pointer; transition: all 0.2s; font-size: 18px; color: var(--text); padding: 0; }
   .icon-btn:active { background: var(--line); transform: scale(0.95); }
   .icon-btn.active { background: var(--safe); color: var(--bg); border-color: var(--safe); }
@@ -171,6 +190,11 @@
 
   .svgWrap { position:relative; width:100%; height: 42vh; min-height: 280px; max-height: 460px; touch-action: auto; background: transparent; border-radius: 12px; border: 1px dashed var(--line); overflow: hidden; }
   svg { display: block; width: 100%; height: 100%; }
+
+  /* 💡 V7.2 無邊界畫布：解開邊界與隱藏虛線，方便實境對位 */
+  body.camera-mode .svgWrap { border-color: transparent; overflow: visible; }
+  body.camera-mode svg { overflow: visible; }
+  body.camera-mode .card { overflow: visible; }
 
   .anchor-dot, .draggable-pulley, .stretcher-tag { cursor: grab; touch-action: none; }
   .anchor-dot:active, .draggable-pulley:active, .stretcher-tag:active { cursor: grabbing; }
@@ -294,7 +318,6 @@
 
 <div class="safe-area-blocker"></div>
 
-<!-- 💡 V7.1 修正：全螢幕疊圖層 -->
 <div id="bg-layer">
   <video id="bg-video" autoplay playsinline muted data-html2canvas-ignore="true"></video>
   <img id="bg-image" alt="" data-html2canvas-ignore="true" />
@@ -2318,7 +2341,7 @@ function setMediaMode(isOn) {
         mainCard.classList.add('camera-mode');
         els.svgWrap.style.touchAction = 'none'; 
         els.svgWrap.style.cursor = 'move';
-        showToast('📍 戰術提示：現在可「滑動空白處」將張力儀對齊實境影像！', 'safe');
+        showToast('📍 戰術提示：可自由滑動畫面，工具列已固定於底部供您隨時截圖！', 'safe');
     } else {
         document.documentElement.classList.remove('camera-mode');
         document.body.classList.remove('camera-mode');
@@ -2328,7 +2351,6 @@ function setMediaMode(isOn) {
     }
 }
 
-// 💡 集中管理退出媒體模式的功能，安全關閉鏡頭與照片
 function exitMediaMode() {
     if (stream) {
         stream.getTracks().forEach(track => track.stop());
@@ -2356,7 +2378,7 @@ async function toggleCamera() {
           showToast("⚠️ 您的瀏覽器不支援相機功能，請改用原生 Safari 或 Chrome 開啟！", "bad");
           return;
       }
-      exitMediaMode(); // 開啟相機前先清除可能存在的照片
+      exitMediaMode(); 
       stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }); 
       videoTrack = stream.getVideoTracks()[0];
       video.srcObject = stream; video.style.opacity = "1"; btnCamera.classList.add('active'); 
@@ -2389,7 +2411,7 @@ async function toggleFlashlight() {
 function handlePhotoUpload(event) {
     event.preventDefault(); 
     if (image.style.opacity === "1") {
-        exitMediaMode(); // 如果照片已經開啟，就當作關閉鍵
+        exitMediaMode(); 
         showToast('📍 已退出照片疊圖模式，恢復淨空', 'safe');
     } else {
         attemptFeature('featPhoto', () => { document.getElementById('upload-image').click(); });
@@ -2399,7 +2421,6 @@ function handlePhotoUpload(event) {
 function loadImage(event) { 
   const file = event.target.files[0]; 
   if (file) { 
-    // 💡 修正：載入新照片時不呼叫 exitMediaMode() 避免中斷 FileReader
     if (stream) {
         stream.getTracks().forEach(track => track.stop());
         stream = null; videoTrack = null;
@@ -2444,7 +2465,6 @@ function resetEngine() {
   exitMediaMode();
 }
 
-// 💡 針對全螢幕背景精準計算擷取範圍的渲染引擎
 function drawCoverAligned(ctx, source, sW, sH, cardRect, scaleVal) {
     const screenW = window.innerWidth;
     const screenH = window.innerHeight;
@@ -2528,7 +2548,6 @@ async function takeScreenshot() {
     link.href = compositeCanvas.toDataURL('image/png'); 
     link.click();
     
-    // 💡 截圖完成後，顯示提示並自動退出媒體模式，清空戰場！
     showToast("📸 戰術截圖已匯出！已為您自動關閉疊圖模式。", "safe");
     setTimeout(exitMediaMode, 500);
 
