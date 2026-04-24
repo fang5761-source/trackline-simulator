@@ -96,6 +96,12 @@
     padding-left: max(10px, env(safe-area-inset-left));
     padding-right: max(10px, env(safe-area-inset-right));
   }
+  
+  body.camera-mode .app-container {
+    padding-top: 25vh;
+    padding-bottom: 50vh; 
+  }
+
   input[type="file"] { display: none; }
 
   .card { 
@@ -110,6 +116,7 @@
   .card.camera-mode {
     background: transparent !important; border-color: rgba(255,255,255,0.2) !important;
     backdrop-filter: none !important; -webkit-backdrop-filter: none !important; box-shadow: none !important;
+    overflow: visible; 
   }
   .card.capture-mode {
     background-color: transparent !important; 
@@ -139,26 +146,26 @@
   #langSelect:focus { border-color: var(--safe); color: var(--text); }
   #langSelect option { background: var(--bg); color: var(--text); }
 
-  /* 💡 V7.2 戰術工具列分離與底部懸浮設計 */
   .icon-bar { display: flex; justify-content: space-between; align-items: center; gap: 6px; background: rgba(0,0,0,0.4); padding: 6px 8px; border-radius: 12px; margin-bottom: 8px; border: 1px solid var(--line); z-index: 10;}
   
-  body.camera-mode .icon-bar {
-      position: fixed;
-      bottom: calc(15px + env(safe-area-inset-bottom));
-      left: 50%;
-      transform: translateX(-50%);
-      width: calc(100% - 24px);
-      max-width: 480px;
-      z-index: 10000;
-      background: rgba(15, 22, 35, 0.95);
-      border: 1px solid var(--safe);
-      box-shadow: 0 10px 40px rgba(0,0,0,0.8);
-      margin-bottom: 0;
-      padding: 8px 10px;
-      transition: all 0.3s ease;
-  }
-  body.camera-mode .app-container {
-      padding-bottom: calc(100px + env(safe-area-inset-bottom)); /* 保留底部懸浮按鈕的空間 */
+  /* 💡 V7.3 終極防護：使用最暴力的寫法鎖死底部，避開 iOS 的 calc Bug */
+  .docked-bottom {
+      position: fixed !important;
+      top: auto !important;
+      bottom: 25px !important;
+      margin-bottom: env(safe-area-inset-bottom, 0px) !important;
+      left: 50% !important;
+      transform: translateX(-50%) !important;
+      width: 92% !important;
+      max-width: 480px !important;
+      z-index: 99999 !important;
+      background: rgba(15, 22, 35, 0.95) !important;
+      border: 1px solid var(--safe) !important;
+      box-shadow: 0 -5px 30px rgba(0,0,0,0.8) !important;
+      border-radius: 16px !important;
+      display: flex !important;
+      padding: 8px 12px !important;
+      transition: opacity 0.3s ease;
   }
 
   .icon-btn { flex: 1; aspect-ratio: 1/1; max-height: 38px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid transparent; display: flex; justify-content: center; align-items: center; position: relative; cursor: pointer; transition: all 0.2s; font-size: 18px; color: var(--text); padding: 0; }
@@ -191,10 +198,8 @@
   .svgWrap { position:relative; width:100%; height: 42vh; min-height: 280px; max-height: 460px; touch-action: auto; background: transparent; border-radius: 12px; border: 1px dashed var(--line); overflow: hidden; }
   svg { display: block; width: 100%; height: 100%; }
 
-  /* 💡 V7.2 無邊界畫布：解開邊界與隱藏虛線，方便實境對位 */
   body.camera-mode .svgWrap { border-color: transparent; overflow: visible; }
   body.camera-mode svg { overflow: visible; }
-  body.camera-mode .card { overflow: visible; }
 
   .anchor-dot, .draggable-pulley, .stretcher-tag { cursor: grab; touch-action: none; }
   .anchor-dot:active, .draggable-pulley:active, .stretcher-tag:active { cursor: grabbing; }
@@ -409,16 +414,19 @@
         </div>
       </div>
 
-      <div class="icon-bar" data-html2canvas-ignore="true">
-        <button class="icon-btn" id="btn-camera" title="實境相機">📷<span class="lock-icon">🔒</span></button>
-        <button class="icon-btn" id="btn-flashlight" title="手電筒">🔦</button>
-        <label class="icon-btn" id="btn-photo" onclick="handlePhotoUpload(event)" title="載入照片" style="margin:0;">📁<span class="lock-icon">🔒</span></label>
-        <input type="file" id="upload-image" accept="image/*" onchange="loadImage(event)">
-        <button class="icon-btn" id="btn-grid" title="工程網格">🌐</button>
-        <button class="icon-btn" id="btn-hud" title="專注/淨空模式">👁️</button>
-        <button class="icon-btn" id="btn-shock" title="動態震動衝擊">📳<span class="lock-icon">🔒</span></button>
-        <button class="icon-btn" id="btn-screenshot" title="戰術截圖">📸<span class="lock-icon">🔒</span></button>
-        <button class="icon-btn" id="btn-reset" title="重置沙盤">↺</button>
+      <!-- 💡 V7.3 防呆停機坪：為工具列設計專屬位置，確保切換不跑位 -->
+      <div id="icon-bar-placeholder">
+          <div class="icon-bar" id="mainIconBar" data-html2canvas-ignore="true">
+            <button class="icon-btn" id="btn-camera" title="實境相機">📷<span class="lock-icon">🔒</span></button>
+            <button class="icon-btn" id="btn-flashlight" title="手電筒">🔦</button>
+            <label class="icon-btn" id="btn-photo" onclick="handlePhotoUpload(event)" title="載入照片" style="margin:0;">📁<span class="lock-icon">🔒</span></label>
+            <input type="file" id="upload-image" accept="image/*" onchange="loadImage(event)">
+            <button class="icon-btn" id="btn-grid" title="工程網格">🌐</button>
+            <button class="icon-btn" id="btn-hud" title="專注/淨空模式">👁️</button>
+            <button class="icon-btn" id="btn-shock" title="動態震動衝擊">📳<span class="lock-icon">🔒</span></button>
+            <button class="icon-btn" id="btn-screenshot" title="戰術截圖">📸<span class="lock-icon">🔒</span></button>
+            <button class="icon-btn" id="btn-reset" title="重置沙盤">↺</button>
+          </div>
       </div>
 
       <div class="hud-container">
@@ -2334,20 +2342,33 @@ function requestUserAgreement() {
   });
 }
 
+// 💡 V7.3 防護升級：真正將工具列綁死在螢幕底部
 function setMediaMode(isOn) {
+    const iconBar = document.getElementById('mainIconBar');
+    const placeholder = document.getElementById('icon-bar-placeholder');
+    
     if(isOn) {
         document.documentElement.classList.add('camera-mode');
         document.body.classList.add('camera-mode');
         mainCard.classList.add('camera-mode');
         els.svgWrap.style.touchAction = 'none'; 
         els.svgWrap.style.cursor = 'move';
-        showToast('📍 戰術提示：可自由滑動畫面，工具列已固定於底部供您隨時截圖！', 'safe');
+        
+        // 幫工具列加上絕對固定的 CSS Class，並搬移到最外層的 body
+        iconBar.classList.add('docked-bottom');
+        document.body.appendChild(iconBar);
+        
+        showToast('📍 戰術提示：可自由滑動畫面，工具列已為您固定於底部！', 'safe');
     } else {
         document.documentElement.classList.remove('camera-mode');
         document.body.classList.remove('camera-mode');
         mainCard.classList.remove('camera-mode');
         els.svgWrap.style.touchAction = 'auto'; 
         els.svgWrap.style.cursor = 'default';
+        
+        // 撤收裝備，解除固定 Class，並放回原本準備好的坑位
+        iconBar.classList.remove('docked-bottom');
+        placeholder.appendChild(iconBar);
     }
 }
 
@@ -2528,8 +2549,7 @@ async function takeScreenshot() {
       drawCoverAligned(ctx, image, image.naturalWidth, image.naturalHeight, targetRect, scaleVal);
   }
 
-  window.scrollTo(0, 0);
-  await new Promise(r => setTimeout(r, 100));
+  await new Promise(r => setTimeout(r, 150));
   
   try {
     const uiCanvas = await html2canvas(target, { 
