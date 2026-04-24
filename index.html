@@ -125,6 +125,20 @@
   }
   .capture-mode .capture-hide { display: none !important; }
   
+  /* 💡 截圖時徹底刪除標題列，節省大量空間 */
+  .capture-mode .topbar { display: none !important; }
+  
+  /* 💡 真・淨空模式：一鍵隱形所有不必要的控制介面 */
+  .zen-mode .hud-panel, 
+  .zen-mode .tagline-wrap, 
+  .zen-mode .tag-badge { 
+      opacity: 0 !important; 
+      pointer-events: none !important; 
+  }
+  .zen-mode .topbar { 
+      display: none !important; 
+  }
+
   .topbar { display: flex; flex-direction: column; gap: 10px; margin-bottom: 8px; padding: 0 4px; }
   .title-row { display: flex; align-items: center; width: 100%; justify-content: center; }
   .title-left { display: flex; align-items: center; cursor: pointer; user-select: none; }
@@ -148,16 +162,16 @@
 
   .icon-bar { display: flex; justify-content: space-between; align-items: center; gap: 6px; background: rgba(0,0,0,0.4); padding: 6px 8px; border-radius: 12px; margin-bottom: 8px; border: 1px solid var(--line); z-index: 10;}
   
-  /* 💡 V7.3 終極防護：使用最暴力的寫法鎖死底部，避開 iOS 的 calc Bug */
+  /* 💡 V7.4 重新定位底部懸浮區塊，並留出切換鈕的空間 */
   .docked-bottom {
       position: fixed !important;
       top: auto !important;
       bottom: 25px !important;
       margin-bottom: env(safe-area-inset-bottom, 0px) !important;
-      left: 50% !important;
-      transform: translateX(-50%) !important;
-      width: 92% !important;
-      max-width: 480px !important;
+      left: 15px !important;
+      transform: none !important;
+      width: calc(100% - 80px) !important; /* 保留右側懸浮按鈕空間 */
+      max-width: 420px !important;
       z-index: 99999 !important;
       background: rgba(15, 22, 35, 0.95) !important;
       border: 1px solid var(--safe) !important;
@@ -165,7 +179,49 @@
       border-radius: 16px !important;
       display: flex !important;
       padding: 8px 12px !important;
-      transition: opacity 0.3s ease;
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
+  }
+
+  @media (min-width: 540px) {
+      .docked-bottom {
+          left: calc(50% - 210px - 25px) !important; /* 置中並微調偏移 */
+      }
+  }
+
+  .icon-bar.docked-bottom.collapsed-dock {
+      transform: translateY(150px) !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+  }
+
+  /* 💡 V7.4 專屬懸浮收合按鈕 (FAB) */
+  .fab-toggle {
+      display: none;
+      position: fixed;
+      bottom: 25px;
+      margin-bottom: env(safe-area-inset-bottom, 0px);
+      right: 15px;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(15, 22, 35, 0.95);
+      border: 1px solid var(--safe);
+      color: var(--safe);
+      box-shadow: 0 -5px 20px rgba(0,0,0,0.8);
+      z-index: 100000;
+      justify-content: center;
+      align-items: center;
+      font-size: 20px;
+      cursor: pointer;
+      transition: transform 0.2s, background 0.2s;
+  }
+  body.camera-mode .fab-toggle {
+      display: flex;
+  }
+  .fab-toggle:active {
+      transform: scale(0.9);
+      background: var(--safe);
+      color: var(--bg);
   }
 
   .icon-btn { flex: 1; aspect-ratio: 1/1; max-height: 38px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid transparent; display: flex; justify-content: center; align-items: center; position: relative; cursor: pointer; transition: all 0.2s; font-size: 18px; color: var(--text); padding: 0; }
@@ -184,7 +240,7 @@
   @keyframes glow-red { 0%, 100% { box-shadow: 0 4px 10px rgba(0,0,0,0.6); border-color: #9a3412; } 50% { box-shadow: 0 0 15px rgba(239,68,68,0.8); border-color: #ef4444; } }
   .shock-anim { animation: glow-red 1s infinite; }
 
-  .hud-container { display: flex; justify-content: space-between; align-items: stretch; gap: 6px; width: 100%; margin-bottom: 8px; z-index: 10; }
+  .hud-container { display: flex; justify-content: space-between; align-items: stretch; gap: 6px; width: 100%; margin-bottom: 8px; z-index: 10; transition: opacity 0.3s ease; }
   .hud-panel { background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 8px 10px; color: var(--text); display: flex; flex-direction: column; gap: 4px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.2); flex: 1; max-width: calc(50% - 4px); }
   .hud-title { font-size: 12px; font-weight: 900; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 4px; margin-bottom: 2px; }
   .hud-tr .hud-title { text-align: right; }
@@ -204,7 +260,7 @@
   .anchor-dot, .draggable-pulley, .stretcher-tag { cursor: grab; touch-action: none; }
   .anchor-dot:active, .draggable-pulley:active, .stretcher-tag:active { cursor: grabbing; }
 
-  .hud-container, .tagline-wrap, .tag-badge { transition: opacity 0.3s ease; }
+  .tagline-wrap, .tag-badge { transition: opacity 0.3s ease; }
 
   .tag-badge { position: absolute; padding: 6px 12px; border-radius: 8px; font-size: 14px; font-weight: 900; white-space: nowrap; pointer-events: none; transform: translate(-50%, -50%); box-shadow: 0 4px 12px rgba(0,0,0,0.6); transition: left 0.15s ease-out, top 0.15s ease-out, background 0.2s, border 0.2s; z-index: 90; display: none; }
   .tag-badge.active { background: rgba(15, 22, 35, 0.95); border: 1px solid var(--tagline); color: var(--tagline); }
@@ -414,7 +470,6 @@
         </div>
       </div>
 
-      <!-- 💡 V7.3 防呆停機坪：為工具列設計專屬位置，確保切換不跑位 -->
       <div id="icon-bar-placeholder">
           <div class="icon-bar" id="mainIconBar" data-html2canvas-ignore="true">
             <button class="icon-btn" id="btn-camera" title="實境相機">📷<span class="lock-icon">🔒</span></button>
@@ -510,15 +565,15 @@
         </div>
       </div>
       
-      <div class="control-deck capture-hide">
-         <div class="angle-slider-header">
+      <div class="control-deck">
+         <div class="angle-slider-header capture-hide">
             <span data-i18n="angleLoose">鬆 (夾角小)</span>
             <span style="color:var(--text);" data-i18n="angleDrag">📐 滑動調整主繩夾角</span>
             <span data-i18n="angleTight">緊 (夾角大)</span>
          </div>
-         <input type="range" id="angleSlider" min="0" max="180" step="0.5" value="120">
+         <input type="range" id="angleSlider" class="capture-hide" min="0" max="180" step="0.5" value="120">
          
-         <hr style="border:0; border-top:1px dashed rgba(255,255,255,0.1); margin: 2px 0;">
+         <hr class="capture-hide" style="border:0; border-top:1px dashed rgba(255,255,255,0.1); margin: 2px 0;">
 
          <div class="dash-inputs">
             <div class="dash-input-group">
@@ -539,7 +594,8 @@
          </div>
       </div>
       
-      <div class="tagline-wrap capture-hide" id="taglineWrap">
+      <!-- 💡 V7.4 解除隱藏，確保截圖完整捕捉下方的省力比數據 -->
+      <div class="tagline-wrap" id="taglineWrap">
          <div id="taglineInfo" data-i18n="dragTip">📍 在沙盤中自由上下左右拖曳進行動態模擬</div>
          <div class="ma-control" id="maControl" style="display:none;">
             <span style="font-size:13px; color:var(--tagline); font-weight:bold;" data-i18n="maTitle">⚙️ 水平牽引省力比</span>
@@ -674,6 +730,11 @@
       </div>
     </div>
   </div>
+</div>
+
+<!-- 💡 V7.4 懸浮工具箱切換按鈕 -->
+<div id="fab-toggle" class="fab-toggle" onclick="toggleIconBar()" title="收合/展開工具列">
+  <span id="fab-icon">🔽</span>
 </div>
 
 <script>
@@ -1129,7 +1190,7 @@ const i18n = {
     toastAuthSuccess: "🎉 인증 성공!",
     toastTrialSuccess: "⏱️ 체험 권한 활성화!",
     toastLogout: "🔄 로그아웃 되었습니다.",
-    updateMsg: "시스템 보고: 캐시를 지우고 최신 버전을 다시 로드합니다!\n\n계속하시겠습니까?",
+    updateMsg: "시스템 보고: 캐시 지우고 최신 버전을 다시 로드합니다!\n\n계속하시겠습니까?",
     supTitle: "💬 문제 신고",
     supDesc: "버그나 개선 사항이 있나요?<br><br>아래 버튼을 클릭하여 양식을 작성해 주시면 신속히 처리하겠습니다!",
     supLater: "나중에",
@@ -2310,6 +2371,7 @@ window.addEventListener('mouseup', () => isDragging = null);
 let stream = null, videoTrack = null, torchOn = false; 
 const video = document.getElementById('bg-video'), image = document.getElementById('bg-image'), btnCamera = document.getElementById('btn-camera'), btnFlashlight = document.getElementById('btn-flashlight'), gridOverlay = document.getElementById('grid-overlay'); 
 let gridVisible = true, hudVisible = true;
+let isIconBarCollapsed = false; // 💡 追蹤工具列收合狀態
 
 function toggleShock() {
   const btnShock = document.getElementById('btn-shock');
@@ -2342,7 +2404,6 @@ function requestUserAgreement() {
   });
 }
 
-// 💡 V7.3 防護升級：真正將工具列綁死在螢幕底部
 function setMediaMode(isOn) {
     const iconBar = document.getElementById('mainIconBar');
     const placeholder = document.getElementById('icon-bar-placeholder');
@@ -2354,7 +2415,6 @@ function setMediaMode(isOn) {
         els.svgWrap.style.touchAction = 'none'; 
         els.svgWrap.style.cursor = 'move';
         
-        // 幫工具列加上絕對固定的 CSS Class，並搬移到最外層的 body
         iconBar.classList.add('docked-bottom');
         document.body.appendChild(iconBar);
         
@@ -2366,9 +2426,23 @@ function setMediaMode(isOn) {
         els.svgWrap.style.touchAction = 'auto'; 
         els.svgWrap.style.cursor = 'default';
         
-        // 撤收裝備，解除固定 Class，並放回原本準備好的坑位
         iconBar.classList.remove('docked-bottom');
         placeholder.appendChild(iconBar);
+    }
+}
+
+// 💡 V7.4 懸浮工具箱切換邏輯
+function toggleIconBar() {
+    isIconBarCollapsed = !isIconBarCollapsed;
+    const iconBar = document.getElementById('mainIconBar');
+    const fabIcon = document.getElementById('fab-icon');
+    if (isIconBarCollapsed) {
+        iconBar.classList.add('collapsed-dock');
+        fabIcon.textContent = '🛠️';
+        showToast('📍 工具列已暫時收合', 'safe');
+    } else {
+        iconBar.classList.remove('collapsed-dock');
+        fabIcon.textContent = '🔽';
     }
 }
 
@@ -2384,6 +2458,12 @@ function exitMediaMode() {
     image.style.opacity = "0";
     image.src = "";
     document.getElementById('btn-photo').classList.remove('active');
+    
+    // 退出時確保展開狀態重置
+    isIconBarCollapsed = false;
+    document.getElementById('mainIconBar').classList.remove('collapsed-dock');
+    document.getElementById('fab-icon').textContent = '🔽';
+    
     setMediaMode(false);
     document.getElementById('upload-image').value = ""; 
 }
@@ -2462,15 +2542,17 @@ function loadImage(event) {
 }
 function toggleGrid() { gridVisible = !gridVisible; gridOverlay.style.opacity = gridVisible ? "0.5" : "0"; }
 
+// 💡 V7.4 改寫淨空模式：一鍵觸發 CSS Zen-Mode，連標題都收合！
 function toggleHUD() {
   hudVisible = !hudVisible;
-  const huds = document.querySelectorAll('.hud-panel, .tagline-wrap, .tag-badge');
-  huds.forEach(el => el.style.opacity = hudVisible ? "1" : "0");
   const eyeBtn = document.getElementById('btn-hud');
+  const mainCard = document.getElementById('mainCard');
   if (hudVisible) {
       eyeBtn.classList.remove('eye-slash');
+      mainCard.classList.remove('zen-mode');
   } else {
       eyeBtn.classList.add('eye-slash');
+      mainCard.classList.add('zen-mode');
   }
 }
 
@@ -2506,9 +2588,14 @@ function drawCoverAligned(ctx, source, sW, sH, cardRect, scaleVal) {
     ctx.drawImage(source, finalX, finalY, finalW, finalH);
 }
 
+// 💡 V7.4 全境截圖邏輯升級
 async function takeScreenshot() {
   const target = document.getElementById('mainCard'); 
   target.classList.add('capture-mode');
+  
+  // 隱藏懸浮按鈕避免入鏡
+  const fab = document.getElementById('fab-toggle');
+  if(fab) fab.style.display = 'none';
   
   const inputs = target.querySelectorAll('input[type="number"]');
   const placeholders = [];
@@ -2529,7 +2616,7 @@ async function takeScreenshot() {
       placeholders.push({ span, inp });
   });
 
-  const huds = document.querySelectorAll('.hud-panel, .stretcher-tag, .tagline-wrap');
+  const huds = document.querySelectorAll('.hud-panel, .stretcher-tag');
   huds.forEach(el => { el.style.backdropFilter = 'none'; el.style.webkitBackdropFilter = 'none'; });
 
   const targetRect = target.getBoundingClientRect();
@@ -2581,6 +2668,9 @@ async function takeScreenshot() {
   });
   target.classList.remove('capture-mode');
   huds.forEach(el => { el.style.backdropFilter = ''; el.style.webkitBackdropFilter = ''; });
+  
+  // 恢復懸浮按鈕顯示
+  if(fab && document.body.classList.contains('camera-mode')) fab.style.display = 'flex';
 }
 
 const supportBtnAction = document.getElementById('supportBtnAction');
