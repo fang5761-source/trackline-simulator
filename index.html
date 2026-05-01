@@ -230,7 +230,6 @@
 
   .menu-list { display: flex; flex-direction: column; width: 100%; margin-top: 5px; }
   details.main-accordion { margin-top: 12px; }
-  /* 💡 將這兩個標題字體顏色改為橘黃色 (var(--warn)) */
   details.main-accordion > summary {
     font-size: 14px; font-weight: bold; color: var(--warn); padding: 12px 16px; background: rgba(150,150,150,0.1);
     border-radius: 12px; letter-spacing: 0.5px; cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; user-select: none; transition: background 0.2s;
@@ -269,7 +268,6 @@
   
   .footer-disclaimer { margin-top: 20px; padding: 15px; font-size: 12px; color: var(--muted); line-height: 1.6; text-align: justify; background: rgba(150,150,150,0.05); border-radius: 10px; border-left: 4px solid var(--bad); }
 
-  /* 💡 散木專屬浮動提示框 (Toast) 樣式 - 修復顯示機制 */
   #toastMessage {
     position: fixed; top: -50px; left: 50%; transform: translateX(-50%);
     background: var(--card); color: var(--text); padding: 14px 24px; border-radius: 10px;
@@ -278,7 +276,7 @@
     transition: top 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
     opacity: 0; pointer-events: none;
   }
-  #toastMessage.show { top: 20px; opacity: 1; pointer-events: auto; }
+  #toastMessage.show { top: 20px; opacity: 1; pointer-events: auto; display: block; }
 </style>
 </head>
 <body>
@@ -423,7 +421,7 @@ const i18n = {
     featShock: "📳 動態震動衝擊系統",
     featShockDesc: "自訂拖拉過程中的頓挫與晃動百分比，精準預測最危險的峰值受力！",
     featShot: "📸 戰術純淨截圖",
-    featShotDesc: "自動濾除雜訊，一鍵匯出全螢幕高解析度的專業戰術報告圖紙！",
+    featShotDesc: "一鍵完美去背，自動匯出無浮水印、高解析度的專業戰術主畫面截圖！",
     featHeight: "↕️ 峽谷高低差模擬",
     featHeightDesc: "解鎖高低差限制，真實模擬深谷上拉與下放的極端物理張力變化！",
     featMA: "⚙️ 牽引省力比換算",
@@ -527,7 +525,7 @@ const i18n = {
     featShock: "📳 Dynamic Shock System",
     featShockDesc: "Customize shock percentage to predict extreme peak forces!",
     featShot: "📸 Tactical Screenshot",
-    featShotDesc: "Capture the entire screen with data overlay flawlessly!",
+    featShotDesc: "Flawlessly capture the main canvas with data overlay perfectly combined!",
     featHeight: "↕️ Height Diff Simulation",
     featHeightDesc: "Unlock height limits for extreme physics tension variations!",
     featMA: "⚙️ Horizontal MA Calc",
@@ -631,7 +629,7 @@ const i18n = {
     featShock: "📳 動的衝撃システム",
     featShockDesc: "衝撃のパーセンテージをカスタマイズしてピーク荷重を予測！",
     featShot: "📸 スクリーンショット",
-    featShotDesc: "全画面キャプチャで写真とデータを完全に結合します！",
+    featShotDesc: "メイン画面を切り取り、データと背景を美しく合成します！",
     featHeight: "↕️ 高低差シミュレーション",
     featHeightDesc: "高低差の制限を解除し、極端な張力変化をシミュレーション！",
     featMA: "⚙️ 倍力比の計算",
@@ -735,7 +733,7 @@ const i18n = {
     featShock: "📳 동적 충격 시스템",
     featShockDesc: "충격 백분율을 설정하여 극한의 피크 하중을 예측하세요!",
     featShot: "📸 전술 스크린샷",
-    featShotDesc: "사진과 데이터를 함께 캡처하여 고해상도 리포트를 출력합니다!",
+    featShotDesc: "메인 화면을 완벽하게 자르고 데이터를 합성하여 출력합니다!",
     featHeight: "↕️ 고저차 시뮬레이션",
     featHeightDesc: "고저차 제한을 해제하여 극한의 장력 변화를 시뮬레이션하세요!",
     featMA: "⚙️ 수평 MA 계산",
@@ -839,7 +837,7 @@ const i18n = {
     featShock: "📳 Choc Dynamique",
     featShockDesc: "Personnalisez le pourcentage de choc pour prévoir les pics extrêmes !",
     featShot: "📸 Capture Tactique",
-    featShotDesc: "Capture d'écran complète avec données et photo fusionnées !",
+    featShotDesc: "Recadre parfaitement l'écran principal en combinant photo et données !",
     featHeight: "↕️ Simulation de Dénivelé",
     featHeightDesc: "Débloquez les limites de dénivelé pour des variations extrêmes !",
     featMA: "⚙️ Calcul de l'AM",
@@ -943,7 +941,7 @@ const i18n = {
     featShock: "📳 Dynamische Schocklast",
     featShockDesc: "Passen Sie den Schock-Prozentsatz an, um extreme Spitzenlasten vorherzusagen!",
     featShot: "📸 Taktischer Screenshot",
-    featShotDesc: "Vollständiger Screenshot, der Foto und Daten perfekt kombiniert!",
+    featShotDesc: "Schneidet den Hauptbildschirm perfekt zu und kombiniert Foto mit Daten!",
     featHeight: "↕️ Höhenunterschied",
     featHeightDesc: "Höhenunterschied für extreme Spannungsvariationen freischalten!",
     featMA: "⚙️ Flaschenzug Berechnung",
@@ -1047,7 +1045,7 @@ const i18n = {
     featShock: "📳 Sistema de Choque Dinámico",
     featShockDesc: "¡Personalice el porcentaje de choque para predecir fuerzas máximas!",
     featShot: "📸 Captura Táctica",
-    featShotDesc: "¡Captura de pantalla completa que combina perfectamente foto y datos!",
+    featShotDesc: "¡Recorta perfectamente la pantalla principal, combinando foto y datos!",
     featHeight: "↕️ Diferencia de Altura",
     featHeightDesc: "¡Desbloquee la simulación de diferencia de altura para cañones profundos!",
     featMA: "⚙️ Cálculo de Ventaja Mecánica",
@@ -1151,7 +1149,7 @@ const i18n = {
     featShock: "📳 Carga de Choque Dinâmica",
     featShockDesc: "Personalize o choque para prever forças máximas extremas!",
     featShot: "📸 Captura Táctica",
-    featShotDesc: "Captura de tela inteira combinando foto e dados!",
+    featShotDesc: "Recorta perfeitamente a tela principal, combinando foto e dados!",
     featHeight: "↕️ Diferença de Altura",
     featHeightDesc: "Desbloqueie a simulação de diferença de altura para cânions!",
     featMA: "⚙️ Cálculo de Vantagem Mecânica",
@@ -2040,17 +2038,17 @@ function getSVGPos(e) {
   return pt.matrixTransform(svgEl.getScreenCTM().inverse());
 }
 
-let isDragging = null, dragStartX, dragStartY, startSpan, startHeight;
+let isDragging = null, dragStartX, dragStartY, startSpan, startHeight, startPanX, startPanY;
 function startDrag(e, node) { 
   if(e.target.tagName.toLowerCase() === 'input') return; 
   isDragging = node; 
-  
   let clientX = e.touches ? e.touches[0].clientX : e.clientX;
   let clientY = e.touches ? e.touches[0].clientY : e.clientY;
   dragStartX = clientX; dragStartY = clientY; 
-  
   startSpan = parseFloat(inSpan.value) || 20; 
   startHeight = parseFloat(inHeight.value) || 0; 
+  startPanX = panX;
+  startPanY = panY;
   
   // 💡 當拖曳畫布空白處 (PAN) 時，阻止預設滑動行為，讓全區可平移
   if(e.type === 'touchstart' && e.cancelable && node === 'PAN') { e.preventDefault(); }
@@ -2080,17 +2078,28 @@ function processDrag(e) {
   if(!isDragging) return;
   if(e.cancelable && isDragging !== 'ALL') e.preventDefault(); 
   
+  let clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  let clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  let dxScreen = clientX - dragStartX;
+  let dyScreen = clientY - dragStartY;
+  
+  let rect = svgEl.getBoundingClientRect();
+  let cssScale = 400 / rect.width; 
+  let svgDx = dxScreen * cssScale;
+  let svgDy = dyScreen * cssScale;
+  let dxMeters = svgDx / scale;
+  let dyMeters = svgDy / scale;
+
+  if (!isUserVip && (isDragging === 'A' || isDragging === 'B')) {
+      dyMeters = 0;
+      svgDy = 0;
+  }
+
   if (isDragging === 'PAN') {
-      let clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      let clientY = e.touches ? e.touches[0].clientY : e.clientY;
-      let rect = svgEl.getBoundingClientRect();
-      let cssScale = 400 / rect.width; 
-      
-      panX += (clientX - dragStartX) * cssScale;
-      panY += (clientY - dragStartY) * cssScale;
+      panX += svgDx;
+      panY += svgDy;
       dragStartX = clientX;
       dragStartY = clientY;
-      updateEngine(true);
   } else if (isDragging === 'P') {
       let pos = getSVGPos(e);
       let S = parseFloat(inSpan.value) || 20;
@@ -2109,32 +2118,33 @@ function processDrag(e) {
       
       newL = Math.max(minL, Math.min(500, newL));
       inRope.value = newL.toFixed(2);
-      updateEngine(true);
-  } else {
-      let clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      let clientY = e.touches ? e.touches[0].clientY : e.clientY;
-      let dxScreen = clientX - dragStartX;
-      let dyScreen = clientY - dragStartY;
-      
-      let rect = svgEl.getBoundingClientRect();
-      let pixelsPerMeter = (rect.width / 400) * scale;
-      let dxMeters = dxScreen / pixelsPerMeter;
-      let dyMeters = dyScreen / pixelsPerMeter;
+  } else if (isDragging === 'B') { 
+      let newSpan = Math.max(5, Math.min(200, Math.round(startSpan + dxMeters))); 
+      let newHeight = Math.max(-100, Math.min(100, Math.round(startHeight + dyMeters))); 
+      inSpan.value = newSpan;
+      inHeight.value = newHeight; 
 
-      if (!isUserVip && (isDragging === 'A' || isDragging === 'B')) {
-          dyMeters = 0;
-      }
-
-      if (isDragging === 'B') { 
-          inSpan.value = Math.max(5, Math.min(200, Math.round(startSpan + dxMeters))); 
-          inHeight.value = Math.max(-100, Math.min(100, Math.round(startHeight + dyMeters))); 
-      }
-      else if (isDragging === 'A') { 
-          inSpan.value = Math.max(5, Math.min(200, Math.round(startSpan - dxMeters))); 
-          inHeight.value = Math.max(-100, Math.min(100, Math.round(startHeight - dyMeters))); 
-      }
-      updateEngine(true);
+      // B 點視角動態補償：確保 A 點絕對靜止
+      let startAutoY = (startHeight < 0 ? Math.abs(startHeight)*scale : 0);
+      let newAutoY = (newHeight < 0 ? Math.abs(newHeight)*scale : 0);
+      panY = startPanY - (newAutoY - startAutoY);
   }
+  else if (isDragging === 'A') { 
+      let newSpan = Math.max(5, Math.min(200, Math.round(startSpan - dxMeters))); 
+      let newHeight = Math.max(-100, Math.min(100, Math.round(startHeight - dyMeters))); 
+      inSpan.value = newSpan;
+      inHeight.value = newHeight; 
+
+      // 💡 A 點視角動態補償：反向平移畫布，確保 A 點跟隨手指，B 點絕對靜止
+      let actualDxMeters = startSpan - newSpan;
+      let actualDyMeters = startHeight - newHeight;
+      let startAutoY = (startHeight < 0 ? Math.abs(startHeight)*scale : 0);
+      let newAutoY = (newHeight < 0 ? Math.abs(newHeight)*scale : 0);
+
+      panX = startPanX + (actualDxMeters * scale);
+      panY = startPanY + (actualDyMeters * scale) - (newAutoY - startAutoY);
+  }
+  updateEngine(true);
 }
 
 window.addEventListener('touchmove', processDrag, {passive: false});
@@ -2239,28 +2249,22 @@ function resetEngine() {
   adjustLForAngle(120);
 }
 
-// 💡 戰術純淨截圖 2.0 (全域抓取，完美結合實境照片與圖紙)
+// 💡 戰術純淨截圖 3.0 (完美裁切主畫面，去除非必要選單，並支援拖曳相機背景)
 async function takeScreenshot() {
-  const exportTarget = document.body;
+  const target = document.getElementById('mainCard');
   
   const iconBar = document.querySelector('.icon-bar');
   const captureHides = document.querySelectorAll('.capture-hide');
-  const menuList = document.querySelector('.menu-list');
-  const topbar = document.querySelector('.topbar');
   
   const origIconBar = iconBar ? iconBar.style.display : '';
-  const origMenuList = menuList ? menuList.style.display : '';
-  const origTopbar = topbar ? topbar.style.display : '';
   
   if(iconBar) iconBar.style.display = 'none';
   captureHides.forEach(el => el.style.display = 'none');
-  if(menuList) menuList.style.display = 'none';
-  if(topbar) topbar.style.display = 'none';
 
-  const inputs = mainCard.querySelectorAll('input[type="number"]');
+  const inputs = target.querySelectorAll('input[type="number"]');
   const placeholders = [];
   inputs.forEach(inp => {
-      if (inp.closest('.capture-hide') || inp.style.display === 'none' || inp.offsetParent === null) return;
+      if (inp.style.display === 'none' || inp.offsetParent === null) return;
       const span = document.createElement('span');
       span.textContent = inp.value;
       span.style.color = inp.style.color || 'var(--text)';
@@ -2278,7 +2282,6 @@ async function takeScreenshot() {
   let originalVideoState = bgVideo.style.display; 
   let originalImageSrc = bgImage.src; 
   let originalImageState = bgImage.style.display;
-  let originalImageOpacity = bgImage.style.opacity;
   
   if (isCameraOn && bgVideo.videoWidth) {
     const tempCanvas = document.createElement('canvas'); 
@@ -2291,57 +2294,63 @@ async function takeScreenshot() {
     bgVideo.style.display = 'none';
   }
 
-  let originalCardBg = mainCard.style.background;
-  let originalCardBorder = mainCard.style.borderColor;
-  let originalCardShadow = mainCard.style.boxShadow;
-  let originalCardBackdrop = mainCard.style.backdropFilter;
+  let originalCardBg = target.style.background;
+  let originalCardBorder = target.style.borderColor;
+  let originalCardShadow = target.style.boxShadow;
+  let originalCardBackdrop = target.style.backdropFilter;
   let originalBodyBg = document.body.style.backgroundColor;
 
   if (isCameraOn || (bgImage.src && bgImage.style.opacity !== "0")) {
-      mainCard.style.background = 'transparent';
-      mainCard.style.backdropFilter = 'none';
-      mainCard.style.boxShadow = 'none';
+      target.style.background = 'transparent';
+      target.style.backdropFilter = 'none';
+      target.style.boxShadow = 'none';
       document.body.style.backgroundColor = 'transparent';
   } else {
-      mainCard.style.background = 'var(--bg)';
+      target.classList.add('capture-mode');
   }
 
+  // 💡 將浮水印直接掛在主畫面內，確保截圖時能被完美捕捉
   let watermark = document.getElementById('watermark');
   if (!watermark) {
       watermark = document.createElement('div');
       watermark.id = 'watermark';
       watermark.style.position = 'absolute';
-      watermark.style.bottom = '20px';
-      watermark.style.left = '20px';
-      watermark.style.fontSize = '12px';
+      watermark.style.bottom = '10px';
+      watermark.style.left = '10px';
+      watermark.style.fontSize = '10px';
       watermark.style.fontWeight = 'bold';
       watermark.style.color = '#e8eef7';
       watermark.style.background = 'rgba(15, 22, 35, 0.85)';
-      watermark.style.borderLeft = '4px solid var(--safe)';
-      watermark.style.padding = '8px 12px';
-      watermark.style.borderRadius = '8px';
+      watermark.style.borderLeft = '3px solid var(--safe)';
+      watermark.style.padding = '6px 10px';
+      watermark.style.borderRadius = '6px';
       watermark.style.zIndex = '9999';
-      document.body.appendChild(watermark);
+      target.appendChild(watermark);
   }
   const now = new Date(); 
   const dateStr = now.getFullYear() + '/' + String(now.getMonth()+1).padStart(2, '0') + '/' + String(now.getDate()).padStart(2, '0');
   const timeStr = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
-  watermark.innerHTML = `🛡️ ${t('appTitle')}<br><span style="font-size:10px; color:#a8b3c5; font-weight:normal;">${dateStr} ${timeStr} ｜ © 散木團隊</span>`;
+  watermark.innerHTML = `🛡️ ${t('appTitle')}<br><span style="font-size:9px; color:#a8b3c5; font-weight:normal;">${dateStr} ${timeStr} ｜ © 散木團隊</span>`;
   watermark.style.display = 'block';
 
-  const scrollWrapper = document.getElementById('scroll-wrapper');
-  let origScrollOverflow = scrollWrapper.style.overflowY;
-  scrollWrapper.style.overflowY = 'hidden';
+  await new Promise(r => setTimeout(r, 150));
+  
+  const rect = target.getBoundingClientRect();
+  const scrollX = window.pageXOffset;
+  const scrollY = window.pageYOffset;
 
-  window.scrollTo(0, 0);
   showToast("📸 正在生成高解析度戰術報告...", "safe");
-  await new Promise(r => setTimeout(r, 500));
   
   try {
+    // 💡 鎖定截圖範圍為 target (mainCard) 的幾何大小，完美避開底下長選單
     const canvas = await html2canvas(document.body, { 
         backgroundColor: (isCameraOn || (bgImage.src && bgImage.style.opacity !== "0")) ? null : '#0f1623', 
         scale: 2, 
         useCORS: true,
+        x: rect.left + scrollX,
+        y: rect.top + scrollY,
+        width: rect.width,
+        height: rect.height,
         ignoreElements: (el) => el.hasAttribute('data-html2canvas-ignore') || el.classList.contains('capture-hide') 
     });
     
@@ -2357,19 +2366,17 @@ async function takeScreenshot() {
   watermark.style.display = 'none';
   if(iconBar) iconBar.style.display = origIconBar;
   captureHides.forEach(el => el.style.display = '');
-  if(menuList) menuList.style.display = origMenuList;
-  if(topbar) topbar.style.display = origTopbar;
-  scrollWrapper.style.overflowY = origScrollOverflow;
-
+  
   placeholders.forEach(p => {
       p.inp.style.display = '';
       p.span.remove();
   });
 
-  mainCard.style.background = originalCardBg;
-  mainCard.style.borderColor = originalCardBorder;
-  mainCard.style.boxShadow = originalCardShadow;
-  mainCard.style.backdropFilter = originalCardBackdrop;
+  target.classList.remove('capture-mode');
+  target.style.background = originalCardBg;
+  target.style.borderColor = originalCardBorder;
+  target.style.boxShadow = originalCardShadow;
+  target.style.backdropFilter = originalCardBackdrop;
   document.body.style.backgroundColor = originalBodyBg;
   
   if (isCameraOn) { 
