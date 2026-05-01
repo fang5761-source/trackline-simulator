@@ -230,8 +230,9 @@
 
   .menu-list { display: flex; flex-direction: column; width: 100%; margin-top: 5px; }
   details.main-accordion { margin-top: 12px; }
+  /* 💡 將這兩個標題字體顏色改為橘黃色 (var(--warn)) */
   details.main-accordion > summary {
-    font-size: 14px; font-weight: bold; color: var(--text); padding: 12px 16px; background: rgba(150,150,150,0.1);
+    font-size: 14px; font-weight: bold; color: var(--warn); padding: 12px 16px; background: rgba(150,150,150,0.1);
     border-radius: 12px; letter-spacing: 0.5px; cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; user-select: none; transition: background 0.2s;
   }
   details.main-accordion > summary:active { background: rgba(150,150,150,0.2); }
@@ -1420,14 +1421,14 @@ function showToast(msg, type = 'safe') {
             <div class="menu-action-btn" style="border-bottom: 1px solid var(--line); justify-content: space-between;">
               <div class="menu-header-left"><span class="menu-icon">🌍</span><span data-i18n="menuLang">語言設定 / Language</span></div>
               <select id="langSelect" onchange="changeLang(this.value)" style="background: rgba(255,255,255,0.05); border: 1px solid var(--line); color: var(--text); border-radius: 6px; padding: 4px 8px; font-size: 13px; font-weight: bold; outline: none; cursor: pointer;">
-                <option value="zh">🇹🇼 繁中</option>
-                <option value="en">🇺🇸 EN</option>
-                <option value="ja">🇯🇵 日本語</option>
-                <option value="ko">🇰🇷 한국어</option>
-                <option value="fr">🇫🇷 Français</option>
-                <option value="de">🇩🇪 Deutsch</option>
-                <option value="es">🇪🇸 Español</option>
-                <option value="pt">🇵🇹 Português</option>
+                <option value="zh">繁體中文</option>
+                <option value="en">English</option>
+                <option value="ja">日本語</option>
+                <option value="ko">한국어</option>
+                <option value="fr">Français</option>
+                <option value="de">Deutsch</option>
+                <option value="es">Español</option>
+                <option value="pt">Português</option>
               </select>
             </div>
 
@@ -1654,10 +1655,10 @@ function verifyVip() {
 }
 
 function handleImageUploadClick(e) {
-    e.preventDefault(); 
-    attemptFeature('featPhoto', () => {
-        document.getElementById('upload-image').click();
-    });
+    if (!isUserVip) {
+        e.preventDefault(); 
+        attemptFeature('featPhoto', () => { document.getElementById('upload-image').click(); });
+    }
 }
 
 function handleHeightClick(e) {
