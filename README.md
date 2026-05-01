@@ -1,2 +1,2 @@
 # trackline-simulator
-多點V角張力儀
+索道張力儀 (動態滑行版)
