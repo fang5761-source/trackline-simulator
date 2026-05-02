@@ -2268,199 +2268,227 @@ function resetEngine() {
   adjustLForAngle(120);
 }
 
-// 💡 戰術純淨相片截圖 8.0 (原生相簿存圖分享、完整保留數據、完美浮水印)
+// 💡 戰術純淨相片截圖 9.0 (完整修復版：真實相片輸出、UI完整復原、浮水印)
 async function takeScreenshot() {
   const target = document.getElementById('mainCard');
   const exportWrapper = document.getElementById('export-wrapper');
   const scrollWrap = document.getElementById('scroll-wrapper');
   const bgLayer = document.getElementById('bg-layer');
   const appContainer = document.querySelector('.app-container');
-  
-  // 1. 隱藏不必要的元素 (標題列、相機按鈕區、底部說明書選單、小白提示)
-  const topbar = document.querySelector('.topbar');
-  const iconBar = document.querySelector('.icon-bar');
-  const menuList = document.querySelector('.menu-list');
-  const taglineInfo = document.getElementById('taglineInfo');
-  
-  const origTopbar = topbar ? topbar.style.display : '';
-  const origIconBar = iconBar ? iconBar.style.display : '';
-  const origMenuList = menuList ? menuList.style.display : '';
-  const origTaglineInfo = taglineInfo ? taglineInfo.style.display : '';
-  
-  if(topbar) topbar.style.display = 'none';
-  if(iconBar) iconBar.style.display = 'none';
-  if(menuList) menuList.style.display = 'none';
-  if(taglineInfo) taglineInfo.style.display = 'none';
 
-  // 2. 將 Input 替換為純文字，避免相片破圖
+  // ── 快照所有需要還原的狀態 ───────────────────────────
+  const topbar      = document.querySelector('.topbar');
+  const iconBar     = document.querySelector('.icon-bar');
+  const menuList    = document.querySelector('.menu-list');
+  const taglineInfo = document.getElementById('taglineInfo');
+  const captureHideEls = document.querySelectorAll('.capture-hide');
+
+  const origTopbar        = topbar      ? topbar.style.display      : '';
+  const origIconBar       = iconBar     ? iconBar.style.display      : '';
+  const origMenuList      = menuList    ? menuList.style.display     : '';
+  const origTaglineInfo   = taglineInfo ? taglineInfo.style.display  : '';
+  const origExportHeight  = exportWrapper.style.height;
+  const origExportPos     = exportWrapper.style.position;
+  const origScrollOverflow = scrollWrap.style.overflowY;
+  const origScrollPos     = scrollWrap.style.position;
+  const origScrollHeight  = scrollWrap.style.height;
+  const origBgPos         = bgLayer.style.position;
+  const origBgHeight      = bgLayer.style.height;
+
+  const origVideoDisplay  = bgVideo.style.display;
+  const origImageSrc      = bgImage.src;
+  const origImageDisplay  = bgImage.style.display;
+  const origImageOpacity  = bgImage.style.opacity;
+
+  // capture-hide 元素個別快照 display 值
+  const captureHideOrig = Array.from(captureHideEls).map(el => el.style.display);
+
+  // Input 替換佔位 span，避免 html2canvas 無法渲染 input 值
   const inputs = target.querySelectorAll('input[type="number"]');
   const placeholders = [];
-  inputs.forEach(inp => {
-      if (inp.style.display === 'none' || inp.offsetParent === null) return;
+
+  try {
+    // ── STEP 1：隱藏 UI 元素（標題列、按鈕列、底部說明、滑桿等）──
+    if (topbar)      topbar.style.display      = 'none';
+    if (iconBar)     iconBar.style.display      = 'none';
+    if (menuList)    menuList.style.display     = 'none';
+    if (taglineInfo) taglineInfo.style.display  = 'none';
+    captureHideEls.forEach(el => { el.style.display = 'none'; });
+
+    // ── STEP 2：Input → 純文字 span ──────────────────────────
+    inputs.forEach(inp => {
+      if (inp.offsetParent === null) return; // 已隱藏的跳過
       const span = document.createElement('span');
       span.textContent = inp.value;
-      span.style.color = inp.style.color || 'var(--text)';
-      span.style.fontSize = window.getComputedStyle(inp).fontSize;
-      span.style.fontWeight = 'bold';
-      span.style.fontFamily = 'monospace';
-      span.style.margin = '0 2px';
-      span.style.borderBottom = inp.style.borderBottom;
-      
+      span.style.cssText = `
+        color: ${window.getComputedStyle(inp).color};
+        font-size: ${window.getComputedStyle(inp).fontSize};
+        font-weight: bold;
+        font-family: monospace;
+        margin: 0 2px;
+      `;
       inp.style.display = 'none';
       inp.parentNode.insertBefore(span, inp);
       placeholders.push({ span, inp });
-  });
+    });
 
-  // 3. 在最底下動態壓上浮水印 (使用獨立節點，掛在所有數據的正下方！)
-  let watermark = document.getElementById('watermark');
-  if (!watermark) {
+    // ── STEP 3：浮水印節點（掛在 app-container 最底部）────────
+    let watermark = document.getElementById('watermark');
+    if (!watermark) {
       watermark = document.createElement('div');
       watermark.id = 'watermark';
-      watermark.style.marginTop = '15px'; 
-      watermark.style.background = 'rgba(15, 22, 35, 0.85)';
-      watermark.style.borderLeft = '4px solid var(--safe)';
-      watermark.style.padding = '8px 12px';
-      watermark.style.borderRadius = '8px';
-      watermark.style.display = 'flex';
-      watermark.style.flexDirection = 'column';
-      watermark.style.gap = '4px';
-      // 掛在 app-container 裡面，緊接在 mainCard 之後，確保絕不蓋住數據
-      appContainer.appendChild(watermark); 
-  }
-  const now = new Date(); 
-  const dateStr = now.getFullYear() + '/' + String(now.getMonth()+1).padStart(2, '0') + '/' + String(now.getDate()).padStart(2, '0');
-  const timeStr = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
-  
-  // 浮水印加上純手工打造的專屬 SVG ICON，保證 html2canvas 絕對能印出來
-  watermark.innerHTML = `
-    <div style="display:flex; align-items:center; gap:6px;">
-        <svg width="16" height="16" viewBox="0 0 100 100" style="border-radius:4px; border:1px solid rgba(255,255,255,0.2);">
-           <rect width="100" height="100" fill="#0f1623" rx="20"/>
-           <path d="M 15 30 L 50 72 L 85 30" fill="none" stroke="#22c55e" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" />
-           <circle cx="15" cy="30" r="10" fill="#ffffff" /><circle cx="85" cy="30" r="10" fill="#ffffff" />
-           <circle cx="50" cy="72" r="16" fill="#ffd84d" />
-           <line x1="50" y1="72" x2="50" y2="58" stroke="#ef4444" stroke-width="4" stroke-linecap="round"/>
-        </svg>
-        <span style="font-size:12px; font-weight:bold; color:#e8eef7;">${t('appTitle')}</span>
-    </div>
-    <span style="font-size:10px; color:#a8b3c5; font-weight:normal;">${dateStr} ${timeStr} ｜ © 散木團隊</span>
-  `;
-  watermark.style.display = 'flex';
+      appContainer.appendChild(watermark);
+    }
+    const now = new Date();
+    const dateStr = now.getFullYear() + '/' +
+      String(now.getMonth()+1).padStart(2,'0') + '/' +
+      String(now.getDate()).padStart(2,'0');
+    const timeStr = String(now.getHours()).padStart(2,'0') + ':' +
+      String(now.getMinutes()).padStart(2,'0');
 
-  // 4. 動態延展畫布：強迫把被隱藏在捲軸底下的 MA 數據也全部拉開曝光！
-  const origExportHeight = exportWrapper.style.height;
-  const origExportPos = exportWrapper.style.position;
-  const origScrollOverflow = scrollWrap.style.overflowY;
-  const origScrollPos = scrollWrap.style.position;
-  const origScrollHeight = scrollWrap.style.height;
-  const origBgPos = bgLayer.style.position;
-  const origBgHeight = bgLayer.style.height;
-
-  exportWrapper.style.position = 'relative';
-  exportWrapper.style.height = 'auto';
-  scrollWrap.style.position = 'relative';
-  scrollWrap.style.overflowY = 'visible';
-  scrollWrap.style.height = 'auto';
-  
-  const totalHeight = exportWrapper.scrollHeight;
-  bgLayer.style.position = 'absolute';
-  bgLayer.style.height = totalHeight + 'px';
-
-  // 5. 處理相機鏡頭背景轉換為純圖片
-  let originalVideoState = bgVideo.style.display; 
-  let originalImageSrc = bgImage.src; 
-  let originalImageState = bgImage.style.display;
-  
-  if (isCameraOn && bgVideo.videoWidth) {
-    const tempCanvas = document.createElement('canvas'); 
-    tempCanvas.width = bgVideo.videoWidth; 
-    tempCanvas.height = bgVideo.videoHeight;
-    tempCanvas.getContext('2d').drawImage(bgVideo, 0, 0, tempCanvas.width, tempCanvas.height);
-    bgImage.src = tempCanvas.toDataURL('image/jpeg'); 
-    bgImage.style.display = 'block'; 
-    bgImage.style.opacity = '1';
-    bgVideo.style.display = 'none';
-  }
-
-  showToast("📸 正在洗出高解析度戰術相片...", "warn");
-  await new Promise(r => setTimeout(r, 200)); 
-  
-  try {
-    // 💡 開始雷射裁切全區畫布 (保留背景、所有數據)
-    const canvasPromise = html2canvas(exportWrapper, { 
-        backgroundColor: (isCameraOn || (bgImage.src && bgImage.style.opacity !== "0")) ? null : '#0f1623', 
-        scale: 2, 
-        useCORS: true,
-        windowHeight: totalHeight,
-        height: totalHeight,
-        ignoreElements: (el) => el.hasAttribute('data-html2canvas-ignore')
+    Object.assign(watermark.style, {
+      display:        'flex',
+      flexDirection:  'column',
+      gap:            '4px',
+      marginTop:      '15px',
+      padding:        '8px 14px',
+      background:     'rgba(15, 22, 35, 0.9)',
+      borderLeft:     '4px solid #22c55e',
+      borderRadius:   '8px',
+      boxSizing:      'border-box',
     });
-    
-    const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('處理超時，已強制退出')), 8000));
-    const canvas = await Promise.race([canvasPromise, timeoutPromise]);
-    
-    const dataUrl = canvas.toDataURL('image/png');
-    const filename = `散木戰術報告_${new Date().getTime()}.png`;
+    watermark.innerHTML = `
+      <div style="display:flex;align-items:center;gap:8px;">
+        <svg width="18" height="18" viewBox="0 0 100 100">
+          <rect width="100" height="100" fill="#0f1623" rx="20"/>
+          <path d="M15 30 L50 72 L85 30" fill="none" stroke="#22c55e" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="15" cy="30" r="10" fill="#fff"/>
+          <circle cx="85" cy="30" r="10" fill="#fff"/>
+          <circle cx="50" cy="72" r="16" fill="#ffd84d"/>
+          <line x1="50" y1="72" x2="50" y2="58" stroke="#ef4444" stroke-width="4" stroke-linecap="round"/>
+        </svg>
+        <span style="font-size:13px;font-weight:bold;color:#e8eef7;">${t('appTitle')}</span>
+      </div>
+      <span style="font-size:11px;color:#a8b3c5;">${dateStr} ${timeStr} ｜ © 散木團隊</span>
+    `;
 
-    // 💡 【終極殺招】呼叫手機系統底層的「原生分享/儲存相簿API」！
+    // ── STEP 4：展開全版面（確保 MA 省力比等底部數值完整入鏡）──
+    exportWrapper.style.position  = 'relative';
+    exportWrapper.style.height    = 'auto';
+    scrollWrap.style.position     = 'relative';
+    scrollWrap.style.overflowY    = 'visible';
+    scrollWrap.style.height       = 'auto';
+
+    // 等一幀讓 DOM reflow 完成
+    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+    const totalHeight = exportWrapper.scrollHeight;
+    bgLayer.style.position = 'absolute';
+    bgLayer.style.height   = totalHeight + 'px';
+
+    // ── STEP 5：相機畫面凍結為靜態圖片 ────────────────────────
+    if (isCameraOn && bgVideo.videoWidth > 0) {
+      const tmpCanvas = document.createElement('canvas');
+      tmpCanvas.width  = bgVideo.videoWidth;
+      tmpCanvas.height = bgVideo.videoHeight;
+      tmpCanvas.getContext('2d').drawImage(bgVideo, 0, 0);
+      bgImage.src            = tmpCanvas.toDataURL('image/jpeg');
+      bgImage.style.display  = 'block';
+      bgImage.style.opacity  = '1';
+      bgVideo.style.display  = 'none';
+    }
+
+    showToast("📸 正在洗出高解析度戰術相片...", "warn");
+    await new Promise(r => setTimeout(r, 250));
+
+    // ── STEP 6：html2canvas 渲染 ────────────────────────────
+    const hasBg = isCameraOn || (bgImage.src && bgImage.style.opacity !== '0');
+    const canvasPromise = html2canvas(exportWrapper, {
+      backgroundColor: hasBg ? null : '#0f1623',
+      scale:           2,
+      useCORS:         true,
+      allowTaint:      true,
+      windowHeight:    totalHeight,
+      height:          totalHeight,
+      ignoreElements:  (el) => el.hasAttribute('data-html2canvas-ignore'),
+    });
+
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('處理超時，已強制退出')), 10000)
+    );
+    const canvas = await Promise.race([canvasPromise, timeoutPromise]);
+
+    const dataUrl  = canvas.toDataURL('image/png');
+    const filename = `散木戰術報告_${Date.now()}.png`;
+
+    // ── STEP 7：原生分享（手機）或直接下載（桌機）────────────
     let shared = false;
     if (navigator.share && navigator.canShare) {
-        try {
-            const blob = await (await fetch(dataUrl)).blob();
-            const file = new File([blob], filename, { type: 'image/png' });
-            if (navigator.canShare({ files: [file] })) {
-                await navigator.share({
-                    files: [file],
-                    title: '索道張力儀戰術報告',
-                    text: '散木團隊特戰沙盤分析結果'
-                });
-                shared = true;
-                showToast("✅ 已開啟原生分享與儲存選單", "safe");
-            }
-        } catch (e) {
-            console.log("分享取消或不支援", e);
+      try {
+        const blob = await (await fetch(dataUrl)).blob();
+        const file = new File([blob], filename, { type: 'image/png' });
+        if (navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: '索道張力儀戰術報告',
+            text:  '散木團隊特戰沙盤分析結果',
+          });
+          shared = true;
+          showToast("✅ 已開啟原生分享與儲存選單", "safe");
         }
-    }
-
-    // 如果手機不支援原生分享，切換備用下載路線
-    if (!shared) {
-        const link = document.createElement('a'); 
-        link.download = filename; 
-        link.href = dataUrl; 
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        showToast("✅ 戰術相片已下載！", "safe");
-    }
-
-  } catch(e) { 
-      showToast("❌ 洗相片失敗：" + e.message, "bad"); 
-  } finally {
-      // 6. 恢復 UI 原狀，讓系統繼續正常運作
-      watermark.style.display = 'none';
-      if(topbar) topbar.style.display = origTopbar;
-      if(iconBar) iconBar.style.display = origIconBar;
-      if(menuList) menuList.style.display = origMenuList;
-      if(taglineInfo) taglineInfo.style.display = origTaglineInfo;
-      
-      placeholders.forEach(p => {
-          p.inp.style.display = '';
-          p.span.remove();
-      });
-
-      exportWrapper.style.position = origExportPos;
-      exportWrapper.style.height = origExportHeight;
-      scrollWrap.style.position = origScrollPos;
-      scrollWrap.style.overflowY = origScrollOverflow;
-      scrollWrap.style.height = origScrollHeight;
-      bgLayer.style.position = origBgPos;
-      bgLayer.style.height = origBgHeight;
-      
-      if (isCameraOn) { 
-          bgVideo.style.display = originalVideoState; 
-          bgImage.src = originalImageSrc; 
-          bgImage.style.display = originalImageState; 
+      } catch (e) {
+        // 使用者取消分享不視為錯誤
+        if (e.name !== 'AbortError') console.warn("分享失敗", e);
       }
+    }
+
+    if (!shared) {
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href     = dataUrl;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast("✅ 戰術相片已下載！", "safe");
+    }
+
+  } catch (e) {
+    showToast("❌ 洗相片失敗：" + e.message, "bad");
+  } finally {
+    // ── STEP 8：完整還原所有 UI 狀態 ─────────────────────────
+    // 浮水印隱藏
+    const wm = document.getElementById('watermark');
+    if (wm) wm.style.display = 'none';
+
+    // 還原隱藏的 UI 元素
+    if (topbar)      topbar.style.display      = origTopbar;
+    if (iconBar)     iconBar.style.display      = origIconBar;
+    if (menuList)    menuList.style.display     = origMenuList;
+    if (taglineInfo) taglineInfo.style.display  = origTaglineInfo;
+
+    // 還原 capture-hide 元素
+    captureHideEls.forEach((el, i) => { el.style.display = captureHideOrig[i]; });
+
+    // 還原 input 顯示並移除佔位 span
+    placeholders.forEach(p => {
+      p.inp.style.display = '';
+      if (p.span.parentNode) p.span.parentNode.removeChild(p.span);
+    });
+
+    // 還原版面佈局
+    exportWrapper.style.position  = origExportPos;
+    exportWrapper.style.height    = origExportHeight;
+    scrollWrap.style.position     = origScrollPos;
+    scrollWrap.style.overflowY    = origScrollOverflow;
+    scrollWrap.style.height       = origScrollHeight;
+    bgLayer.style.position        = origBgPos;
+    bgLayer.style.height          = origBgHeight;
+
+    // 還原相機/圖片背景（不論是否開啟相機都還原，防止狀態殘留）
+    bgVideo.style.display  = origVideoDisplay;
+    bgImage.src            = origImageSrc;
+    bgImage.style.display  = origImageDisplay;
+    bgImage.style.opacity  = origImageOpacity;
   }
 }
 
