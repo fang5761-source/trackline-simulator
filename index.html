@@ -141,6 +141,10 @@
   .icon-btn.active { background: var(--safe); color: var(--bg); border-color: var(--safe); }
   .icon-btn.active-shock { background: var(--bad); color: #fff; border-color: var(--bad); animation: pulse 1.5s infinite; }
   
+  .btn-strike { position: relative; }
+  .btn-strike::after { content: ''; position: absolute; top: 50%; left: 15%; right: 15%; height: 2px; background-color: var(--bad); transform: translateY(-50%) rotate(-45deg); display: none; border-radius: 2px; }
+  .btn-strike.striked::after { display: block; }
+  
   .lock-icon { position: absolute; bottom: 2px; right: 4px; font-size: 10px; text-shadow: 0 1px 2px #000; pointer-events: none; }
   body.is-vip .lock-icon { display: none; }
   .lock-icon-inline { font-size: 10px; margin-left: 4px; color: var(--vip); }
@@ -1275,10 +1279,10 @@ function changeLang(selectedLang) {
       <div class="icon-bar" data-html2canvas-ignore="true">
         <button class="icon-btn" id="btn-camera" onclick="attemptFeature('featCam', toggleCamera)" title="實境相機">📷<span class="lock-icon">🔒</span></button>
         <button class="icon-btn" id="btn-flashlight" onclick="toggleFlashlight()" title="手電筒">🔦</button>
-        <label class="icon-btn" onclick="handleImageUploadClick(event)" title="載入照片" style="margin:0;">📁<span class="lock-icon">🔒</span></label>
+        <label class="icon-btn" id="btn-photo" onclick="handleImageUploadClick(event)" title="載入照片" style="margin:0;">📁<span class="lock-icon">🔒</span></label>
         <input type="file" id="upload-image" accept="image/*" onchange="loadImage(event)">
         <button class="icon-btn" onclick="toggleGrid()" title="工程網格">🌐</button>
-        <button class="icon-btn" onclick="toggleHUD()" title="專注/淨空模式">👁️</button>
+        <button class="icon-btn btn-strike" id="btn-hud" onclick="toggleHUD()" title="專注/淨空模式">👁️</button>
         <button class="icon-btn" id="btn-shock" onclick="attemptFeature('featShock', toggleShock)" title="動態震動衝擊">📳<span class="lock-icon">🔒</span></button>
         <button class="icon-btn" onclick="attemptFeature('featShot', takeScreenshot)" title="戰術截圖">📸<span class="lock-icon">🔒</span></button>
         <button class="icon-btn" onclick="resetEngine()" title="重置沙盤">↺</button>
@@ -1395,7 +1399,7 @@ function changeLang(selectedLang) {
     
     <div class="menu-list" data-html2canvas-ignore="true">
       <details class="main-accordion" id="theoryAccordion">
-        <summary><div style="display:flex; align-items:center; gap:8px;"><span class="menu-icon">⚙️</span> <span data-i18n="menu2">系統工具與說明書</span></div></summary>
+        <summary><div style="display:flex; align-items:center; gap:8px;"><span class="menu-icon">⚙️</span> <span data-i18n="menu2" style="color: var(--warn);">系統工具與說明書</span></div></summary>
         <div class="menu-group">
           
           <div class="menu-action-btn" style="border-bottom: 1px solid var(--line); justify-content: space-between;">
@@ -1478,7 +1482,7 @@ function changeLang(selectedLang) {
       </details>
 
       <details class="main-accordion" style="margin-top: 10px;">
-        <summary><div style="display:flex; align-items:center; gap:8px;"><span class="menu-icon">📚</span> <span data-i18n="menu1">專業名詞與原理解析</span></div></summary>
+        <summary><div style="display:flex; align-items:center; gap:8px;"><span class="menu-icon">📚</span> <span data-i18n="menu1" style="color: var(--warn);">專業名詞與原理解析</span></div></summary>
         <div class="menu-group">
           <div class="menu-content">
             <p><b style="color:var(--safe)" data-i18n="thTensionT">🔗 張力 (Tension)</b><br><span data-i18n="thTensionD">系統內部主繩繃緊的程度。由於滑輪會滾動平衡力量，整條主繩的張力是一樣的。張力過大將導致主繩斷裂！</span></p>
@@ -1648,6 +1652,13 @@ function verifyVip() {
 }
 
 function handleImageUploadClick(e) {
+    const btnPhoto = document.getElementById('btn-photo');
+    if (image.style.opacity === "1") {
+        e.preventDefault();
+        clearPhotoOverlay();
+        return;
+    }
+
     if (isUserVip) {
         document.getElementById('upload-image').click();
     } else {
@@ -1655,6 +1666,18 @@ function handleImageUploadClick(e) {
         attemptFeature('featPhoto', () => {
             document.getElementById('upload-image').click();
         });
+    }
+}
+
+function clearPhotoOverlay() {
+    const btnPhoto = document.getElementById('btn-photo');
+    image.style.opacity = "0";
+    image.src = ""; 
+    document.getElementById('upload-image').value = ""; 
+    btnPhoto.classList.remove('active'); 
+    if (!stream) {
+        mainCard.classList.remove('camera-mode');
+        document.body.classList.remove('camera-mode');
     }
 }
 
@@ -2143,6 +2166,7 @@ async function toggleCamera() {
     document.body.classList.remove('camera-mode');
   } else { 
     try { 
+      clearPhotoOverlay();
       image.style.opacity = "0"; 
       stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }); 
       videoTrack = stream.getVideoTracks()[0];
@@ -2184,6 +2208,7 @@ function loadImage(event) {
       image.style.opacity = "1"; 
       mainCard.classList.add('camera-mode');
       document.body.classList.add('camera-mode');
+      document.getElementById('btn-photo').classList.add('active');
     }; 
     reader.readAsDataURL(file); 
   } 
@@ -2194,6 +2219,15 @@ function toggleHUD() {
   hudVisible = !hudVisible;
   const huds = document.querySelectorAll('.hud-panel, .stretcher-tag, .tagline-wrap, .control-deck, .tag-badge');
   huds.forEach(el => el.style.opacity = hudVisible ? "1" : "0");
+  
+  const btnHud = document.getElementById('btn-hud');
+  if (!hudVisible) {
+      btnHud.classList.add('active');
+      btnHud.classList.add('striked');
+  } else {
+      btnHud.classList.remove('active');
+      btnHud.classList.remove('striked');
+  }
 }
 
 function resetEngine() {
