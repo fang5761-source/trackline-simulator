@@ -148,7 +148,7 @@
   .svgWrap { 
     position:relative; width:100%; height: 45vh; min-height: 320px; max-height: 460px;
     background: transparent; border-radius: 12px; border: 1px dashed var(--line); overflow: hidden; 
-    cursor: grab; /* 💡 允許拖曳空白處 */
+    cursor: grab;
   }
   .svgWrap:active { cursor: grabbing; }
   svg { display: block; width: 100%; height: 100%; }
@@ -361,12 +361,12 @@ const i18n = {
     thShockT: "📳 動態震動衝擊 (Shock Load)",
     thShockD: "拖拉過程中產生的頓挫與晃動，會瞬間放大系統受力。開啟系統頂端的「📳」按鈕，可自訂百分比，精準模擬最危險的峰值衝擊。",
     collapse: "🔼 收起說明",
-    op1: "直接拖曳畫布上的 <b>A點/B點</b> 設定地形跨距與高低差。",
+    op1: "拖曳 <b>A/B點</b> 自由改變跨距與高低差，拖曳 <b>空白處</b> 可平移畫布。",
     op2: "直接拖曳橘色 <b>大擔架</b> 或滑輪，可精準模擬傷患過河的張力變化。",
     op3: "當擔架處於偏離點時，可點選下方的 <b>⚙️水平牽引省力比</b> 換算手拉力。",
     op4: "滑動下方的 <b>夾角拉桿</b>，系統會自動反推繩長並平滑變形。",
     op5: "點擊 <b>📷實境 / 📁照片</b> 疊圖，並拖曳空白畫布以精準對齊現場地形！",
-    devTitle: "散木索道儀 專業正式版",
+    devTitle: "散木索道儀 專業正式版 v6.6",
     devTeam: "本工具由 <span style='color:var(--warn);'>散木團隊</span> 開發製作",
     devT1: "教學架構與工程判斷／徐世豐",
     devT2: "工具設計與互動介面／吳佩芳（朵朵）",
@@ -416,7 +416,7 @@ const i18n = {
     featShock: "📳 動態震動衝擊系統",
     featShockDesc: "自訂拖拉過程中的頓挫與晃動百分比，精準預測最危險的峰值受力！",
     featShot: "📸 戰術純淨截圖",
-    featShotDesc: "自動濾除雜訊，一鍵匯出全螢幕高解析度的專業戰術報告圖紙！",
+    featShotDesc: "一鍵完美去背，自動匯出無浮水印、高解析度的專業戰術主畫面截圖！",
     featHeight: "↕️ 峽谷高低差模擬",
     featHeightDesc: "解鎖高低差限制，真實模擬深谷上拉與下放的極端物理張力變化！",
     featMA: "⚙️ 牽引省力比換算",
@@ -465,12 +465,12 @@ const i18n = {
     thShockT: "📳 Shock Load",
     thShockD: "Sudden movements amplify system force instantly.",
     collapse: "🔼 Collapse",
-    op1: "Drag <b>Anchor A/B</b> to set terrain.",
+    op1: "Drag <b>Anchor A/B</b> to set terrain, drag <b>blank area</b> to pan.",
     op2: "Drag the <b>orange stretcher</b> to simulate tension changes.",
     op3: "Click <b>⚙️ Horizontal MA</b> to convert pulling force.",
     op4: "Slide the <b>Angle Slider</b> below for dynamic adjustment.",
     op5: "Click <b>📷 AR / 📁 Photo</b> to overlay real scenes, and drag canvas to align!",
-    devTitle: "Trackline Simulator PRO",
+    devTitle: "Trackline Simulator PRO v6.6",
     devTeam: "Developed by <span style='color:var(--warn);'>SunMoon Team</span>",
     devT1: "Engineering & Architecture / Shih-Feng Hsu",
     devT2: "UI/UX Design / Pei-Fang Wu",
@@ -520,7 +520,7 @@ const i18n = {
     featShock: "📳 Dynamic Shock System",
     featShockDesc: "Customize shock percentage to predict extreme peak forces!",
     featShot: "📸 Tactical Screenshot",
-    featShotDesc: "Capture the entire screen with data overlay flawlessly!",
+    featShotDesc: "Perfectly captures the clean main canvas with high-res data overlay!",
     featHeight: "↕️ Height Diff Simulation",
     featHeightDesc: "Unlock height limits for extreme physics tension variations!",
     featMA: "⚙️ Horizontal MA Calc",
@@ -569,12 +569,12 @@ const i18n = {
     thShockT: "📳 衝撃荷重 (Shock Load)",
     thShockD: "動的な衝撃がシステムにかかる力を瞬間的に増幅させます。",
     collapse: "🔼 閉じる",
-    op1: "<b>支点A/B</b> をドラッグして地形を設定します。",
+    op1: "<b>支点A/B</b> をドラッグして地形を設定、<b>背景</b> をドラッグで移動します。",
     op2: "<b>担架</b> をドラッグして張力変化をシミュレーションします。",
     op3: "下の <b>⚙️ 水平倍力比</b> をクリックして引く力を計算します。",
     op4: "下の <b>角度スライダー</b> を操作して動的に調整します。",
     op5: "<b>📷 ARカメラ / 📁 写真</b> で現場画像をオーバーレイし、スライドして合わせます。",
-    devTitle: "トラックライン張力計 PRO",
+    devTitle: "トラックライン張力計 PRO v6.6",
     devTeam: "開発：<span style='color:var(--warn);'>SunMoon Team</span>",
     devT1: "アーキテクチャ・監修 / Shih-Feng Hsu",
     devT2: "UI/UX デザイン / Pei-Fang Wu",
@@ -624,7 +624,7 @@ const i18n = {
     featShock: "📳 動的衝撃システム",
     featShockDesc: "衝撃のパーセンテージをカスタマイズしてピーク荷重を予測！",
     featShot: "📸 スクリーンショット",
-    featShotDesc: "全画面キャプチャで写真とデータを完全に結合します！",
+    featShotDesc: "メイン画面を切り取り、データと背景を美しく合成します！",
     featHeight: "↕️ 高低差シミュレーション",
     featHeightDesc: "高低差の制限を解除し、極端な張力変化をシミュレーション！",
     featMA: "⚙️ 倍力比の計算",
@@ -673,12 +673,12 @@ const i18n = {
     thShockT: "📳 충격 하중 (Shock Load)",
     thShockD: "갑작스러운 움직임은 시스템의 힘을 순간적으로 증폭시킵니다.",
     collapse: "🔼 닫기",
-    op1: "<b>앵커 A/B</b>를 드래그하여 지형을 설정하세요.",
+    op1: "<b>앵커 A/B</b>를 드래그하여 지형을 설정하고, <b>빈 공간</b>을 드래그하여 캔버스를 이동합니다.",
     op2: "<b>들것</b>을 드래그하여 장력 변화를 시뮬레이션하세요.",
     op3: "아래 <b>⚙️ 수평 MA</b>를 클릭하여 견인력을 계산하세요.",
     op4: "아래 <b>각도 슬라이더</b>를 움직여 동적으로 조절하세요.",
     op5: "<b>📷 AR / 📁 사진</b>을 클릭하여 실제 현장 이미지를 오버레이하세요.",
-    devTitle: "트랙라인 장력계 PRO",
+    devTitle: "트랙라인 장력계 PRO v6.6",
     devTeam: "개발: <span style='color:var(--warn);'>SunMoon Team</span>",
     devT1: "아키텍처 및 엔지니어링 / Shih-Feng Hsu",
     devT2: "UI/UX 디자인 / Pei-Fang Wu",
@@ -728,7 +728,7 @@ const i18n = {
     featShock: "📳 동적 충격 시스템",
     featShockDesc: "충격 백분율을 설정하여 극한의 피크 하중을 예측하세요!",
     featShot: "📸 전술 스크린샷",
-    featShotDesc: "사진과 데이터를 함께 캡처하여 고해상도 리포트를 출력합니다!",
+    featShotDesc: "메인 화면을 완벽하게 자르고 데이터를 합성하여 출력합니다!",
     featHeight: "↕️ 고저차 시뮬레이션",
     featHeightDesc: "고저차 제한을 해제하여 극한의 장력 변화를 시뮬레이션하세요!",
     featMA: "⚙️ 수평 MA 계산",
@@ -777,12 +777,12 @@ const i18n = {
     thShockT: "📳 Charge de Choc",
     thShockD: "Les mouvements soudains amplifient instantanément la force.",
     collapse: "🔼 Fermer",
-    op1: "Glissez les <b>Ancrages A/B</b> pour définir le terrain.",
+    op1: "Glissez les <b>Ancrages A/B</b> pour le terrain, ou le <b>fond</b> pour déplacer.",
     op2: "Glissez la <b>civière</b> pour simuler la tension.",
     op3: "Cliquez sur <b>⚙️ Avantage Mécanique</b> pour la force.",
     op4: "Faites glisser le <b>curseur d'angle</b> en bas.",
     op5: "Cliquez sur <b>📷 AR / 📁 Photo</b> pour superposer des images.",
-    devTitle: "Simulateur Tyrolienne PRO",
+    devTitle: "Simulateur Tyrolienne PRO v6.6",
     devTeam: "Développé par <span style='color:var(--warn);'>SunMoon Team</span>",
     devT1: "Ingénierie et Architecture / Shih-Feng Hsu",
     devT2: "Design UI/UX / Pei-Fang Wu",
@@ -832,7 +832,7 @@ const i18n = {
     featShock: "📳 Choc Dynamique",
     featShockDesc: "Personnalisez le pourcentage de choc pour prévoir les pics extrêmes !",
     featShot: "📸 Capture Tactique",
-    featShotDesc: "Capture d'écran complète avec données et photo fusionnées !",
+    featShotDesc: "Recadre parfaitement l'écran principal en combinant photo et données !",
     featHeight: "↕️ Simulation de Dénivelé",
     featHeightDesc: "Débloquez les limites de dénivelé pour des variations extrêmes !",
     featMA: "⚙️ Calcul de l'AM",
@@ -881,12 +881,12 @@ const i18n = {
     thShockT: "📳 Schocklast",
     thShockD: "Plötzliche Bewegungen verstärken die Kraft im System sofort.",
     collapse: "🔼 Schließen",
-    op1: "Ziehen Sie <b>Anker A/B</b>, um das Gelände festzulegen.",
+    op1: "Ziehen Sie <b>Anker A/B</b> um das Gelände festzulegen, oder den <b>Hintergrund</b> zum Verschieben.",
     op2: "Ziehen Sie die <b>Trage</b>, um die Spannungsänderung zu simulieren.",
     op3: "Klicken Sie auf <b>⚙️ Flaschenzug</b> für die Zugkraft.",
     op4: "Bewegen Sie den <b>Winkelschieber</b> für dynamische Anpassungen.",
     op5: "Klicken Sie auf <b>📷 AR / 📁 Foto</b> für reale Bildüberlagerungen.",
-    devTitle: "Seilbahn Simulator PRO",
+    devTitle: "Seilbahn Simulator PRO v6.6",
     devTeam: "Entwickelt von <span style='color:var(--warn);'>SunMoon Team</span>",
     devT1: "Technik & Architektur / Shih-Feng Hsu",
     devT2: "UI/UX Design / Pei-Fang Wu",
@@ -936,7 +936,7 @@ const i18n = {
     featShock: "📳 Dynamische Schocklast",
     featShockDesc: "Passen Sie den Schock-Prozentsatz an, um extreme Spitzenlasten vorherzusagen!",
     featShot: "📸 Taktischer Screenshot",
-    featShotDesc: "Vollständiger Screenshot, der Foto und Daten perfekt kombiniert!",
+    featShotDesc: "Schneidet den Hauptbildschirm perfekt zu und kombiniert Foto mit Daten!",
     featHeight: "↕️ Höhenunterschied",
     featHeightDesc: "Höhenunterschied für extreme Spannungsvariationen freischalten!",
     featMA: "⚙️ Flaschenzug Berechnung",
@@ -985,12 +985,12 @@ const i18n = {
     thShockT: "📳 Carga de Choque",
     thShockD: "Los movimientos bruscos amplificam la fuerza instantáneamente.",
     collapse: "🔼 Cerrar",
-    op1: "Arrastre los <b>Anclajes A/B</b> para establecer el terreno.",
+    op1: "Arrastre el <b>Anclaje A/B</b> para establecer el terreno, y el <b>área en blanco</b> para desplazar.",
     op2: "Arrastre la <b>camilla</b> para simular la tensión.",
     op3: "Haga clic en <b>⚙️ Ventaja Mecánica</b> para calcular la fuerza.",
     op4: "Deslice el <b>Control de Ángulo</b> para ajustar dinámicamente.",
     op5: "Haga clic en <b>📷 AR / 📁 Foto</b> para superponer imágenes reales.",
-    devTitle: "Simulador de Tirolesa PRO",
+    devTitle: "Simulador de Tirolesa PRO v6.6",
     devTeam: "Desarrollado por <span style='color:var(--warn);'>SunMoon Team</span>",
     devT1: "Ingeniería y Arquitectura / Shih-Feng Hsu",
     devT2: "Diseño UI/UX / Pei-Fang Wu",
@@ -1040,7 +1040,7 @@ const i18n = {
     featShock: "📳 Sistema de Choque Dinámico",
     featShockDesc: "¡Personalice el porcentaje de choque para predecir fuerzas máximas!",
     featShot: "📸 Captura Táctica",
-    featShotDesc: "¡Captura de pantalla completa que combina perfectamente foto y datos!",
+    featShotDesc: "¡Recorta perfectamente la pantalla principal, combinando foto y datos!",
     featHeight: "↕️ Diferencia de Altura",
     featHeightDesc: "¡Desbloquee la simulación de diferencia de altura para cañones profundos!",
     featMA: "⚙️ Cálculo de Ventaja Mecánica",
@@ -1089,12 +1089,12 @@ const i18n = {
     thShockT: "📳 Carga de Choque",
     thShockD: "Movimentos bruscos amplificam a força instantaneamente.",
     collapse: "🔼 Fechar",
-    op1: "Arraste as <b>Ancoragens A/B</b> para definir o terreno.",
+    op1: "Arraste as <b>Ancoragens A/B</b> para definir o terreno, e a <b>área vazia</b> para deslocar.",
     op2: "Arraste a <b>maca</b> para simular a tensão.",
     op3: "Clique em <b>⚙️ Vantagem Mecânica</b> para calcular a força.",
     op4: "Deslize o <b>Controle de Ângulo</b> para ajuste dinâmico.",
     op5: "Clique em <b>📷 AR / 📁 Foto</b> para sobrepor imagens reais.",
-    devTitle: "Simulador de Tirolesa PRO",
+    devTitle: "Simulador de Tirolesa PRO v6.6",
     devTeam: "Desenvolvido por <span style='color:var(--warn);'>SunMoon Team</span>",
     devT1: "Engenharia e Arquitetura / Shih-Feng Hsu",
     devT2: "Design UI/UX / Pei-Fang Wu",
@@ -1110,7 +1110,7 @@ const i18n = {
     pwaStep7: "Selecione 'Adicionar à Tela de Início'",
     pwaStep8: "Toque em 'Adicionar'",
     installBtn: "📥 Instalar APP",
-    disclaimer: "<strong style='color: var(--bad); font-size: 14px;'>⚠️ Aviso Legal:</strong><br>Ferramenta teórica. A montagem real DEVE ser determinada por profissionais.<br><br><span style='color:var(--warn);'>* Licença para dispositivo único. Sem suporte para troca de aparelho. Por favor, compre novamente.</span>",
+    disclaimer: "<strong style='color: var(--bad); font-size: 14px;'>⚠️ Aviso Legal:</strong><br>Ferramenta teórica. A montagem real DEBE ser determinada por profissionais.<br><br><span style='color:var(--warn);'>* Licença para dispositivo único. Sem suporte para troca de aparelho. Por favor, compre novamente.</span>",
     vipTitle: "🔒 Recurso PRO",
     vipEnable1: "Ativar '",
     vipEnable2: "'",
@@ -1144,7 +1144,7 @@ const i18n = {
     featShock: "📳 Carga de Choque Dinâmica",
     featShockDesc: "Personalize o choque para prever forças máximas extremas!",
     featShot: "📸 Captura Táctica",
-    featShotDesc: "Captura de tela inteira combinando foto e dados!",
+    featShotDesc: "Recorta perfeitamente a tela principal, combinando foto e dados!",
     featHeight: "↕️ Diferença de Altura",
     featHeightDesc: "Desbloqueie a simulação de diferença de altura para cânions!",
     featMA: "⚙️ Cálculo de Vantagem Mecânica",
@@ -1214,7 +1214,8 @@ function changeLang(selectedLang) {
       <span style="color:var(--bad); font-size:12px; font-weight:bold; line-height:1.5; display:block;" data-i18n="vipDisclaimer">⚠️ 注意：本系統採單機授權，遺失密碼或更換設備請重新購買，恕無提供補發與人工客服。</span>
     </div>
 
-    <button class="primary-btn" style="background:var(--vip); margin-bottom:10px;" onclick="window.open('https://gumroad.com', '_blank')" data-i18n="vipStoreBtn">🛒 前往專業版自動販賣機</button>
+    <button class="primary-btn" style="background:var(--vip); margin-bottom:10px;" onclick="window.open('https://fang5761.gumroad.com/l/trackline-pro', '_blank')" data-i18n="vipStoreBtn">🛒 前往專業版自動販賣機</button>
+    
     <hr style="border:0; border-top:1px dashed var(--line); margin: 15px 0;">
     <p style="font-size:12px; color:var(--muted); margin-bottom:8px;" data-i18n="vipHasPwd">已取得密碼？請在此輸入：</p>
     <input type="text" id="vipPwdInput" data-i18n-plh="vipPwdPlh" placeholder="輸入 VIP 通關密碼" style="width: 100%; padding: 10px; font-size: 16px; text-align: center; border-radius: 8px; border: 1px solid var(--line); background: rgba(0,0,0,0.3); color: #fff; margin-bottom: 12px; letter-spacing: 2px; font-family: monospace;" autocomplete="off">
@@ -1239,9 +1240,22 @@ function changeLang(selectedLang) {
   </div>
 </div>
 
+<!-- 📸 戰術截圖結果視窗 (解決無法下載與假截圖問題) -->
+<div id="screenshotModal" class="modal-overlay" style="z-index: 10001; flex-direction: column;">
+  <div class="modal-box" style="width: 95%; max-width: 500px; padding: 16px; display: flex; flex-direction: column; max-height: 90vh;">
+    <h3 style="color:var(--safe); margin-top:0; margin-bottom:12px; font-size:18px;">📸 戰術截圖已生成！</h3>
+    <p style="color:var(--text); font-size:13px; margin-bottom:12px;">請 <b style="color:var(--warn);">長按下方圖片</b> 來儲存相片或分享。</p>
+    <div style="flex: 1; overflow-y: auto; border: 1px solid var(--line); border-radius: 8px; margin-bottom: 12px; background: #000; min-height: 200px;">
+        <img id="screenshotResultImage" src="" style="width: 100%; height: auto; display: block;" alt="戰術截圖">
+    </div>
+    <div class="modal-btn-group">
+      <button class="primary-btn btn-cancel" style="margin-bottom:0;" onclick="document.getElementById('screenshotModal').style.display='none'">關閉視窗</button>
+    </div>
+  </div>
+</div>
+
 <div id="toastMessage"></div>
 
-<!-- 💡 改用 export-wrapper 以利 HTML2Canvas 完整抓取包含背景的畫面 -->
 <div id="export-wrapper" style="width: 100%; height: 100%; position: absolute; top:0; left:0; overflow:hidden;">
   <div id="bg-layer"><video id="bg-video" autoplay playsinline muted></video><img id="bg-image" src="" alt="背景圖片"></div>
   <div id="grid-overlay"></div>
@@ -1254,7 +1268,10 @@ function changeLang(selectedLang) {
           <div class="title-row">
             <div class="title-left" id="mainTitleText">
               <img src="icon-192.png" alt="[ICON]" style="width: 28px; height: 28px; border-radius: 6px; margin-right: 8px; object-fit: cover; border: 1px solid var(--line); display: inline-block;" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><rect width=\'100\' height=\'100\' fill=\'%23334155\'/><text x=\'50\' y=\'65\' font-size=\'40\' fill=\'%23fff\' text-anchor=\'middle\'>?</text></svg>'">
-              <div class="title-tag"><span id="modeTitleLabel" data-i18n="appTitle">索道張力儀 (動態滑行版)</span> <span class="vip-badge">PRO</span></div>
+              <div class="title-tag">
+                <span id="modeTitleLabel" data-i18n="appTitle">索道張力儀 (動態滑行版)</span> 
+                <span class="vip-badge">PRO</span>
+              </div>
             </div>
             
             <div style="display:flex; align-items:center; gap:8px;">
@@ -1266,7 +1283,7 @@ function changeLang(selectedLang) {
         <div class="icon-bar" data-html2canvas-ignore="true">
           <button class="icon-btn" id="btn-camera" onclick="attemptFeature('featCam', toggleCamera)" title="實境相機">📷<span class="lock-icon">🔒</span></button>
           <button class="icon-btn" id="btn-flashlight" onclick="toggleFlashlight()" title="手電筒">🔦</button>
-          <label class="icon-btn" onclick="handleImageUploadClick(event)" title="載入照片" style="margin:0;">📁<span class="lock-icon">🔒</span></label>
+          <button class="icon-btn" id="btn-photo" onclick="handleImageUploadClick(event)" title="載入照片" style="margin:0;">📁<span class="lock-icon">🔒</span></button>
           <input type="file" id="upload-image" accept="image/*" onchange="loadImage(event)">
           <button class="icon-btn" onclick="toggleGrid()" title="工程網格">🌐</button>
           <button class="icon-btn" onclick="toggleHUD()" title="專注/淨空模式">👁️</button>
@@ -1341,14 +1358,14 @@ function changeLang(selectedLang) {
         </div>
         
         <div class="control-deck">
-           <div class="angle-slider-header">
+           <div class="angle-slider-header capture-hide">
               <span data-i18n="angleLoose">鬆 (夾角小)</span>
               <span style="color:var(--text);" data-i18n="angleDrag">📐 滑動調整主繩夾角</span>
               <span data-i18n="angleTight">緊 (夾角大)</span>
            </div>
-           <input type="range" id="angleSlider" min="0" max="180" step="0.5" value="120">
+           <input type="range" class="capture-hide" id="angleSlider" min="0" max="180" step="0.5" value="120">
            
-           <hr style="border:0; border-top:1px dashed rgba(255,255,255,0.1); margin: 2px 0;">
+           <hr class="capture-hide" style="border:0; border-top:1px dashed rgba(255,255,255,0.1); margin: 2px 0;">
 
            <div class="dash-inputs">
               <div class="dash-input-group">
@@ -1370,7 +1387,7 @@ function changeLang(selectedLang) {
         </div>
         
         <div class="tagline-wrap" id="taglineWrap">
-           <div id="taglineInfo" data-i18n="dragTip">📍 提示：拖曳下方空白處可平移畫布，完美對齊實境照片</div>
+           <div id="taglineInfo" class="capture-hide" data-i18n="dragTip">📍 提示：拖曳下方空白處可平移畫布，完美對齊實境照片</div>
            <div class="ma-control" id="maControl" style="display:none;">
               <span style="font-size:13px; color:var(--tagline); font-weight:bold;" data-i18n="maTitle">⚙️ 水平牽引省力比</span>
               <div class="ma-btn-group">
@@ -1404,7 +1421,7 @@ function changeLang(selectedLang) {
             
             <div class="menu-action-btn" style="border-bottom: 1px solid var(--line); justify-content: space-between;">
               <div class="menu-header-left"><span class="menu-icon">🌍</span><span data-i18n="menuLang">語言設定 / Language</span></div>
-              <select id="langSelect" onchange="changeLang(this.value)">
+              <select id="langSelect" onchange="changeLang(this.value)" style="background: rgba(255,255,255,0.05); border: 1px solid var(--line); color: var(--text); border-radius: 6px; padding: 4px 8px; font-size: 13px; font-weight: bold; outline: none; cursor: pointer;">
                 <option value="zh">🇹🇼 繁中</option>
                 <option value="en">🇺🇸 EN</option>
                 <option value="ja">🇯🇵 日本語</option>
@@ -1423,7 +1440,7 @@ function changeLang(selectedLang) {
               </summary>
               <div class="menu-content">
                 <ul style="margin-top: 0; padding-left: 20px;">
-                  <li style="margin-bottom: 6px;" data-i18n="op1">直接拖曳畫布上的 <b>A點/B點</b> 設定地形跨距與高低差。</li>
+                  <li style="margin-bottom: 6px;" data-i18n="op1">拖曳 <b>A/B點</b> 自由改變跨距與高低差，拖曳 <b>空白處</b> 可平移畫布。</li>
                   <li style="margin-bottom: 6px;" data-i18n="op2">直接拖曳橘色 <b>大擔架</b> 或滑輪，可精準模擬傷患過河的張力變化。</li>
                   <li style="margin-bottom: 6px;" data-i18n="op3">當擔架處於偏離點時，可點選下方的 <b>⚙️水平牽引省力比</b> 換算手拉力。</li>
                   <li style="margin-bottom: 6px;" data-i18n="op4">滑動下方的 <b>夾角拉桿</b>，系統會自動反推繩長並平滑變形。</li>
@@ -1440,7 +1457,7 @@ function changeLang(selectedLang) {
               </summary>
               <div class="menu-content">
                 <div style="text-align: center; margin-bottom: 15px;">
-                  <span data-i18n="devTitle" style="display:inline-block; background:var(--safe); color:#0f1623; font-weight:bold; padding:4px 14px; border-radius:20px; font-size:13px; letter-spacing:0.5px; box-shadow: 0 2px 6px rgba(34,197,94,0.3);">散木索道儀 專業正式版</span>
+                  <span data-i18n="devTitle" style="display:inline-block; background:var(--safe); color:#0f1623; font-weight:bold; padding:4px 14px; border-radius:20px; font-size:13px; letter-spacing:0.5px; box-shadow: 0 2px 6px rgba(34,197,94,0.3);">散木索道儀 專業正式版 v6.6</span>
                 </div>
                 <p style="margin-top: 0; margin-bottom: 6px; font-weight: bold; color: var(--text); text-align: center;" data-i18n="devTeam">本工具由 <span style="color:var(--warn);">散木團隊</span> 開發製作</p>
                 <p style="margin-top: 0; margin-bottom: 4px; font-size: 13px; text-align: center;" data-i18n="devT1">教學架構與工程判斷／徐世豐</p>
@@ -1640,10 +1657,24 @@ function verifyVip() {
     errorMsg.textContent = t('vipErrPwd');
 }
 
+// 💡 修正相簿按鈕邏輯：一鍵退出相片模式！
 function handleImageUploadClick(e) {
     if (!isUserVip) {
         e.preventDefault(); 
         attemptFeature('featPhoto', () => { document.getElementById('upload-image').click(); });
+    } else {
+        if (image.src && image.style.opacity !== "0" && image.src !== window.location.href) {
+            image.src = "";
+            image.style.opacity = "0";
+            if (!isCameraOn) {
+                mainCard.classList.remove('camera-mode');
+                document.body.classList.remove('camera-mode');
+            }
+            document.getElementById('upload-image').value = "";
+            document.getElementById('btn-photo').classList.remove('active');
+        } else {
+            document.getElementById('upload-image').click();
+        }
     }
 }
 
@@ -2026,23 +2057,30 @@ function getSVGPos(e) {
   return pt.matrixTransform(svgEl.getScreenCTM().inverse());
 }
 
-let isDragging = null, dragStartX, dragStartY, startSpan, startHeight;
+let isDragging = null, dragStartX, dragStartY, startSpan, startHeight, startPanX, startPanY;
 function startDrag(e, node) { 
   if(e.target.tagName.toLowerCase() === 'input') return; 
   isDragging = node; 
-  
   let clientX = e.touches ? e.touches[0].clientX : e.clientX;
   let clientY = e.touches ? e.touches[0].clientY : e.clientY;
   dragStartX = clientX; dragStartY = clientY; 
-  
   startSpan = parseFloat(inSpan.value) || 20; 
   startHeight = parseFloat(inHeight.value) || 0; 
+  startPanX = panX;
+  startPanY = panY;
   
-  // 💡 當拖曳畫布空白處 (PAN) 時，阻止預設滑動行為，讓全區可平移
+  // A 點動態補償：記錄 B 點原始螢幕座標
+  let oldScale = scale;
+  let oldBaseOffsetX = 50 + startPanX;
+  let oldBaseOffsetY = 140 + (startHeight < 0 ? Math.abs(startHeight)*oldScale : 0) + startPanY;
+  window.startBx = oldBaseOffsetX + startSpan * oldScale;
+  window.startBy = oldBaseOffsetY + startHeight * oldScale;
+
+  // 當拖曳畫布空白處 (PAN) 時，阻止預設滑動行為
   if(e.type === 'touchstart' && e.cancelable && node === 'PAN') { e.preventDefault(); }
 }
 
-// 💡 綁定全域畫布平移 (Free Pan) 功能
+// 綁定全域畫布平移 (Free Pan) 功能
 els.svgWrap.addEventListener('mousedown', (e) => {
     if(e.target.closest('.anchor-dot') || e.target.closest('.draggable-pulley') || e.target.closest('.stretcher-tag')) return;
     startDrag(e, 'PAN');
@@ -2052,6 +2090,7 @@ els.svgWrap.addEventListener('touchstart', (e) => {
     startDrag(e, 'PAN');
 }, {passive: false});
 
+// 恢復 A 點的專屬拖曳權限！
 attachDragEvents(els.anchorA, 'A');
 attachDragEvents(els.anchorB, 'B');
 attachDragEvents(els.pulleyGroup, 'P');
@@ -2066,17 +2105,28 @@ function processDrag(e) {
   if(!isDragging) return;
   if(e.cancelable && isDragging !== 'ALL') e.preventDefault(); 
   
+  let clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  let clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  let dxScreen = clientX - dragStartX;
+  let dyScreen = clientY - dragStartY;
+  
+  let rect = svgEl.getBoundingClientRect();
+  let cssScale = 400 / rect.width; 
+  let svgDx = dxScreen * cssScale;
+  let svgDy = dyScreen * cssScale;
+  let dxMeters = svgDx / scale;
+  let dyMeters = svgDy / scale;
+
+  if (!isUserVip && (isDragging === 'A' || isDragging === 'B')) {
+      dyMeters = 0;
+      svgDy = 0;
+  }
+
   if (isDragging === 'PAN') {
-      let clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      let clientY = e.touches ? e.touches[0].clientY : e.clientY;
-      let rect = svgEl.getBoundingClientRect();
-      let cssScale = 400 / rect.width; 
-      
-      panX += (clientX - dragStartX) * cssScale;
-      panY += (clientY - dragStartY) * cssScale;
+      panX += svgDx;
+      panY += svgDy;
       dragStartX = clientX;
       dragStartY = clientY;
-      updateEngine(true);
   } else if (isDragging === 'P') {
       let pos = getSVGPos(e);
       let S = parseFloat(inSpan.value) || 20;
@@ -2095,32 +2145,35 @@ function processDrag(e) {
       
       newL = Math.max(minL, Math.min(500, newL));
       inRope.value = newL.toFixed(2);
-      updateEngine(true);
-  } else {
-      let clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      let clientY = e.touches ? e.touches[0].clientY : e.clientY;
-      let dxScreen = clientX - dragStartX;
-      let dyScreen = clientY - dragStartY;
+  } else if (isDragging === 'B') { 
+      let newSpan = Math.max(5, Math.min(200, Math.round(startSpan + dxMeters))); 
+      let newHeight = Math.max(-100, Math.min(100, Math.round(startHeight + dyMeters))); 
+      inSpan.value = newSpan;
+      inHeight.value = newHeight; 
+
+      // B 點視角動態補償：確保 A 點絕對靜止
+      let startAutoY = (startHeight < 0 ? Math.abs(startHeight)*scale : 0);
+      let newAutoY = (newHeight < 0 ? Math.abs(newHeight)*scale : 0);
+      panY = startPanY - (newAutoY - startAutoY);
+  } else if (isDragging === 'A') { 
+      let newSpan = Math.max(5, Math.min(200, Math.round(startSpan - dxMeters))); 
+      let newHeight = Math.max(-100, Math.min(100, Math.round(startHeight - dyMeters))); 
+      inSpan.value = newSpan;
+      inHeight.value = newHeight; 
+
+      // A 點終極物理補償：反向平移畫布，確保 B 點定在原地，A 點跟隨手指！
+      let L = parseFloat(inRope.value) || 22;
+      let minL = Math.hypot(newSpan, newHeight);
+      let calcL = minL > L * 1.03 ? L : (L <= minL + 0.001 ? minL : L);
+      let maxCanvasH = 460 - 150; 
+      let newScale = Math.min((400 - 80) / Math.max(10, newSpan), maxCanvasH / Math.max(10, Math.abs(newHeight) + Math.max(minL, calcL)*0.5));
+
+      let newBaseOffsetY_without_pan = 140 + (newHeight < 0 ? Math.abs(newHeight)*newScale : 0);
       
-      let rect = svgEl.getBoundingClientRect();
-      let pixelsPerMeter = (rect.width / 400) * scale;
-      let dxMeters = dxScreen / pixelsPerMeter;
-      let dyMeters = dyScreen / pixelsPerMeter;
-
-      if (!isUserVip && (isDragging === 'A' || isDragging === 'B')) {
-          dyMeters = 0;
-      }
-
-      if (isDragging === 'B') { 
-          inSpan.value = Math.max(5, Math.min(200, Math.round(startSpan + dxMeters))); 
-          inHeight.value = Math.max(-100, Math.min(100, Math.round(startHeight + dyMeters))); 
-      }
-      else if (isDragging === 'A') { 
-          inSpan.value = Math.max(5, Math.min(200, Math.round(startSpan - dxMeters))); 
-          inHeight.value = Math.max(-100, Math.min(100, Math.round(startHeight - dyMeters))); 
-      }
-      updateEngine(true);
+      panX = window.startBx - 50 - newSpan * newScale;
+      panY = window.startBy - newBaseOffsetY_without_pan - newHeight * newScale;
   }
+  updateEngine(true);
 }
 
 window.addEventListener('touchmove', processDrag, {passive: false});
@@ -2160,7 +2213,11 @@ async function toggleCamera() {
     isCameraOn = false;
   } else { 
     try { 
+      // 開啟相機時，自動關閉照片
       image.style.opacity = "0"; 
+      image.src = "";
+      document.getElementById('btn-photo').classList.remove('active');
+      
       stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }); 
       videoTrack = stream.getVideoTracks()[0];
       video.srcObject = stream; video.style.opacity = "1"; btnCamera.classList.add('active'); 
@@ -2202,6 +2259,7 @@ function loadImage(event) {
       image.style.opacity = "1"; 
       mainCard.classList.add('camera-mode');
       document.body.classList.add('camera-mode');
+      document.getElementById('btn-photo').classList.add('active');
     }; 
     reader.readAsDataURL(file); 
   } 
@@ -2225,32 +2283,26 @@ function resetEngine() {
   adjustLForAngle(120);
 }
 
-// 💡 戰術純淨截圖 6.0 (自由拖曳圖層精準裁切，隱藏頂部與選單，保留所有數據)
+// 💡 戰術純淨相片截圖 7.0 (隱藏頂部與選單、保留數據、生成真實圖片視窗)
 async function takeScreenshot() {
   const target = document.getElementById('mainCard');
   const exportWrapper = document.getElementById('export-wrapper');
   const scrollWrap = document.getElementById('scroll-wrapper');
   
-  // 1. 隱藏不必要的元素 (標題列、功能區、底部選單)
+  // 1. 隱藏不必要的元素 (標題列、相機按鈕區、底部說明書選單)
   const topbar = document.querySelector('.topbar');
   const iconBar = document.querySelector('.icon-bar');
   const menuList = document.querySelector('.menu-list');
-  const angleSlider = document.getElementById('angleSlider');
-  const taglineInfo = document.getElementById('taglineInfo');
   
   const origTopbar = topbar ? topbar.style.display : '';
   const origIconBar = iconBar ? iconBar.style.display : '';
   const origMenuList = menuList ? menuList.style.display : '';
-  const origAngleSlider = angleSlider ? angleSlider.style.display : '';
-  const origTaglineInfo = taglineInfo ? taglineInfo.style.display : '';
   
   if(topbar) topbar.style.display = 'none';
   if(iconBar) iconBar.style.display = 'none';
   if(menuList) menuList.style.display = 'none';
-  if(angleSlider) angleSlider.style.display = 'none';
-  if(taglineInfo) taglineInfo.style.display = 'none';
 
-  // 2. 將 Input 替換為文字，避免破圖
+  // 2. 將 Input 替換為純文字，避免相片破圖
   const inputs = target.querySelectorAll('input[type="number"]');
   const placeholders = [];
   inputs.forEach(inp => {
@@ -2269,44 +2321,43 @@ async function takeScreenshot() {
       placeholders.push({ span, inp });
   });
 
-  // 3. 畫面滾動到最頂部確保精準測量
+  // 3. 畫面滾動到最頂部確保相機精準抓取
   scrollWrap.scrollTop = 0;
   await new Promise(r => setTimeout(r, 150)); 
   
-  // 取得主畫面的精準邊界，這樣才能把背景的拖曳角度一起「框」下來
-  const rect = target.getBoundingClientRect();
-  
-  // 4. 壓上戰術浮水印 (改掛在主畫面內，確保被一起裁切，並加上 APP ICON)
+  // 4. 在最底下動態壓上浮水印 (相對定位，絕對不會蓋住省力比與數據)
   let watermark = document.getElementById('watermark');
   if (!watermark) {
       watermark = document.createElement('div');
       watermark.id = 'watermark';
-      watermark.style.position = 'absolute';
-      watermark.style.bottom = '15px';
-      watermark.style.left = '15px';
+      watermark.style.marginTop = '15px'; // 把空間推開
       watermark.style.background = 'rgba(15, 22, 35, 0.85)';
       watermark.style.borderLeft = '4px solid var(--safe)';
       watermark.style.padding = '8px 12px';
       watermark.style.borderRadius = '8px';
-      watermark.style.zIndex = '9999';
       watermark.style.display = 'flex';
       watermark.style.flexDirection = 'column';
       watermark.style.gap = '4px';
-      target.appendChild(watermark);
+      target.appendChild(watermark); // 掛在主畫面的最底部
   }
   const now = new Date(); 
   const dateStr = now.getFullYear() + '/' + String(now.getMonth()+1).padStart(2, '0') + '/' + String(now.getDate()).padStart(2, '0');
   const timeStr = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+  
+  // 浮水印加上專屬 ICON
   watermark.innerHTML = `
     <div style="display:flex; align-items:center; gap:6px;">
-        <img src="icon-192.png" style="width:16px; height:16px; border-radius:4px; object-fit:cover;">
+        <img src="icon-192.png" style="width:16px; height:16px; border-radius:4px; object-fit:cover;" onerror="this.style.display='none'">
         <span style="font-size:12px; font-weight:bold; color:#e8eef7;">${t('appTitle')}</span>
     </div>
     <span style="font-size:10px; color:#a8b3c5; font-weight:normal;">${dateStr} ${timeStr} ｜ © 散木團隊</span>
   `;
   watermark.style.display = 'flex';
 
-  // 5. 處理相機與圖片
+  // 重新取得加入浮水印後的主畫面邊界
+  const rect = target.getBoundingClientRect();
+
+  // 5. 處理相機鏡頭背景轉換為純圖片
   let originalVideoState = bgVideo.style.display; 
   let originalImageSrc = bgImage.src; 
   let originalImageState = bgImage.style.display;
@@ -2322,10 +2373,10 @@ async function takeScreenshot() {
     bgVideo.style.display = 'none';
   }
 
-  showToast("📸 正在生成高解析度戰術報告...", "safe");
+  showToast("📸 正在洗出戰術相片...", "warn");
   
   try {
-    // 💡 針對 export-wrapper 進行特定座標與長寬的裁切 (完美保留背景與平移結果)
+    // 💡 開始雷射裁切，只框取 rect 指定的主畫面區域
     const canvasPromise = html2canvas(exportWrapper, { 
         backgroundColor: (isCameraOn || (bgImage.src && bgImage.style.opacity !== "0")) ? null : '#0f1623', 
         scale: 2, 
@@ -2336,26 +2387,24 @@ async function takeScreenshot() {
         height: rect.height,
         ignoreElements: (el) => el.hasAttribute('data-html2canvas-ignore')
     });
+    
     const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('處理超時，已強制退出')), 8000));
     const canvas = await Promise.race([canvasPromise, timeoutPromise]);
     
-    const link = document.createElement('a'); 
-    link.download = `散木戰術報告_${new Date().getTime()}.png`; 
-    link.href = canvas.toDataURL('image/png'); 
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    showToast("✅ 截圖成功！已匯出。", "safe");
+    // 💡 【終極殺招】不再直接觸發下載，而是將圖片塞入實體相片視窗，讓手機瀏覽器可長按儲存！
+    const imgDataUrl = canvas.toDataURL('image/png');
+    document.getElementById('screenshotResultImage').src = imgDataUrl;
+    document.getElementById('screenshotModal').style.display = 'flex';
+
+    showToast("✅ 戰術相片已生成！請長按儲存。", "safe");
   } catch(e) { 
-      showToast("❌ 截圖失敗：" + e.message, "bad"); 
+      showToast("❌ 洗相片失敗：" + e.message, "bad"); 
   } finally {
-      // 6. 恢復 UI 原狀
+      // 6. 恢復 UI 原狀，讓系統繼續正常運作
       watermark.style.display = 'none';
       if(topbar) topbar.style.display = origTopbar;
       if(iconBar) iconBar.style.display = origIconBar;
       if(menuList) menuList.style.display = origMenuList;
-      if(angleSlider) angleSlider.style.display = origAngleSlider;
-      if(taglineInfo) taglineInfo.style.display = origTaglineInfo;
       
       placeholders.forEach(p => {
           p.inp.style.display = '';
