@@ -1589,13 +1589,36 @@ if (mainTitleEl) {
     mainTitleEl.addEventListener('click', () => {
         if (isUserVip) {
             pendingFeatureCallback = null;
-            document.getElementById('vipFeatureName').parentElement.innerHTML = "";
-            document.getElementById('vipFeatureDesc').textContent = "";
-            document.querySelector('[data-i18n="vipTitle"]').textContent = t('vipStateUnlocked');
-            document.getElementById('vipErrorMsg').textContent = "";
-            document.getElementById('vipPwdInput').value = "";
+            
+            // 安全地隱藏包含 featureName 的外層 P 標籤，而不是刪掉它
+            const featureNameEl = document.getElementById('vipFeatureName');
+            if (featureNameEl && featureNameEl.parentElement) {
+                featureNameEl.parentElement.style.display = 'none';
+            }
+            
+            // 隱藏描述標籤
+            const featureDescEl = document.getElementById('vipFeatureDesc');
+            if (featureDescEl) {
+                featureDescEl.style.display = 'none';
+            }
+            
+            const vipTitleEl = document.querySelector('[data-i18n="vipTitle"]');
+            if (vipTitleEl) {
+                vipTitleEl.textContent = t('vipStateUnlocked');
+            }
+            
+            const errMsg = document.getElementById('vipErrorMsg');
+            if (errMsg) errMsg.textContent = "";
+            
+            const pwdInp = document.getElementById('vipPwdInput');
+            if (pwdInp) pwdInp.value = "";
+            
             document.getElementById('vipModal').style.display = 'flex';
-            setTimeout(() => document.getElementById('vipPwdInput').focus(), 100);
+            setTimeout(() => { 
+                if(document.getElementById('vipPwdInput')) {
+                    document.getElementById('vipPwdInput').focus(); 
+                }
+            }, 100);
         }
     });
 }
