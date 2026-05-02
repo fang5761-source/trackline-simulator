@@ -317,7 +317,7 @@
 </script>
 
 <script>
-// 💡 V6.2.1 8國語言智慧切換引擎 (i18n)
+// 💡 V6.2 8國語言智慧切換引擎 (i18n)
 const i18n = {
   zh: {
     appTitle: "索道張力儀 (動態滑行版)",
@@ -652,7 +652,7 @@ const i18n = {
     sagFail: "설치 불가",
     maTitle: "⚙️ 수평 MA",
     dragTip: "📍 샌드박스에서 드래그하여 시뮬레이션 하세요",
-    warnSpan: "🚨 스팬이 너무 큽니다! 3% 연장 한계 초과",
+    warnSpan: "🚨 스팬이 너무 큽니다! 대략 3% 연장 한계 초과",
     warnDeath: "🚨 경고: 3% 연장 한계에 근접했습니다 (데스 라인)!",
     balSafe: "📍 자연적인 평형 상태입니다. 태그라인 힘이 필요하지 않습니다.",
     pullAction: "당기기/브레이크",
@@ -967,7 +967,7 @@ const i18n = {
     warnSpan: "🚨 ¡Tramo muy grande! Excede el 3% de límite.",
     warnDeath: "🚨 Advertencia: ¡Se acerca al límite del 3%!",
     balSafe: "📍 Equilibrio natural. No se requiere fuerza.",
-    pullAction: "Tirar/Frenar",
+    pullAction: "Tirer/Frenar",
     slackAction: "Flojo",
     peak: "Pico",
     deadLineShort: "FALLA!",
@@ -1589,7 +1589,7 @@ if (mainTitleEl) {
     mainTitleEl.addEventListener('click', () => {
         if (isUserVip) {
             pendingFeatureCallback = null;
-            document.getElementById('vipFeatureName').parentElement.innerHTML = t('vipStateDesc');
+            document.getElementById('vipFeatureName').parentElement.innerHTML = "";
             document.getElementById('vipFeatureDesc').textContent = "";
             document.querySelector('[data-i18n="vipTitle"]').textContent = t('vipStateUnlocked');
             document.getElementById('vipErrorMsg').textContent = "";
