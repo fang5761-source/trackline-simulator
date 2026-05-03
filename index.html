@@ -1436,14 +1436,14 @@ function showToast(msg, type = 'safe') {
           <div class="menu-action-btn" style="border-bottom: 1px solid var(--line); justify-content: space-between;">
             <div class="menu-header-left"><span class="menu-icon">🌍</span><span data-i18n="menuLang">語言設定 / Language</span></div>
             <select id="langSelect" onchange="changeLang(this.value)" style="background: rgba(255,255,255,0.05); border: 1px solid var(--line); color: var(--text); border-radius: 6px; padding: 4px 8px; font-size: 13px; font-weight: bold; outline: none; cursor: pointer;">
-              <option value="zh">繁體中文</option>
-              <option value="en">English</option>
-              <option value="ja">日本語</option>
-              <option value="ko">한국어</option>
-              <option value="fr">Français</option>
-              <option value="de">Deutsch</option>
-              <option value="es">Español</option>
-              <option value="pt">Português</option>
+              <option value="zh">🇹🇼 繁中</option>
+              <option value="en">🇺🇸 EN</option>
+              <option value="ja">🇯🇵 日本語</option>
+              <option value="ko">🇰🇷 한국어</option>
+              <option value="fr">🇫🇷 Français</option>
+              <option value="de">🇩🇪 Deutsch</option>
+              <option value="es">🇪🇸 Español</option>
+              <option value="pt">🇵🇹 Português</option>
             </select>
           </div>
 
@@ -1523,7 +1523,7 @@ function showToast(msg, type = 'safe') {
             <div class="menu-content">
               <div style="text-align: center; margin-bottom: 15px;">
                 <span data-i18n="devTitle" style="display:inline-block; background:var(--safe); color:#0f1623; font-weight:bold; padding:4px 14px; border-radius:20px; font-size:13px; letter-spacing:0.5px; box-shadow: 0 2px 6px rgba(34,197,94,0.3);">散木索道儀 專業正式版</span>
-                <div style="font-size: 11px; color: var(--muted); margin-top: 8px; font-family: monospace;">Version 6.2.1</div>
+                <div style="font-size: 11px; color: var(--muted); margin-top: 8px; font-family: monospace;">Version 6.2.2</div>
               </div>
               <p style="margin-top: 0; margin-bottom: 6px; font-weight: bold; color: var(--text); text-align: center;" data-i18n="devTeam">本工具由 <span style="color:var(--warn);">散木團隊</span> 開發製作</p>
               <p style="margin-top: 0; margin-bottom: 4px; font-size: 13px; text-align: center;" data-i18n="devT1">教學架構與工程判斷／徐世豐</p>
@@ -1532,33 +1532,28 @@ function showToast(msg, type = 'safe') {
             </div>
           </details>
 
-<!-- 這裡就是您剛剛貼上的贊助按鈕 -->
-<div class="menu-action-btn" onclick="window.open('https://fang5761.gumroad.com/l/trackline-pro', '_blank')" style="border-bottom: 1px solid var(--line);">
-  <div class="menu-header-left"><span class="menu-icon">☕</span><span style="color:var(--warn); font-weight:bold;">贊助散木團隊 (請喝咖啡)</span></div>
-  <span class="menu-arrow">❯</span>
-</div>
-
-<!-- 下面這是原本的分享按鈕，完全沒被破壞 -->
-<div class="menu-action-btn" id="shareBtnAction" style="border-bottom: 1px solid var(--line);">
-  <div class="menu-header-left"><span class="menu-icon">🔗</span><span data-i18n="menu3">分享系統連結</span></div>
-  <span class="menu-arrow">❯</span>
-</div>
-
+          <!-- 保留唯一且正確的分享系統連結按鈕 -->
           <div class="menu-action-btn" id="shareBtnAction" style="border-bottom: 1px solid var(--line);">
-           
- <div class="menu-header-left"><span class="menu-icon">🔗</span><span data-i18n="menu3">分享系統連結</span></div>
+            <div class="menu-header-left"><span class="menu-icon">🔗</span><span data-i18n="menu3">分享系統連結</span></div>
             <span class="menu-arrow">❯</span>
           </div>
+
           <div class="menu-action-btn" onclick="checkForUpdates()" style="border-bottom: 1px solid var(--line);">
             <div class="menu-header-left"><span class="menu-icon">🔄</span><span data-i18n="menu4">檢查並載入最新版本</span></div>
             <span class="menu-arrow">❯</span>
           </div>
-          <div class="menu-action-btn" id="supportBtnAction">
+          
+          <div class="menu-action-btn" id="supportBtnAction" style="border-bottom: none;">
             <div class="menu-header-left"><span class="menu-icon">💬</span><span data-i18n="menu5">系統問題回報</span></div>
             <span class="menu-arrow">❯</span>
           </div>
 
         </div>
+      </details>
+      
+      <!-- 第四區：贊助散木團隊 (獨立出來的第四個大標題) -->
+      <details class="main-accordion" style="margin-top: 10px;" onclick="window.open('https://fang5761.gumroad.com/l/trackline-pro', '_blank'); event.preventDefault();">
+        <summary><div style="display:flex; align-items:center; gap:8px;"><span class="menu-icon">☕</span> <span style="color: var(--warn);">喜歡這APP嗎？歡迎請團隊喝咖啡</span></div></summary>
       </details>
 
       <div class="footer-disclaimer" data-i18n="disclaimer">
