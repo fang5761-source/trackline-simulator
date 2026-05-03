@@ -2480,7 +2480,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
-<!-- 🚀 散木團隊：雲端金鑰外掛升級包 (含身分切換與萬用後門) -->
+<!-- 🚀 散木團隊：雲端金鑰外掛升級包 (標籤不消失 + 測試後門版) -->
 <script>
 (function() {
   const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQlTgAJeOrQIlyQVjvjDLtZycBAgc1d2R5vZWymQUrfNrzp6F7tdt74cmPbPIbobzmrFunwvwzfOc2S/pub?output=csv";
@@ -2507,7 +2507,6 @@ document.addEventListener('DOMContentLoaded', () => {
       return html;
   }
 
-  // 🚪 登出功能：徹底清除所有權限標籤並刷新
   logoutVip = function() {
       localStorage.removeItem('sunmoon_vip_trackline_status');
       localStorage.removeItem('sunmoon_vip_trackline_expire');
@@ -2519,6 +2518,7 @@ document.addEventListener('DOMContentLoaded', () => {
       var inputPwd = document.getElementById('vipPwdInput').value.trim().toUpperCase(); 
       var errorMsg = document.getElementById('vipErrorMsg');
       
+      // ✅ 測試專用萬用後門：DALO-999 (永久保留)
       if (inputPwd === "DALO-999" || inputPwd === "SUNMOONBOSS") { openCommanderConsole(); return; }
       if (inputPwd === "TEACHER888") { openAllyConsole(); return; }
 
@@ -2543,7 +2543,6 @@ document.addEventListener('DOMContentLoaded', () => {
       errorMsg.innerHTML = '❌ 授權碼錯誤！若需領取新密碼請 <a href="https://fang5761.gumroad.com/l/trackline-pro" target="_blank" style="color:var(--safe); text-decoration:underline;">按此前往</a>';
   };
 
-  // 指揮官控制台 (含登出按鈕)
   openCommanderConsole = function() {
       var keysList = getMultiDayKeys(3);
       document.getElementById('vipModalBox').innerHTML = 
@@ -2562,7 +2561,6 @@ document.addEventListener('DOMContentLoaded', () => {
         '</div>';
   };
 
-  // 盟友教官派發台 (現在也加上登出按鈕，方便測試)
   openAllyConsole = function() {
       var keysList = getMultiDayKeys(3);
       document.getElementById('vipModalBox').innerHTML = 
@@ -2576,9 +2574,13 @@ document.addEventListener('DOMContentLoaded', () => {
           '<button class="primary-btn btn-unlock" onclick="closeVipModal()">關閉面板</button>' +
         '</div>';
   };
+
+  // 🛡️ 核心修正：確保登入後 PRO 標籤不消失，讓指揮官隨時能點擊
+  setInterval(function() {
+      document.body.classList.remove('is-vip');
+  }, 1000);
 })();
 </script>
-
 
 </body>
 </html>
