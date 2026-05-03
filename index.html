@@ -2481,7 +2481,7 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 
 
-<!-- 🚀 散木團隊：雲端金鑰外掛升級包 (指揮官 & 盟友雙重 3 天同步版) -->
+<!-- 🚀 散木團隊：雲端金鑰外掛升級包 (請貼在 </body> 的正上方) -->
 <script>
 (function() {
   const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQlTgAJeOrQIlyQVjvjDLtZycBAgc1d2R5vZWymQUrfNrzp6F7tdt74cmPbPIbobzmrFunwvwzfOc2S/pub?output=csv";
@@ -2495,28 +2495,28 @@ document.addEventListener('DOMContentLoaded', () => {
     })
     .catch(err => console.log("雲端連線異常"));
 
-  // 核心邏輯：計算指定天數的密碼列表
+  // 核心邏輯：計算指定天數的密碼列表 (改用字串相加，避開反引號問題)
   function getMultiDayKeys(days) {
-      let html = "";
-      for(let i = 0; i < days; i++) {
-          const d = new Date();
+      var html = "";
+      for(var i = 0; i < days; i++) {
+          var d = new Date();
           d.setDate(d.getDate() + i);
-          const dateStr = d.toLocaleDateString('zh-TW', { timeZone: 'Asia/Taipei', year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '');
-          const key = "SMT-" + ((parseInt(dateStr) * 17 % 9000) + 1000);
-          const mm = d.getMonth() + 1;
-          const dd = d.getDate();
-          let label = i === 0 ? "今天" : (i === 1 ? "明天" : "後天");
-          html += `<div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.05); padding:6px 0;">
-                     <span style="color:var(--muted); font-size:14px;">${label} (${mm}/${dd})</span>
-                     <strong style="color:var(--safe); letter-spacing:1px;">${key}</strong>
-                   </div>`;
+          var dateStr = d.toLocaleDateString('zh-TW', { timeZone: 'Asia/Taipei', year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '');
+          var key = "SMT-" + ((parseInt(dateStr) * 17 % 9000) + 1000);
+          var mm = d.getMonth() + 1;
+          var dd = d.getDate();
+          var label = i === 0 ? "今天" : (i === 1 ? "明天" : "後天");
+          html += '<div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.05); padding:6px 0;">' +
+                     '<span style="color:var(--muted); font-size:14px;">' + label + ' (' + mm + '/' + dd + ')</span>' +
+                     '<strong style="color:var(--safe); letter-spacing:1px;">' + key + '</strong>' +
+                   '</div>';
       }
       return html;
   }
 
   verifyVip = function() {
-      const inputPwd = document.getElementById('vipPwdInput').value.trim().toUpperCase(); 
-      const errorMsg = document.getElementById('vipErrorMsg');
+      var inputPwd = document.getElementById('vipPwdInput').value.trim().toUpperCase(); 
+      var errorMsg = document.getElementById('vipErrorMsg');
       
       if (inputPwd === "SUNMOONBOSS") { openCommanderConsole(); return; }
       if (inputPwd === "TEACHER888") { openAllyConsole(); return; }
@@ -2528,12 +2528,12 @@ document.addEventListener('DOMContentLoaded', () => {
           return;
       }
 
-      const d = new Date();
-      const dateStr = d.toLocaleDateString('zh-TW', { timeZone: 'Asia/Taipei', year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '');
-      const todayKey = "SMT-" + ((parseInt(dateStr) * 17 % 9000) + 1000); 
+      var d = new Date();
+      var dateStr = d.toLocaleDateString('zh-TW', { timeZone: 'Asia/Taipei', year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '');
+      var todayKey = "SMT-" + ((parseInt(dateStr) * 17 % 9000) + 1000); 
 
       if (inputPwd === todayKey) {
-          const todayStr = new Date().toLocaleDateString('en-CA', {timeZone: 'Asia/Taipei'});
+          var todayStr = new Date().toLocaleDateString('en-CA', {timeZone: 'Asia/Taipei'});
           try { localStorage.setItem('sunmoon_vip_trackline_expire', todayStr); } catch(e){} 
           isUserVip = true; document.body.classList.add('is-vip'); closeVipModal();
           showToast("⏱️ 臨時授權成功！", "safe");
@@ -2542,41 +2542,38 @@ document.addEventListener('DOMContentLoaded', () => {
       errorMsg.innerHTML = '❌ 授權碼錯誤！若需領取新密碼請 <a href="https://fang5761.gumroad.com/l/trackline-pro" target="_blank" style="color:var(--safe); text-decoration:underline;">按此前往</a>';
   };
 
-  // 4. 最高指揮官控制台 (現在也顯示 3 天動態碼)
   openCommanderConsole = function() {
-      document.getElementById('vipModalBox').innerHTML = `
-        <h3 style="color: var(--warn); margin-top:0;">👑 指揮官專屬控制台</h3>
-        <div style="background:rgba(0,0,0,0.3); padding:10px 15px; border-radius:8px; margin-bottom:10px; text-align:left; border-left: 4px solid var(--vip);">
-          <span style="color:var(--muted); font-size:11px;">📡 雲端終身金鑰 (A1)</span><br>
-          <strong style="color:var(--vip); font-size:18px; letter-spacing:1px;">\${REMOTE_PERMANENT_KEY || '讀取中...'}</strong>
-        </div>
-        <div style="background:rgba(0,0,0,0.3); padding:10px 15px; border-radius:8px; margin-bottom:15px; text-align:left; border-left: 4px solid var(--safe);">
-          <span style="color:var(--muted); font-size:11px;">📅 近三日動態體驗碼</span>
-          \${getMultiDayKeys(3)}
-        </div>
-        <div class="modal-btn-group">
-          <button class="primary-btn btn-cancel" onclick="logoutVip()">清除授權(登出)</button>
-          <button class="primary-btn btn-unlock" onclick="closeVipModal()">關閉控制台</button>
-        </div>
-      `;
+      var keysList = getMultiDayKeys(3);
+      document.getElementById('vipModalBox').innerHTML = 
+        '<h3 style="color: var(--warn); margin-top:0;">👑 指揮官專屬控制台</h3>' +
+        '<div style="background:rgba(0,0,0,0.3); padding:10px 15px; border-radius:8px; margin-bottom:10px; text-align:left; border-left: 4px solid var(--vip);">' +
+          '<span style="color:var(--muted); font-size:11px;">📡 雲端終身金鑰 (A1)</span><br>' +
+          '<strong style="color:var(--vip); font-size:18px; letter-spacing:1px;">' + (REMOTE_PERMANENT_KEY || '讀取中...') + '</strong>' +
+        '</div>' +
+        '<div style="background:rgba(0,0,0,0.3); padding:10px 15px; border-radius:8px; margin-bottom:15px; text-align:left; border-left: 4px solid var(--safe);">' +
+          '<span style="color:var(--muted); font-size:11px;">📅 近三日動態體驗碼</span>' +
+          keysList +
+        '</div>' +
+        '<div class="modal-btn-group">' +
+          '<button class="primary-btn btn-cancel" onclick="logoutVip()">清除授權(登出)</button>' +
+          '<button class="primary-btn btn-unlock" onclick="closeVipModal()">關閉控制台</button>' +
+        '</div>';
   };
 
-  // 5. 盟友教官專屬派發台 (3 天版)
   openAllyConsole = function() {
-      document.getElementById('vipModalBox').innerHTML = `
-        <h3 style="color: var(--safe); margin-top:0;">🤝 盟友教官派發台</h3>
-        <p style="font-size:13px; color:var(--text); text-align:left; margin-bottom:10px;">以下為未來 3 天的單日體驗碼，請直接提供給現場學員使用：</p>
-        <div style="background:rgba(0,0,0,0.3); padding:10px 15px; border-radius:8px; margin-bottom:15px; text-align:left; border-left: 4px solid var(--safe);">
-          \${getMultiDayKeys(3)}
-        </div>
-        <div class="modal-btn-group">
-          <button class="primary-btn btn-unlock" onclick="closeVipModal()">關閉面板</button>
-        </div>
-      `;
+      var keysList = getMultiDayKeys(3);
+      document.getElementById('vipModalBox').innerHTML = 
+        '<h3 style="color: var(--safe); margin-top:0;">🤝 盟友教官派發台</h3>' +
+        '<p style="font-size:13px; color:var(--text); text-align:left; margin-bottom:10px;">以下為未來 3 天的單日體驗碼，請直接提供給現場學員使用：</p>' +
+        '<div style="background:rgba(0,0,0,0.3); padding:10px 15px; border-radius:8px; margin-bottom:15px; text-align:left; border-left: 4px solid var(--safe);">' +
+          keysList +
+        '</div>' +
+        '<div class="modal-btn-group">' +
+          '<button class="primary-btn btn-unlock" onclick="closeVipModal()">關閉面板</button>' +
+        '</div>';
   };
 })();
 </script>
-
 
 </body>
 </html>
