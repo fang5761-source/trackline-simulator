@@ -2480,49 +2480,54 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
-<!-- 🚀 散木團隊：雲端金鑰外掛升級包 (請貼在 </body> 的正上方) -->
+
+<!-- 🚀 散木團隊：雲端金鑰外掛升級包 (指揮官 & 盟友雙重 3 天同步版) -->
 <script>
 (function() {
-  // 1. 綁定您的 Google 試算表 CSV 網址
   const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQlTgAJeOrQIlyQVjvjDLtZycBAgc1d2R5vZWymQUrfNrzp6F7tdt74cmPbPIbobzmrFunwvwzfOc2S/pub?output=csv";
   let REMOTE_PERMANENT_KEY = "";
   
-  // 2. APP 啟動時自動連網讀取密碼
   fetch(SHEET_CSV_URL)
     .then(response => response.text())
     .then(data => {
-        // 抓取試算表 A1 格子裡的字
         const fetchedKey = data.split(/\r?\n/)[0].split(',')[0].trim();
         if(fetchedKey) REMOTE_PERMANENT_KEY = fetchedKey;
     })
-    .catch(err => console.log("雲端連線異常，維持單機防禦"));
+    .catch(err => console.log("雲端連線異常"));
 
-  // 3. 覆蓋舊的 VIP 驗證系統 (無痛接管)
+  // 核心邏輯：計算指定天數的密碼列表
+  function getMultiDayKeys(days) {
+      let html = "";
+      for(let i = 0; i < days; i++) {
+          const d = new Date();
+          d.setDate(d.getDate() + i);
+          const dateStr = d.toLocaleDateString('zh-TW', { timeZone: 'Asia/Taipei', year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '');
+          const key = "SMT-" + ((parseInt(dateStr) * 17 % 9000) + 1000);
+          const mm = d.getMonth() + 1;
+          const dd = d.getDate();
+          let label = i === 0 ? "今天" : (i === 1 ? "明天" : "後天");
+          html += `<div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.05); padding:6px 0;">
+                     <span style="color:var(--muted); font-size:14px;">${label} (${mm}/${dd})</span>
+                     <strong style="color:var(--safe); letter-spacing:1px;">${key}</strong>
+                   </div>`;
+      }
+      return html;
+  }
+
   verifyVip = function() {
       const inputPwd = document.getElementById('vipPwdInput').value.trim().toUpperCase(); 
       const errorMsg = document.getElementById('vipErrorMsg');
       
-      // (A) 指揮官權限
-      if (inputPwd === "SUNMOONBOSS") {
-          openCommanderConsole();
-          return; 
-      }
+      if (inputPwd === "SUNMOONBOSS") { openCommanderConsole(); return; }
+      if (inputPwd === "TEACHER888") { openAllyConsole(); return; }
 
-      // (B) 雲端終身金鑰 (對接您的試算表)
       if (inputPwd === REMOTE_PERMANENT_KEY && REMOTE_PERMANENT_KEY !== "") {
           try { localStorage.setItem('sunmoon_vip_trackline_status', 'true'); } catch(e){} 
-          isUserVip = true; 
-          document.body.classList.add('is-vip'); 
-          closeVipModal();
-          showToast("🎉 終身禮遇授權成功！歡迎使用！", "safe");
-          if (typeof pendingFeatureCallback !== 'undefined' && pendingFeatureCallback) { 
-              pendingFeatureCallback(); 
-              pendingFeatureCallback = null; 
-          }
+          isUserVip = true; document.body.classList.add('is-vip'); closeVipModal();
+          showToast("🎉 終身禮遇授權成功！", "safe");
           return;
       }
 
-      // (C) 單日動態金鑰 (實體課專用)
       const d = new Date();
       const dateStr = d.toLocaleDateString('zh-TW', { timeZone: 'Asia/Taipei', year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '');
       const todayKey = "SMT-" + ((parseInt(dateStr) * 17 % 9000) + 1000); 
@@ -2530,41 +2535,42 @@ document.addEventListener('DOMContentLoaded', () => {
       if (inputPwd === todayKey) {
           const todayStr = new Date().toLocaleDateString('en-CA', {timeZone: 'Asia/Taipei'});
           try { localStorage.setItem('sunmoon_vip_trackline_expire', todayStr); } catch(e){} 
-          isUserVip = true; 
-          document.body.classList.add('is-vip'); 
-          closeVipModal();
-          showToast("⏱️ 臨時授權成功！(今晚自動失效)", "safe");
-          if (typeof pendingFeatureCallback !== 'undefined' && pendingFeatureCallback) { 
-              pendingFeatureCallback(); 
-              pendingFeatureCallback = null; 
-          }
+          isUserVip = true; document.body.classList.add('is-vip'); closeVipModal();
+          showToast("⏱️ 臨時授權成功！", "safe");
           return;
       }
-
-      // ⛔ 密碼錯誤
       errorMsg.innerHTML = '❌ 授權碼錯誤！若需領取新密碼請 <a href="https://fang5761.gumroad.com/l/trackline-pro" target="_blank" style="color:var(--safe); text-decoration:underline;">按此前往</a>';
   };
 
-  // 4. 覆蓋指揮官控制台介面
+  // 4. 最高指揮官控制台 (現在也顯示 3 天動態碼)
   openCommanderConsole = function() {
-      const d = new Date();
-      const dateStr = d.toLocaleDateString('zh-TW', { timeZone: 'Asia/Taipei', year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '');
-      const todayKey = "SMT-" + ((parseInt(dateStr) * 17 % 9000) + 1000); 
-      
       document.getElementById('vipModalBox').innerHTML = `
         <h3 style="color: var(--warn); margin-top:0;">👑 指揮官專屬控制台</h3>
-        <div style="background:rgba(0,0,0,0.3); padding:10px; border-radius:8px; margin-bottom:10px; text-align:left; border-left: 4px solid var(--safe);">
-          <span style="color:var(--muted); font-size:11px;">👉 今日上課體驗碼 (午夜失效)</span><br>
-          <strong style="color:var(--safe); font-size:22px; letter-spacing:1px;">${todayKey}</strong>
+        <div style="background:rgba(0,0,0,0.3); padding:10px 15px; border-radius:8px; margin-bottom:10px; text-align:left; border-left: 4px solid var(--vip);">
+          <span style="color:var(--muted); font-size:11px;">📡 雲端終身金鑰 (A1)</span><br>
+          <strong style="color:var(--vip); font-size:18px; letter-spacing:1px;">\${REMOTE_PERMANENT_KEY || '讀取中...'}</strong>
         </div>
-        <div style="background:rgba(0,0,0,0.3); padding:10px; border-radius:8px; margin-bottom:15px; text-align:left; border-left: 4px solid var(--vip);">
-          <span style="color:var(--muted); font-size:11px;">📡 雲端終身金鑰 (與 Google 試算表同步中)</span><br>
-          <strong style="color:var(--vip); font-size:18px; letter-spacing:1px;">${REMOTE_PERMANENT_KEY || '網路讀取中...'}</strong>
+        <div style="background:rgba(0,0,0,0.3); padding:10px 15px; border-radius:8px; margin-bottom:15px; text-align:left; border-left: 4px solid var(--safe);">
+          <span style="color:var(--muted); font-size:11px;">📅 近三日動態體驗碼</span>
+          \${getMultiDayKeys(3)}
         </div>
-        <p style="font-size:10px; color:var(--muted); line-height:1.4;">提示：請直接修改 Google 試算表 A1 儲存格，APP 將自動同步最新防盜鎖！</p>
-        <div class="modal-btn-group" style="margin-top: 15px;">
+        <div class="modal-btn-group">
           <button class="primary-btn btn-cancel" onclick="logoutVip()">清除授權(登出)</button>
           <button class="primary-btn btn-unlock" onclick="closeVipModal()">關閉控制台</button>
+        </div>
+      `;
+  };
+
+  // 5. 盟友教官專屬派發台 (3 天版)
+  openAllyConsole = function() {
+      document.getElementById('vipModalBox').innerHTML = `
+        <h3 style="color: var(--safe); margin-top:0;">🤝 盟友教官派發台</h3>
+        <p style="font-size:13px; color:var(--text); text-align:left; margin-bottom:10px;">以下為未來 3 天的單日體驗碼，請直接提供給現場學員使用：</p>
+        <div style="background:rgba(0,0,0,0.3); padding:10px 15px; border-radius:8px; margin-bottom:15px; text-align:left; border-left: 4px solid var(--safe);">
+          \${getMultiDayKeys(3)}
+        </div>
+        <div class="modal-btn-group">
+          <button class="primary-btn btn-unlock" onclick="closeVipModal()">關閉面板</button>
         </div>
       `;
   };
