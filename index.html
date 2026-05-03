@@ -2480,7 +2480,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
-<!-- 🚀 散木團隊：雲端金鑰外掛升級包 (含強效登出 & 測試後門) -->
+<!-- 🚀 散木團隊：雲端金鑰外掛升級包 (含身分切換與萬用後門) -->
 <script>
 (function() {
   const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQlTgAJeOrQIlyQVjvjDLtZycBAgc1d2R5vZWymQUrfNrzp6F7tdt74cmPbPIbobzmrFunwvwzfOc2S/pub?output=csv";
@@ -2507,22 +2507,19 @@ document.addEventListener('DOMContentLoaded', () => {
       return html;
   }
 
-  // 🚪 登出功能：全方位清除暫存並刷新頁面
+  // 🚪 登出功能：徹底清除所有權限標籤並刷新
   logoutVip = function() {
       localStorage.removeItem('sunmoon_vip_trackline_status');
       localStorage.removeItem('sunmoon_vip_trackline_expire');
-      showToast("⚠️ 權限已登出，系統重置中...", "warn");
-      setTimeout(function(){ location.reload(); }, 800);
+      showToast("⚠️ 權限已重置，請重新輸入密碼", "warn");
+      setTimeout(function(){ location.reload(); }, 600);
   };
 
   verifyVip = function() {
       var inputPwd = document.getElementById('vipPwdInput').value.trim().toUpperCase(); 
       var errorMsg = document.getElementById('vipErrorMsg');
       
-      // ✅ 測試專用萬用後門
-      if (inputPwd === "DALO-999") { openCommanderConsole(); return; }
-      
-      if (inputPwd === "SUNMOONBOSS") { openCommanderConsole(); return; }
+      if (inputPwd === "DALO-999" || inputPwd === "SUNMOONBOSS") { openCommanderConsole(); return; }
       if (inputPwd === "TEACHER888") { openAllyConsole(); return; }
 
       if (inputPwd === REMOTE_PERMANENT_KEY && REMOTE_PERMANENT_KEY !== "") {
@@ -2546,6 +2543,7 @@ document.addEventListener('DOMContentLoaded', () => {
       errorMsg.innerHTML = '❌ 授權碼錯誤！若需領取新密碼請 <a href="https://fang5761.gumroad.com/l/trackline-pro" target="_blank" style="color:var(--safe); text-decoration:underline;">按此前往</a>';
   };
 
+  // 指揮官控制台 (含登出按鈕)
   openCommanderConsole = function() {
       var keysList = getMultiDayKeys(3);
       document.getElementById('vipModalBox').innerHTML = 
@@ -2559,25 +2557,28 @@ document.addEventListener('DOMContentLoaded', () => {
           keysList +
         '</div>' +
         '<div class="modal-btn-group">' +
-          '<button class="primary-btn btn-cancel" onclick="logoutVip()">清除授權(登出)</button>' +
+          '<button class="primary-btn btn-cancel" onclick="logoutVip()">登出並切換身分</button>' +
           '<button class="primary-btn btn-unlock" onclick="closeVipModal()">關閉控制台</button>' +
         '</div>';
   };
 
+  // 盟友教官派發台 (現在也加上登出按鈕，方便測試)
   openAllyConsole = function() {
       var keysList = getMultiDayKeys(3);
       document.getElementById('vipModalBox').innerHTML = 
         '<h3 style="color: var(--safe); margin-top:0;">🤝 盟友教官派發台</h3>' +
-        '<p style="font-size:13px; color:var(--text); text-align:left; margin-bottom:10px;">以下為未來 3 天的單日體驗碼，請提供給現場學員：</p>' +
+        '<p style="font-size:13px; color:var(--text); text-align:left; margin-bottom:10px;">以下為未來 3 天的單日體驗碼：</p>' +
         '<div style="background:rgba(0,0,0,0.3); padding:10px 15px; border-radius:8px; margin-bottom:15px; text-align:left; border-left: 4px solid var(--safe);">' +
           keysList +
         '</div>' +
         '<div class="modal-btn-group">' +
+          '<button class="primary-btn btn-cancel" onclick="logoutVip()">登出並切換身分</button>' +
           '<button class="primary-btn btn-unlock" onclick="closeVipModal()">關閉面板</button>' +
         '</div>';
   };
 })();
 </script>
+
 
 </body>
 </html>
