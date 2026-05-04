@@ -1517,7 +1517,7 @@ function showToast(msg, type = 'safe') {
             <div class="menu-content">
               <div style="text-align: center; margin-bottom: 15px;">
                 <span data-i18n="devTitle" style="display:inline-block; background:var(--safe); color:#0f1623; font-weight:bold; padding:4px 14px; border-radius:20px; font-size:13px; letter-spacing:0.5px; box-shadow: 0 2px 6px rgba(34,197,94,0.3);">散木索道儀 專業正式版</span>
-                <div style="font-size: 11px; color: var(--muted); margin-top: 8px; font-family: monospace;">Version 6.2.2</div>
+                <div style="font-size: 11px; color: var(--muted); margin-top: 8px; font-family: monospace;">Version 6.2.3</div>
               </div>
               <p style="margin-top: 0; margin-bottom: 6px; font-weight: bold; color: var(--text); text-align: center;" data-i18n="devTeam">本工具由 <span style="color:var(--warn);">散木團隊</span> 開發製作</p>
               <p style="margin-top: 0; margin-bottom: 4px; font-size: 13px; text-align: center;" data-i18n="devT1">教學架構與工程判斷／徐世豐</p>
@@ -1575,6 +1575,22 @@ function getDailyKey(offsetDays = 0) {
     const dateStr = d.toLocaleDateString('zh-TW', { timeZone: 'Asia/Taipei', year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '');
     const hash = (parseInt(dateStr) * 17 % 9000) + 1000;
     return "SMT-" + hash;
+}
+
+function getMultiDayKeys(days) {
+    let html = "";
+    for(let i = 0; i < days; i++) {
+        let d = new Date(); d.setDate(d.getDate() + i);
+        let dateStr = d.toLocaleDateString('zh-TW', { timeZone: 'Asia/Taipei', year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '');
+        let key = "SMT-" + ((parseInt(dateStr) * 17 % 9000) + 1000);
+        let mm = d.getMonth() + 1; let dd = d.getDate();
+        let label = i === 0 ? "今天" : (i === 1 ? "明天" : "後天");
+        html += '<div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.05); padding:6px 0;">' +
+                   '<span style="color:var(--muted); font-size:14px;">' + label + ' (' + mm + '/' + dd + ')</span>' +
+                   '<strong style="color:var(--safe); letter-spacing:1px;">' + key + '</strong>' +
+                 '</div>';
+    }
+    return html;
 }
 
 const todayStr = new Date().toLocaleDateString('en-CA', {timeZone: 'Asia/Taipei'}); 
@@ -1687,6 +1703,49 @@ function logoutVip() {
     setTimeout(() => { window.location.reload(); }, 600); 
 }
 
+function openCommanderConsole() {
+    let keysList = getMultiDayKeys(3);
+    document.getElementById('vipModalBox').innerHTML = 
+      '<h3 style="color: var(--warn); margin-top:0;">👑 指揮官專屬控制台</h3>' +
+      '<div style="background:rgba(0,0,0,0.3); padding:10px 15px; border-radius:8px; margin-bottom:10px; text-align:left; border-left: 4px solid var(--vip);">' +
+        '<span style="color:var(--muted); font-size:11px;">📡 雲端終身金鑰 (A1)</span><br>' +
+        '<strong style="color:var(--vip); font-size:18px; letter-spacing:1px;">' + (REMOTE_PERMANENT_KEY || '讀取中...') + '</strong>' +
+      '</div>' +
+      '<div style="background:rgba(0,0,0,0.3); padding:10px 15px; border-radius:8px; margin-bottom:15px; text-align:left; border-left: 4px solid var(--safe);">' +
+        '<span style="color:var(--muted); font-size:11px;">📅 近三日動態體驗碼</span>' +
+        keysList +
+      '</div>' +
+      '<div class="modal-btn-group">' +
+        '<button class="primary-btn btn-cancel" onclick="logoutVip()">登出並切換身分</button>' +
+        '<button class="primary-btn btn-unlock" onclick="closeVipModal()">關閉控制台</button>' +
+      '</div>';
+}
+
+function openAllyConsole() {
+    let keysList = getMultiDayKeys(3);
+    document.getElementById('vipModalBox').innerHTML = 
+      '<h3 style="color: var(--safe); margin-top:0;">🤝 盟友教官派發台</h3>' +
+      '<p style="font-size:13px; color:var(--text); text-align:left; margin-bottom:10px;">以下為未來 3 天的單日體驗碼：</p>' +
+      '<div style="background:rgba(0,0,0,0.3); padding:10px 15px; border-radius:8px; margin-bottom:15px; text-align:left; border-left: 4px solid var(--safe);">' +
+        keysList +
+      '</div>' +
+      '<div class="modal-btn-group">' +
+        '<button class="primary-btn btn-cancel" onclick="logoutVip()">登出並切換身分</button>' +
+        '<button class="primary-btn btn-unlock" onclick="closeVipModal()">關閉面板</button>' +
+      '</div>';
+}
+
+function openLogoutConsole() {
+    document.getElementById('vipModalBox').innerHTML = 
+      '<h3 style="color: var(--bad); margin-top:0;">⚠️ 授權清除確認</h3>' +
+      '<p style="font-size:13.5px; color:var(--text); text-align:left; margin-bottom:15px; line-height:1.6;">' +
+      '您目前處於專業版授權狀態。<br>請問是否要清除此裝置的所有授權紀錄並強制登出？<br><br><span style="color:var(--muted); font-size:12px;">(登出後將恢復為一般模式，需重新輸入密碼才能再次解鎖)</span></p>' +
+      '<div class="modal-btn-group" style="margin-top: 15px;">' +
+        '<button class="primary-btn btn-cancel" onclick="closeVipModal()">取消返回</button>' +
+        '<button class="primary-btn btn-unlock" style="background:var(--bad); color:#fff;" onclick="logoutVip()">確認清除授權</button>' +
+      '</div>';
+}
+
 function verifyVip() {
     const inputPwd = document.getElementById('vipPwdInput').value.trim().toUpperCase(); 
     const errorMsg = document.getElementById('vipErrorMsg');
@@ -1738,65 +1797,6 @@ function verifyVip() {
     }
 
     errorMsg.innerHTML = '❌ 授權碼錯誤！若需領取新密碼請 <a href="https://fang5761.gumroad.com/l/trackline-pro" target="_blank" style="color:var(--safe); text-decoration:underline;">按此前往</a>';
-}
-
-function getMultiDayKeys(days) {
-    let html = "";
-    for(let i = 0; i < days; i++) {
-        let d = new Date(); d.setDate(d.getDate() + i);
-        let dateStr = d.toLocaleDateString('zh-TW', { timeZone: 'Asia/Taipei', year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '');
-        let key = "SMT-" + ((parseInt(dateStr) * 17 % 9000) + 1000);
-        let mm = d.getMonth() + 1; let dd = d.getDate();
-        let label = i === 0 ? "今天" : (i === 1 ? "明天" : "後天");
-        html += '<div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.05); padding:6px 0;">' +
-                   '<span style="color:var(--muted); font-size:14px;">' + label + ' (' + mm + '/' + dd + ')</span>' +
-                   '<strong style="color:var(--safe); letter-spacing:1px;">' + key + '</strong>' +
-                 '</div>';
-    }
-    return html;
-}
-
-function openCommanderConsole() {
-    let keysList = getMultiDayKeys(3);
-    document.getElementById('vipModalBox').innerHTML = 
-      '<h3 style="color: var(--warn); margin-top:0;">👑 指揮官專屬控制台</h3>' +
-      '<div style="background:rgba(0,0,0,0.3); padding:10px 15px; border-radius:8px; margin-bottom:10px; text-align:left; border-left: 4px solid var(--vip);">' +
-        '<span style="color:var(--muted); font-size:11px;">📡 雲端終身金鑰 (A1)</span><br>' +
-        '<strong style="color:var(--vip); font-size:18px; letter-spacing:1px;">' + (REMOTE_PERMANENT_KEY || '讀取中...') + '</strong>' +
-      '</div>' +
-      '<div style="background:rgba(0,0,0,0.3); padding:10px 15px; border-radius:8px; margin-bottom:15px; text-align:left; border-left: 4px solid var(--safe);">' +
-        '<span style="color:var(--muted); font-size:11px;">📅 近三日動態體驗碼</span>' +
-        keysList +
-      '</div>' +
-      '<div class="modal-btn-group">' +
-        '<button class="primary-btn btn-cancel" onclick="logoutVip()">登出並切換身分</button>' +
-        '<button class="primary-btn btn-unlock" onclick="closeVipModal()">關閉控制台</button>' +
-      '</div>';
-}
-
-function openAllyConsole() {
-    let keysList = getMultiDayKeys(3);
-    document.getElementById('vipModalBox').innerHTML = 
-      '<h3 style="color: var(--safe); margin-top:0;">🤝 盟友教官派發台</h3>' +
-      '<p style="font-size:13px; color:var(--text); text-align:left; margin-bottom:10px;">以下為未來 3 天的單日體驗碼：</p>' +
-      '<div style="background:rgba(0,0,0,0.3); padding:10px 15px; border-radius:8px; margin-bottom:15px; text-align:left; border-left: 4px solid var(--safe);">' +
-        keysList +
-      '</div>' +
-      '<div class="modal-btn-group">' +
-        '<button class="primary-btn btn-cancel" onclick="logoutVip()">登出並切換身分</button>' +
-        '<button class="primary-btn btn-unlock" onclick="closeVipModal()">關閉面板</button>' +
-      '</div>';
-}
-
-function openLogoutConsole() {
-    document.getElementById('vipModalBox').innerHTML = 
-      '<h3 style="color: var(--bad); margin-top:0;">⚠️ 授權清除確認</h3>' +
-      '<p style="font-size:13.5px; color:var(--text); text-align:left; margin-bottom:15px; line-height:1.6;">' +
-      '您目前處於專業版授權狀態。<br>請問是否要清除此裝置的所有授權紀錄並強制登出？<br><br><span style="color:var(--muted); font-size:12px;">(登出後將恢復為一般模式，需重新輸入密碼才能再次解鎖)</span></p>' +
-      '<div class="modal-btn-group" style="margin-top: 15px;">' +
-        '<button class="primary-btn btn-cancel" onclick="closeVipModal()">取消返回</button>' +
-        '<button class="primary-btn btn-unlock" style="background:var(--bad); color:#fff;" onclick="logoutVip()">確認清除授權</button>' +
-      '</div>';
 }
 
 function handleImageUploadClick(e) {
