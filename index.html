@@ -218,19 +218,21 @@
   .ma-btn.active { background: var(--tagline); color: var(--bg); border-color: var(--tagline); }
   .ma-btn .lock-icon { bottom: 2px; right: 2px; font-size: 8px; }
 
-  /* 💡 模態視窗與按鈕視覺放大更新 (加入 max-height 與 overflow 解決手機滑動問題) */
+  /* 💡 模態視窗與按鈕視覺放大更新 (加入 max-height 與 padding 解決手機滑動回彈問題) */
   .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); }
   .modal-box { 
-    background: var(--card); border: 2px solid var(--vip); border-radius: 16px; padding: 24px; 
+    background: var(--card); border: 2px solid var(--vip); border-radius: 16px; 
+    padding: 20px 20px 30px 20px; /* 增加下方 Padding，防止按鈕被切或彈回 */
     width: 85%; max-width: 400px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.8); 
     position: relative; 
-    max-height: 80vh; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
+    max-height: 88vh; /* 放寬高度限制 */
+    overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
   }
   .modal-box::-webkit-scrollbar { display: none; } /* 隱藏滾動條保持美觀 */
 
-  .modal-box h3 { margin: 0 0 12px 0; color: var(--warn); font-size: 18px; display: flex; align-items: center; justify-content: center; gap: 8px; }
-  .modal-box p { font-size: 14px; color: var(--text); margin-bottom: 16px; line-height: 1.6; }
-  .primary-btn { background: var(--vip); color: #fff; border: none; padding: 12px 20px; border-radius: 8px; font-size: 15px; font-weight: bold; width: 100%; cursor: pointer; box-shadow: 0 4px 12px rgba(192, 132, 252, 0.4); margin-bottom: 10px; transition: transform 0.2s; }
+  .modal-box h3 { margin: 0 0 10px 0; color: var(--warn); font-size: 18px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .modal-box p { font-size: 14px; color: var(--text); margin-bottom: 12px; line-height: 1.6; }
+  .primary-btn { background: var(--vip); color: #fff; border: none; padding: 12px 20px; border-radius: 8px; font-size: 15px; font-weight: bold; width: 100%; cursor: pointer; box-shadow: 0 4px 12px rgba(192, 132, 252, 0.4); margin-bottom: 8px; transition: transform 0.2s; }
   .primary-btn:active { transform: scale(0.95); }
   .pwd-input { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--line); color: #fff; padding: 12px; border-radius: 8px; font-size: 16px; text-align: center; outline: none; margin-bottom: 12px; letter-spacing: 2px; font-family: monospace; }
   .pwd-input:focus { border-color: var(--safe); }
@@ -846,6 +848,8 @@ const i18n = {
     featCamDesc: "Superposez la simulation sur la scène réelle !",
     featPhoto: "📁 Superposition Photo",
     featPhotoDesc: "Importez des photos pour simuler sur site !",
+    featShock: "📳 Choc Dynamique",
+    featShockDesc: "Personnalisez le pourcentage de choc pour prévoir les pics extrêmes !",
     featShot: "📸 Capture Tactique",
     featShotDesc: "Exportation propre et haute résolution !",
     featHeight: "↕️ Simulation de Dénivelé",
