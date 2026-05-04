@@ -218,27 +218,33 @@
   .ma-btn.active { background: var(--tagline); color: var(--bg); border-color: var(--tagline); }
   .ma-btn .lock-icon { bottom: 2px; right: 2px; font-size: 8px; }
 
-  /* 💡 模態視窗與按鈕視覺放大更新 (加入 max-height 與 padding 解決手機滑動回彈問題) */
-  .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); }
+  /* 💡 模態視窗與按鈕視覺放大更新 (徹底解決蘋果 iOS 鍵盤彈出導致頂部消失與滑動卡死問題) */
+  .modal-overlay { 
+    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+    background: rgba(0,0,0,0.85); z-index: 9999; 
+    align-items: flex-start; justify-content: center; /* 關鍵：改為 flex-start 防止頂部被切掉 */
+    overflow-y: auto; -webkit-overflow-scrolling: touch; /* 讓整片半透明黑底成為滾動主體 */
+    padding: max(30px, env(safe-area-inset-top)) 15px max(30px, env(safe-area-inset-bottom)) 15px; 
+    backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); 
+  }
   .modal-box { 
     background: var(--card); border: 2px solid var(--vip); border-radius: 16px; 
-    padding: 20px 20px 30px 20px; /* 增加下方 Padding，防止按鈕被切或彈回 */
-    width: 85%; max-width: 400px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.8); 
+    padding: 24px 20px; 
+    width: 100%; max-width: 400px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.8); 
     position: relative; 
-    max-height: 88vh; /* 放寬高度限制 */
-    overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
+    margin: auto; /* 關鍵：空間夠時自動置中，空間不夠時順勢往上頂 */
+    flex-shrink: 0; /* 防止視窗在空間不足時被過度擠壓 */
   }
-  .modal-box::-webkit-scrollbar { display: none; } /* 隱藏滾動條保持美觀 */
 
-  .modal-box h3 { margin: 0 0 10px 0; color: var(--warn); font-size: 18px; display: flex; align-items: center; justify-content: center; gap: 8px; }
-  .modal-box p { font-size: 14px; color: var(--text); margin-bottom: 12px; line-height: 1.6; }
-  .primary-btn { background: var(--vip); color: #fff; border: none; padding: 12px 20px; border-radius: 8px; font-size: 15px; font-weight: bold; width: 100%; cursor: pointer; box-shadow: 0 4px 12px rgba(192, 132, 252, 0.4); margin-bottom: 8px; transition: transform 0.2s; }
+  .modal-box h3 { margin: 0 0 12px 0; color: var(--warn); font-size: 18px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .modal-box p { font-size: 14px; color: var(--text); margin-bottom: 16px; line-height: 1.6; }
+  .primary-btn { background: var(--vip); color: #fff; border: none; padding: 12px 20px; border-radius: 8px; font-size: 15px; font-weight: bold; width: 100%; cursor: pointer; box-shadow: 0 4px 12px rgba(192, 132, 252, 0.4); margin-bottom: 10px; transition: transform 0.2s; }
   .primary-btn:active { transform: scale(0.95); }
   .pwd-input { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--line); color: #fff; padding: 12px; border-radius: 8px; font-size: 16px; text-align: center; outline: none; margin-bottom: 12px; letter-spacing: 2px; font-family: monospace; }
   .pwd-input:focus { border-color: var(--safe); }
   .modal-btn-group { display: flex; gap: 10px; }
-  .modal-btn-group .btn-cancel { flex: 1; background: var(--muted); color: #fff; border: none; padding: 12px; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; }
-  .modal-btn-group .btn-unlock { flex: 1; background: var(--safe); border: none; color: #0f1623; padding: 12px; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; }
+  .modal-btn-group .btn-cancel { flex: 1; background: var(--muted); color: #fff; border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+  .modal-btn-group .btn-unlock { flex: 1; background: var(--safe); border: none; color: #0f1623; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
   /* 統一：選單樣式全面對齊最新設計 */
   .menu-list { display: flex; flex-direction: column; width: 100%; margin-top: 5px; }
