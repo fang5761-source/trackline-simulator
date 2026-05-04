@@ -218,8 +218,16 @@
   .ma-btn.active { background: var(--tagline); color: var(--bg); border-color: var(--tagline); }
   .ma-btn .lock-icon { bottom: 2px; right: 2px; font-size: 8px; }
 
+  /* 💡 模態視窗與按鈕視覺放大更新 (加入 max-height 與 overflow 解決手機滑動問題) */
   .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); }
-  .modal-box { background: var(--card); border: 2px solid var(--vip); border-radius: 16px; padding: 24px; width: 85%; max-width: 400px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.8); position: relative; }
+  .modal-box { 
+    background: var(--card); border: 2px solid var(--vip); border-radius: 16px; padding: 24px; 
+    width: 85%; max-width: 400px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.8); 
+    position: relative; 
+    max-height: 80vh; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
+  }
+  .modal-box::-webkit-scrollbar { display: none; } /* 隱藏滾動條保持美觀 */
+
   .modal-box h3 { margin: 0 0 12px 0; color: var(--warn); font-size: 18px; display: flex; align-items: center; justify-content: center; gap: 8px; }
   .modal-box p { font-size: 14px; color: var(--text); margin-bottom: 16px; line-height: 1.6; }
   .primary-btn { background: var(--vip); color: #fff; border: none; padding: 12px 20px; border-radius: 8px; font-size: 15px; font-weight: bold; width: 100%; cursor: pointer; box-shadow: 0 4px 12px rgba(192, 132, 252, 0.4); margin-bottom: 10px; transition: transform 0.2s; }
@@ -227,10 +235,12 @@
   .pwd-input { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--line); color: #fff; padding: 12px; border-radius: 8px; font-size: 16px; text-align: center; outline: none; margin-bottom: 12px; letter-spacing: 2px; font-family: monospace; }
   .pwd-input:focus { border-color: var(--safe); }
   .modal-btn-group { display: flex; gap: 10px; }
-  .modal-btn-group .btn-cancel { flex: 1; background: var(--muted); color: #fff; border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-  .modal-btn-group .btn-unlock { flex: 1; background: var(--safe); border: none; color: #0f1623; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+  .modal-btn-group .btn-cancel { flex: 1; background: var(--muted); color: #fff; border: none; padding: 12px; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; }
+  .modal-btn-group .btn-unlock { flex: 1; background: var(--safe); border: none; color: #0f1623; padding: 12px; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; }
 
+  /* 統一：選單樣式全面對齊最新設計 */
   .menu-list { display: flex; flex-direction: column; width: 100%; margin-top: 5px; }
+  
   details.main-accordion { margin-top: 12px; }
   details.main-accordion > summary {
     font-size: 14px; font-weight: bold; color: var(--text); padding: 12px 16px; background: rgba(150,150,150,0.1);
@@ -270,6 +280,7 @@
   
   .footer-disclaimer { margin-top: 20px; padding: 15px; font-size: 12px; color: var(--muted); line-height: 1.6; text-align: justify; background: rgba(150,150,150,0.05); border-radius: 10px; border-left: 4px solid var(--bad); }
 
+  /* 💡 散木專屬浮動提示框 (Toast) 樣式 - 修復顯示機制 */
   #toastMessage {
     position: fixed; top: -50px; left: 50%; transform: translateX(-50%);
     background: var(--card); color: var(--text); padding: 14px 24px; border-radius: 10px;
