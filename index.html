@@ -1462,6 +1462,11 @@ window.copyBankAccount = function() {
         <button class="icon-btn" onclick="resetEngine()" title="重置沙盤">↺</button>
       </div>
 
+      <div class="capture-hide" style="display:flex; align-items:center; gap:8px; background:rgba(0,0,0,0.28); border:1px solid var(--line); border-radius:8px; padding:6px 8px; margin-bottom:8px;">
+         <span style="color:var(--muted); font-size:11px; font-weight:bold; white-space:nowrap;" data-i18n="sceneYOffset">沙盤上下校準</span>
+         <input type="range" id="sceneYOffsetSlider" min="-90" max="160" step="1" value="0" style="flex:1;">
+      </div>
+
       <div class="svgWrap" id="svgWrap">
         <svg id="canvas" viewBox="0 0 400 460" preserveAspectRatio="xMidYMid meet">
           <line id="tagLineA" stroke="var(--tagline)" stroke-width="4" stroke-dasharray="6 4" stroke-linecap="round" />
@@ -1557,10 +1562,6 @@ window.copyBankAccount = function() {
          </div>
          <div class="dash-sag-row">
             <span id="sagText" style="color:var(--tagline); font-size:13px; font-weight:bold; letter-spacing: 1px;" data-i18n="sagLabel">下垂量計算中...</span>
-          </div>
-          <div class="capture-hide" style="display:flex; align-items:center; gap:8px;">
-             <span style="color:var(--muted); font-size:11px; font-weight:bold; white-space:nowrap;" data-i18n="sceneYOffset">沙盤上下校準</span>
-             <input type="range" id="sceneYOffsetSlider" min="-90" max="120" step="1" value="0" style="flex:1;">
           </div>
       </div> 
       
@@ -2676,6 +2677,7 @@ function makeCaptureBackground(target) {
 async function takeScreenshot() {
   const target = document.getElementById('mainCard'); 
   let captureBg = null;
+  const bgDataUrl = makeCaptureBackground(target);
   target.classList.add('capture-mode');
   
   const inputs = target.querySelectorAll('input[type="number"]');
@@ -2698,7 +2700,6 @@ async function takeScreenshot() {
   });
 
   await new Promise(r => setTimeout(r, 100));
-  const bgDataUrl = makeCaptureBackground(target);
   if (bgDataUrl) {
       captureBg = document.createElement('img');
       captureBg.className = 'capture-bg';
