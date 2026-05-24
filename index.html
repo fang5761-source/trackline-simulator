@@ -348,6 +348,7 @@ const i18n = {
     ropeMode: "繩長模式",
     ropeModeVariable: "變動繩長",
     ropeModeFixed: "固定繩長",
+    sceneYOffset: "沙盤上下校準",
     span: "↔️ 跨距",
     height: "↕️ 高差",
     angleLoose: "鬆 (夾角小)",
@@ -389,7 +390,8 @@ const i18n = {
     op2: "直接拖曳橘色 <b>大擔架</b> 或滑輪，可精準模擬傷患過河的張力變化。",
     op3: "當擔架處於偏離點時，可點選下方的 <b>⚙️水平牽引省力比</b> 換算手拉力。",
     op4: "滑動下方的 <b>夾角拉桿</b>，系統會自動反推繩長並平滑變形。",
-    op5: "點擊 <b>📷實境 / 🌐網格 / 👁️淨空</b> 等工具進行實地測量與 <b>📸戰術截圖</b>。",
+    op5: "<b>變動繩長</b>會依拖曳位置自動反推總繩長；<b>固定繩長</b>會鎖定輸入值，用來觀察緊繃程度、下垂與是否無法架設。",
+    op6: "點擊 <b>📷實境 / 🌐網格 / 👁️淨空</b> 等工具進行實地測量與 <b>📸戰術截圖</b>。",
     devTitle: "散木索道儀 專業正式版",
     devTeam: "本工具由 <span style='color:var(--warn);'>散木團隊</span> 開發製作",
     devT1: "教學架構與工程判斷／徐世豐",
@@ -466,6 +468,7 @@ const i18n = {
     ropeMode: "Rope Mode",
     ropeModeVariable: "Variable length",
     ropeModeFixed: "Fixed length",
+    sceneYOffset: "Sandbox vertical offset",
     span: "↔️ Span",
     height: "↕️ Height Diff",
     angleLoose: "Slack",
@@ -507,7 +510,8 @@ const i18n = {
     op2: "Drag the <b>orange stretcher</b> to simulate tension changes.",
     op3: "Click <b>⚙️ Horizontal MA</b> to convert pulling force.",
     op4: "Slide the <b>Angle Slider</b> below for dynamic adjustment.",
-    op5: "Click <b>📷 AR / 📁 Photo</b> to overlay real scene images.",
+    op5: "<b>Variable length</b> recalculates rope length while dragging; <b>Fixed length</b> locks your input to check tightness, sag, and rig feasibility.",
+    op6: "Click <b>📷 AR / 📁 Photo</b> to overlay real scene images.",
     devTitle: "Trackline Simulator PRO",
     devTeam: "Developed by <span style='color:var(--warn);'>SunMoon Team</span>",
     devT1: "Engineering & Architecture / Shih-Feng Hsu",
@@ -584,6 +588,7 @@ const i18n = {
     ropeMode: "ロープ長モード",
     ropeModeVariable: "可変ロープ長",
     ropeModeFixed: "固定ロープ長",
+    sceneYOffset: "サンドボックス上下調整",
     span: "↔️ スパン",
     height: "↕️ 高低差",
     angleLoose: "緩い",
@@ -625,7 +630,8 @@ const i18n = {
     op2: "<b>担架</b> をドラッグして張力変化をシミュレーションします。",
     op3: "下の <b>⚙️ 水平倍力比</b> をクリックして引く力を計算します。",
     op4: "下の <b>角度スライダー</b> を操作して動的に調整します。",
-    op5: "<b>📷 ARカメラ / 📁 写真</b> で現場画像をオーバーレイします。",
+    op5: "<b>可変ロープ長</b> はドラッグに合わせて長さを再計算し、<b>固定ロープ長</b> は入力値を固定して張り具合、サグ、架設可否を確認します。",
+    op6: "<b>📷 ARカメラ / 📁 写真</b> で現場画像をオーバーレイします。",
     devTitle: "トラックライン張力計 PRO",
     devTeam: "開発：<span style='color:var(--warn);'>SunMoon Team</span>",
     devT1: "アーキテクチャ・監修 / Shih-Feng Hsu",
@@ -702,6 +708,7 @@ const i18n = {
     ropeMode: "로프 길이 모드",
     ropeModeVariable: "가변 길이",
     ropeModeFixed: "고정 길이",
+    sceneYOffset: "샌드박스 상하 보정",
     span: "↔️ 스팬",
     height: "↕️ 높이 차이",
     angleLoose: "느슨함",
@@ -743,7 +750,8 @@ const i18n = {
     op2: "<b>들것</b>을 드래그하여 장력 변화를 시뮬레이션하세요.",
     op3: "아래 <b>⚙️ 수평 MA</b>를 클릭하여 견인력을 계산하세요.",
     op4: "아래 <b>각도 슬라이더</b>를 움직여 동적으로 조절하세요.",
-    op5: "<b>📷 AR / 📁 사진</b>을 클릭하여 실제 현장 이미지를 오버레이하세요.",
+    op5: "<b>가변 길이</b>는 드래그 위치에 따라 로프 길이를 다시 계산하고, <b>고정 길이</b>는 입력값을 고정해 장력, 처짐, 설치 가능 여부를 확인합니다.",
+    op6: "<b>📷 AR / 📁 사진</b>을 클릭하여 실제 현장 이미지를 오버레이하세요.",
     devTitle: "트랙라인 장력계 PRO",
     devTeam: "개발: <span style='color:var(--warn);'>SunMoon Team</span>",
     devT1: "아키텍처 및 엔지니어링 / Shih-Feng Hsu",
@@ -820,6 +828,7 @@ const i18n = {
     ropeMode: "Mode longueur",
     ropeModeVariable: "Longueur variable",
     ropeModeFixed: "Longueur fixe",
+    sceneYOffset: "Décalage vertical du bac",
     span: "↔️ Portée",
     height: "↕️ Dénivelé",
     angleLoose: "Lâche",
@@ -861,7 +870,8 @@ const i18n = {
     op2: "Glissez la <b>civière</b> pour simuler la tension.",
     op3: "Cliquez sur <b>⚙️ Avantage Mécanique</b> pour la force.",
     op4: "Faites glisser le <b>curseur d'angle</b> en bas.",
-    op5: "Cliquez sur <b>📷 AR / 📁 Photo</b> pour superposer des images.",
+    op5: "La <b>longueur variable</b> recalcule la corde pendant le glissement ; la <b>longueur fixe</b> verrouille la valeur saisie pour vérifier tension, flèche et faisabilité.",
+    op6: "Cliquez sur <b>📷 AR / 📁 Photo</b> pour superposer des images.",
     devTitle: "Simulateur Tyrolienne PRO",
     devTeam: "Développé par <span style='color:var(--warn);'>SunMoon Team</span>",
     devT1: "Ingénierie et Architecture / Shih-Feng Hsu",
@@ -938,6 +948,7 @@ const i18n = {
     ropeMode: "Seillängenmodus",
     ropeModeVariable: "Variable Länge",
     ropeModeFixed: "Feste Länge",
+    sceneYOffset: "Sandbox vertikal ausrichten",
     span: "↔️ Spannweite",
     height: "↕️ Höhenunterschied",
     angleLoose: "Locker",
@@ -979,7 +990,8 @@ const i18n = {
     op2: "Ziehen Sie die <b>Trage</b>, um die Spannungsänderung zu simulieren.",
     op3: "Klicken Sie auf <b>⚙️ Flaschenzug</b> für die Zugkraft.",
     op4: "Bewegen Sie den <b>Winkelschieber</b> für dynamische Anpassungen.",
-    op5: "Klicken Sie auf <b>📷 AR / 📁 Foto</b> für reale Bildüberlagerungen.",
+    op5: "<b>Variable Länge</b> berechnet die Seillänge beim Ziehen neu; <b>feste Länge</b> sperrt den Eingabewert, um Spannung, Durchhang und Machbarkeit zu prüfen.",
+    op6: "Klicken Sie auf <b>📷 AR / 📁 Foto</b> für reale Bildüberlagerungen.",
     devTitle: "Seilbahn Simulator PRO",
     devTeam: "Entwickelt von <span style='color:var(--warn);'>SunMoon Team</span>",
     devT1: "Technik & Architektur / Shih-Feng Hsu",
@@ -1056,6 +1068,7 @@ const i18n = {
     ropeMode: "Modo de cuerda",
     ropeModeVariable: "Longitud variable",
     ropeModeFixed: "Longitud fija",
+    sceneYOffset: "Ajuste vertical",
     span: "↔️ Tramo",
     height: "↕️ Altura",
     angleLoose: "Flojo",
@@ -1097,7 +1110,8 @@ const i18n = {
     op2: "Arrastre la <b>camilla</b> para simular la tensión.",
     op3: "Haga clic en <b>⚙️ Ventaja Mecánica</b> para calcular la fuerza.",
     op4: "Deslice el <b>Control de Ángulo</b> para ajustar dinámicamente.",
-    op5: "Haga clic en <b>📷 AR / 📁 Foto</b> para superponer imágenes reales.",
+    op5: "La <b>longitud variable</b> recalcula la cuerda al arrastrar; la <b>longitud fija</b> bloquea el valor para comprobar tensión, flecha y viabilidad.",
+    op6: "Haga clic en <b>📷 AR / 📁 Foto</b> para superponer imágenes reales.",
     devTitle: "Simulador de Tirolesa PRO",
     devTeam: "Desarrollado por <span style='color:var(--warn);'>SunMoon Team</span>",
     devT1: "Ingeniería y Arquitectura / Shih-Feng Hsu",
@@ -1174,6 +1188,7 @@ const i18n = {
     ropeMode: "Modo da corda",
     ropeModeVariable: "Comprimento variável",
     ropeModeFixed: "Comprimento fixo",
+    sceneYOffset: "Ajuste vertical",
     span: "↔️ Vão",
     height: "↕️ Altura",
     angleLoose: "Frouxo",
@@ -1215,7 +1230,8 @@ const i18n = {
     op2: "Arraste a <b>maca</b> para simular a tensão.",
     op3: "Clique em <b>⚙️ Vantagem Mecânica</b> para calcular a força.",
     op4: "Deslize o <b>Controle de Ângulo</b> para ajuste dinâmico.",
-    op5: "Clique em <b>📷 AR / 📁 Foto</b> para sobrepor imagens reais.",
+    op5: "O <b>comprimento variável</b> recalcula a corda ao arrastar; o <b>comprimento fixo</b> mantém o valor digitado para verificar tensão, flecha e viabilidade.",
+    op6: "Clique em <b>📷 AR / 📁 Foto</b> para sobrepor imagens reais.",
     devTitle: "Simulador de Tirolesa PRO",
     devTeam: "Desenvolvido por <span style='color:var(--warn);'>SunMoon Team</span>",
     devT1: "Engenharia e Arquitetura / Shih-Feng Hsu",
@@ -1541,8 +1557,12 @@ window.copyBankAccount = function() {
          </div>
          <div class="dash-sag-row">
             <span id="sagText" style="color:var(--tagline); font-size:13px; font-weight:bold; letter-spacing: 1px;" data-i18n="sagLabel">下垂量計算中...</span>
-         </div>
-      </div>
+          </div>
+          <div class="capture-hide" style="display:flex; align-items:center; gap:8px;">
+             <span style="color:var(--muted); font-size:11px; font-weight:bold; white-space:nowrap;" data-i18n="sceneYOffset">沙盤上下校準</span>
+             <input type="range" id="sceneYOffsetSlider" min="-90" max="120" step="1" value="0" style="flex:1;">
+          </div>
+      </div> 
       
       <div class="tagline-wrap" id="taglineWrap">
          <div id="taglineInfo" data-i18n="dragTip">📍 在沙盤中自由上下左右拖曳進行動態模擬</div>
@@ -1590,7 +1610,8 @@ window.copyBankAccount = function() {
                 <li style="margin-bottom: 6px;" data-i18n="op2">直接拖曳橘色 <b>大擔架</b> 或滑輪，可精準模擬傷患過河的張力變化。</li>
                 <li style="margin-bottom: 6px;" data-i18n="op3">當擔架處於偏離點時，可點選下方的 <b>⚙️水平牽引省力比</b> 換算手拉力。</li>
                 <li style="margin-bottom: 6px;" data-i18n="op4">滑動下方的 <b>夾角拉桿</b>，系統會自動反推繩長並平滑變形。</li>
-                <li style="margin-bottom: 6px;" data-i18n="op5">點擊 <b>📷實境 / 🌐網格 / 👁️淨空</b> 等工具進行實地測量與 <b>📸戰術截圖</b>。</li>
+                <li style="margin-bottom: 6px;" data-i18n="op5"><b>變動繩長</b>會依拖曳位置自動反推總繩長；<b>固定繩長</b>會鎖定輸入值，用來觀察緊繃程度、下垂與是否無法架設。</li>
+                <li style="margin-bottom: 6px;" data-i18n="op6">點擊 <b>📷實境 / 🌐網格 / 👁️淨空</b> 等工具進行實地測量與 <b>📸戰術截圖</b>。</li>
               </ul>
               <button type="button" class="btn-collapse-inner" onclick="const p = this.closest('details'); if(p) p.removeAttribute('open');" data-i18n="collapse">🔼 收起說明</button>
             </div>
@@ -2023,6 +2044,7 @@ const inSpan = document.getElementById('inSpan'), inHeight = document.getElement
       inShock = document.getElementById('inShock'), angleSlider = document.getElementById('angleSlider'), 
       taglineInfo = document.getElementById('taglineInfo'), maControl = document.getElementById('maControl');
 const ropeModeSelect = document.getElementById('ropeModeSelect');
+const sceneYOffsetSlider = document.getElementById('sceneYOffsetSlider');
 
 const svgEl = document.getElementById('canvas');
 const mainCard = document.getElementById('mainCard');
@@ -2153,7 +2175,8 @@ function updateEngine(skipSliderUpdate = false) {
 
       let maxCanvasH = 460 - 150; 
       scale = Math.min((400 - 80) / Math.max(10, S), maxCanvasH / Math.max(10, Math.abs(H) + Math.max(minL, calcL)*0.5));
-      offsetY = 140 + (H < 0 ? Math.abs(H)*scale : 0); 
+      const sceneYOffset = parseFloat(sceneYOffsetSlider?.value) || 0;
+      offsetY = 140 + (H < 0 ? Math.abs(H)*scale : 0) + sceneYOffset; 
 
       let ax = 0, ay = 0, bx = S, by = H, px = S * currentSliderPct;
       let s_ax = toX(ax), s_ay = toY(ay), s_bx = toX(bx), s_by = toY(by);
@@ -2391,6 +2414,7 @@ inRope.addEventListener('change', () => { updateEngine(true); });
 [inSpan, inHeight, inLoad, inShock].forEach(el => el.addEventListener('input', () => updateEngine(true)));
 inRope.addEventListener('input', () => updateEngine(true));
 if (ropeModeSelect) ropeModeSelect.addEventListener('change', () => updateEngine(false));
+if (sceneYOffsetSlider) sceneYOffsetSlider.addEventListener('input', () => updateEngine(true));
 
 angleSlider.addEventListener('change', () => { updateEngine(false); });
 angleSlider.addEventListener('input', (e) => {
@@ -2580,6 +2604,7 @@ function toggleHUD() {
 
 function resetEngine() {
   inSpan.value = 20; inHeight.value = 0; inLoad.value = 100; currentSliderPct = 0.5;
+  if (sceneYOffsetSlider) sceneYOffsetSlider.value = 0;
   if(mainCard.classList.contains('shock-mode')) toggleShock(); 
   currentMA = 1; maBtns.forEach(b => b.classList.remove('active'));
   document.querySelector('.ma-btn[data-ma="1"]').classList.add('active');
@@ -2672,7 +2697,6 @@ async function takeScreenshot() {
       placeholders.push({ span, inp });
   });
 
-  window.scrollTo(0, 0);
   await new Promise(r => setTimeout(r, 100));
   const bgDataUrl = makeCaptureBackground(target);
   if (bgDataUrl) {
