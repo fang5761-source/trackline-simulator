@@ -122,6 +122,7 @@
   .card.capture-mode > :not(.capture-bg) { position: relative; z-index: 1; }
   .capture-bg { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
   .capture-mode .capture-hide { display: none !important; }
+  .capture-mode .capture-keep-space { visibility: hidden !important; display: flex !important; }
   
   .topbar { display: flex; flex-direction: column; gap: 10px; margin-bottom: 8px; padding: 0 4px; }
   .title-row { display: flex; align-items: center; width: 100%; justify-content: space-between; }
@@ -1462,7 +1463,7 @@ window.copyBankAccount = function() {
         <button class="icon-btn" onclick="resetEngine()" title="重置沙盤">↺</button>
       </div>
 
-      <div class="capture-hide" style="display:flex; align-items:center; gap:8px; background:rgba(0,0,0,0.28); border:1px solid var(--line); border-radius:8px; padding:6px 8px; margin-bottom:8px;">
+      <div class="capture-hide capture-keep-space" style="display:flex; align-items:center; gap:8px; background:rgba(0,0,0,0.28); border:1px solid var(--line); border-radius:8px; padding:6px 8px; margin-bottom:8px;">
          <span style="color:var(--muted); font-size:11px; font-weight:bold; white-space:nowrap;" data-i18n="sceneYOffset">沙盤上下校準</span>
          <input type="range" id="sceneYOffsetSlider" min="-90" max="160" step="1" value="0" style="flex:1;">
       </div>
@@ -2636,8 +2637,8 @@ function drawMediaToViewport(ctx, media, fitMode, viewportW, viewportH) {
 }
 
 function makeCaptureBackground(target) {
-  const usingVideo = stream && video.style.opacity === "1" && video.videoWidth;
-  const usingImage = image.style.opacity === "1" && image.complete && image.naturalWidth;
+  const usingVideo = stream && video.videoWidth && getComputedStyle(video).opacity !== "0";
+  const usingImage = image.src && image.complete && image.naturalWidth && getComputedStyle(image).opacity !== "0";
   if (!usingVideo && !usingImage) return null;
 
   const rect = target.getBoundingClientRect();
@@ -2654,7 +2655,12 @@ function makeCaptureBackground(target) {
 
   const media = usingVideo ? video : image;
   const fitMode = usingVideo ? 'cover' : 'contain';
-  if (!drawMediaToViewport(fullCtx, media, fitMode, viewportW, viewportH)) return null;
+  try {
+    if (!drawMediaToViewport(fullCtx, media, fitMode, viewportW, viewportH)) return null;
+  } catch (err) {
+    console.warn('背景截圖取樣失敗:', err);
+    return null;
+  }
 
   const cropCanvas = document.createElement('canvas');
   cropCanvas.width = Math.round(rect.width * scaleFactor);
@@ -2671,13 +2677,17 @@ function makeCaptureBackground(target) {
     cropCanvas.width,
     cropCanvas.height
   );
-  return cropCanvas.toDataURL('image/jpeg', 0.92);
+  return {
+    dataUrl: cropCanvas.toDataURL('image/jpeg', 0.92),
+    width: rect.width,
+    height: rect.height
+  };
 }
 
 async function takeScreenshot() {
   const target = document.getElementById('mainCard'); 
   let captureBg = null;
-  const bgDataUrl = makeCaptureBackground(target);
+  const bgSnapshot = makeCaptureBackground(target);
   target.classList.add('capture-mode');
   
   const inputs = target.querySelectorAll('input[type="number"]');
@@ -2700,10 +2710,13 @@ async function takeScreenshot() {
   });
 
   await new Promise(r => setTimeout(r, 100));
-  if (bgDataUrl) {
+  if (bgSnapshot) {
       captureBg = document.createElement('img');
       captureBg.className = 'capture-bg';
-      captureBg.src = bgDataUrl;
+      captureBg.src = bgSnapshot.dataUrl;
+      captureBg.style.width = `${bgSnapshot.width}px`;
+      captureBg.style.height = `${bgSnapshot.height}px`;
+      captureBg.style.objectFit = 'fill';
       target.insertBefore(captureBg, target.firstChild);
       if (captureBg.decode) {
           await captureBg.decode().catch(() => {});
