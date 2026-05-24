@@ -2642,8 +2642,10 @@ function makeCaptureBackground(target) {
   if (!usingVideo && !usingImage) return null;
 
   const rect = target.getBoundingClientRect();
-  const viewportW = window.innerWidth;
-  const viewportH = window.innerHeight;
+  const bgLayer = document.getElementById('bg-layer');
+  const bgRect = bgLayer ? bgLayer.getBoundingClientRect() : { left: 0, top: 0, width: window.innerWidth, height: window.innerHeight };
+  const viewportW = bgRect.width;
+  const viewportH = bgRect.height;
   const scaleFactor = Math.min(2, window.devicePixelRatio || 1);
   const fullCanvas = document.createElement('canvas');
   fullCanvas.width = Math.round(viewportW * scaleFactor);
@@ -2666,10 +2668,12 @@ function makeCaptureBackground(target) {
   cropCanvas.width = Math.round(rect.width * scaleFactor);
   cropCanvas.height = Math.round(rect.height * scaleFactor);
   const cropCtx = cropCanvas.getContext('2d');
+  const cropX = Math.round((rect.left - bgRect.left) * scaleFactor);
+  const cropY = Math.round((rect.top - bgRect.top) * scaleFactor);
   cropCtx.drawImage(
     fullCanvas,
-    Math.round(rect.left * scaleFactor),
-    Math.round(rect.top * scaleFactor),
+    cropX,
+    cropY,
     cropCanvas.width,
     cropCanvas.height,
     0,
