@@ -2639,9 +2639,12 @@ function drawMediaToViewport(ctx, media, fitMode, viewportW, viewportH) {
 async function takeScreenshot() {
   const target = document.getElementById('mainCard');
 
-  // ── 步驟1：隱藏前先記錄背景層真實位置（同上方固定點APP的驗證解法）──
+  // ── 步驟1：隱藏前先記錄背景層和 mainCard 的真實位置 ──
+  // 必須在 capture-mode 加上之前讀取，否則 capture-hide 元素消失後
+  // mainCard 的高度/位置會改變，導致 targetRect.top 不正確。
   const bgLayerEl = document.getElementById('bg-layer');
   const bgLayerRect = bgLayerEl ? bgLayerEl.getBoundingClientRect() : { left:0, top:0, width:window.innerWidth, height:window.innerHeight };
+  const targetRectBefore = target.getBoundingClientRect();  // ← capture-mode 前記錄
 
   // 加上截圖模式 class，讓 capture-hide 元素隱藏
   target.classList.add('capture-mode');
@@ -2712,16 +2715,16 @@ async function takeScreenshot() {
         // bgY 用 bgLayerRect.top - safeAreaTop 補回真實頂端位置
         const bgX = bgLayerRect.left + (containerW - drawW) / 2;
         const bgY = (bgLayerRect.top - safeAreaTop) + (containerH - drawH) / 2;
-        const targetRect = target.getBoundingClientRect();
-        const dX = (bgX - targetRect.left) * canvasScale;
-        const dY = (bgY - targetRect.top)  * canvasScale;
+        // 用 capture-mode 前記錄的位置，避免 capture-hide 消失後位移
+        const dX = (bgX - targetRectBefore.left) * canvasScale;
+        const dY = (bgY - targetRectBefore.top)  * canvasScale;
 
         ctx.drawImage(media, dX, dY, drawW * canvasScale, drawH * canvasScale);
 
         // DEBUG
         const _di = document.getElementById('shotDebugInfo');
         if (_di) {
-            _di.textContent = `sat=${safeAreaTop} | bgRect=t${bgLayerRect.top.toFixed(0)},h${bgLayerRect.height.toFixed(0)} | containerH=${containerH.toFixed(0)} | targetTop=${targetRect.top.toFixed(0)} | drawH=${drawH.toFixed(0)} | bgY=${bgY.toFixed(1)} | dY=${dY.toFixed(1)} | canvasH=${finalCanvas.height}`;
+            _di.textContent = `sat=${safeAreaTop} | bgRect=t${bgLayerRect.top.toFixed(0)},h${bgLayerRect.height.toFixed(0)} | containerH=${containerH.toFixed(0)} | targetTop=${targetRectBefore.top.toFixed(0)} | drawH=${drawH.toFixed(0)} | bgY=${bgY.toFixed(1)} | dY=${dY.toFixed(1)} | canvasH=${finalCanvas.height}`;
             _di.style.display = 'block';
         }
     }
