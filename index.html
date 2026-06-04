@@ -2642,14 +2642,20 @@ function makeCaptureBackground(target) {
   const usingImage = image.src && image.complete && image.naturalWidth && getComputedStyle(image).opacity !== "0";
   if (!usingVideo && !usingImage) return null;
 
-  const rect = target.getBoundingClientRect();
+  // 讀取 mainCard 和 bgLayer 的真實 viewport 位置（必須在任何 class 變更前）
+  const rect    = target.getBoundingClientRect();
   const bgLayer = document.getElementById('bg-layer');
-  const bgRect = bgLayer ? bgLayer.getBoundingClientRect() : { left: 0, top: 0, width: window.innerWidth, height: window.innerHeight };
+  const bgRect  = bgLayer
+    ? bgLayer.getBoundingClientRect()
+    : { left: 0, top: 0, width: window.innerWidth, height: window.innerHeight };
+
   const viewportW = bgRect.width;
   const viewportH = bgRect.height;
   const scaleFactor = Math.min(2, window.devicePixelRatio || 1);
+
+  // 畫完整 viewport 尺寸的背景圖
   const fullCanvas = document.createElement('canvas');
-  fullCanvas.width = Math.round(viewportW * scaleFactor);
+  fullCanvas.width  = Math.round(viewportW * scaleFactor);
   fullCanvas.height = Math.round(viewportH * scaleFactor);
   const fullCtx = fullCanvas.getContext('2d');
   fullCtx.scale(scaleFactor, scaleFactor);
@@ -2665,27 +2671,36 @@ function makeCaptureBackground(target) {
     return null;
   }
 
+  // 關鍵修正：
+  // html2canvas 截的是 mainCard，mainCard 在截圖 canvas 裡 top=0、left=0。
+  // 但背景圖是 viewport 座標系，必須用 mainCard 在 viewport 中的偏移
+  // (rect.top - bgRect.top) 換算成背景圖上對應的起始點來裁切，
+  // 才能讓背景圖和 UI 完全對齊。
   const cropCanvas = document.createElement('canvas');
-  cropCanvas.width = Math.round(rect.width * scaleFactor);
+  cropCanvas.width  = Math.round(rect.width  * scaleFactor);
   cropCanvas.height = Math.round(rect.height * scaleFactor);
   const cropCtx = cropCanvas.getContext('2d');
+  // cropX：mainCard 左邊距離 bgLayer 左邊（通常都是 0）
   const cropX = Math.round((rect.left - bgRect.left) * scaleFactor);
-  const cropY = Math.round((rect.top - bgRect.top) * scaleFactor);
+  // cropY：bgLayer 在 iPhone 上 top 是負值（含瀏海），
+  // rect.top 是 viewport 座標（瀏海下方為 0）。
+  // 兩者相減等於把瀏海高度多算進去，造成裁切偏下→背景圖偏上。
+  // 正確做法：cropY 只用 rect.top（相對於 viewport/body 頂端），
+  // 讓背景圖從 mainCard 實際顯示位置開始裁切。
+  const cropY = Math.round(rect.top * scaleFactor);
   cropCtx.drawImage(
     fullCanvas,
-    cropX,
-    cropY,
-    cropCanvas.width,
-    cropCanvas.height,
-    0,
-    0,
-    cropCanvas.width,
-    cropCanvas.height
+    cropX, cropY, cropCanvas.width, cropCanvas.height,
+    0,     0,     cropCanvas.width, cropCanvas.height
   );
+
   return {
     dataUrl: cropCanvas.toDataURL('image/jpeg', 0.92),
-    width: rect.width,
-    height: rect.height
+    width:   rect.width,
+    height:  rect.height,
+    // 傳回偏移量：insert 後用 CSS 讓背景圖位置精確對齊 mainCard 左上角
+    offsetX: rect.left - bgRect.left,
+    offsetY: rect.top  - bgRect.top
   };
 }
 
@@ -2719,9 +2734,10 @@ async function takeScreenshot() {
       captureBg = document.createElement('img');
       captureBg.className = 'capture-bg';
       captureBg.src = bgSnapshot.dataUrl;
-      captureBg.style.width = `${bgSnapshot.width}px`;
+      captureBg.style.width  = `${bgSnapshot.width}px`;
       captureBg.style.height = `${bgSnapshot.height}px`;
-      captureBg.style.top = `0px`;
+      captureBg.style.top    = `0px`;
+      captureBg.style.left   = `0px`;
       captureBg.style.objectFit = 'fill';
       target.insertBefore(captureBg, target.firstChild);
       if (captureBg.decode) {
