@@ -2698,9 +2698,8 @@ function makeCaptureBackground(target) {
     dataUrl: cropCanvas.toDataURL('image/jpeg', 0.92),
     width:   rect.width,
     height:  rect.height,
-    // 傳回偏移量：insert 後用 CSS 讓背景圖位置精確對齊 mainCard 左上角
-    offsetX: rect.left - bgRect.left,
-    offsetY: rect.top  - bgRect.top
+    // debug 數值：傳給截圖後顯示
+    _debug: `sat=${document.getElementById('status-bar-protector')?.offsetHeight??-1} | bgTop=${bgRect.top.toFixed(1)} bgH=${bgRect.height.toFixed(1)} | cardTop=${rect.top.toFixed(1)} cardH=${rect.height.toFixed(1)} | cropY=${Math.round(rect.top*scaleFactor)} | innerH=${window.innerHeight}`
   };
 }
 
@@ -2754,14 +2753,21 @@ async function takeScreenshot() {
     const canvas = await html2canvas(target, { 
         backgroundColor: '#0f1623', 
         scale: 2, 
-        useCORS: true, 
+        useCORS: true,
+        allowTaint: true,   // 允許 data: URL 的背景圖一起截入（Android 需要）
         ignoreElements: (el) => el.hasAttribute('data-html2canvas-ignore') || el.classList.contains('capture-hide') 
     });
-    
-    const link = document.createElement('a'); 
-    link.download = `散木索道儀_戰術報告_${new Date().getTime()}.png`; 
-    link.href = canvas.toDataURL('image/png'); 
-    link.click();
+
+    // DEBUG：顯示關鍵數值
+    const _di = document.getElementById('shotDebugInfo');
+    if (_di && bgSnapshot?._debug) {
+        _di.textContent = bgSnapshot._debug + ` | canvas=${canvas.width}x${canvas.height}`;
+        _di.style.display = 'block';
+    }
+
+    // 顯示預覽視窗（Android/iPhone 都能長按儲存）
+    document.getElementById('shotPreviewImg').src = canvas.toDataURL('image/png');
+    document.getElementById('shotModal').style.display = 'flex';
   } catch(e) { 
       showToast("❌ 截圖失敗：" + e, "bad"); 
   }
@@ -2870,5 +2876,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 </script>
+<div id="shotModal" class="modal-overlay" style="z-index:10000; flex-direction:column; justify-content:center; align-items:center;">
+  <div class="modal-box" style="padding:15px; max-width:95%; max-height:90vh; display:flex; flex-direction:column; gap:10px;">
+    <h3 style="color:var(--safe); margin:0;">📸 戰術截圖已生成</h3>
+    <p style="font-size:13px; color:var(--muted); margin:0;">請 <b>長按下方圖片</b> 選擇「儲存圖片」或「分享」</p>
+    <div id="shotDebugInfo" style="display:none; font-size:11px; background:#c00; color:#fff; padding:4px 8px; border-radius:6px; word-break:break-all;"></div>
+    <div style="flex:1; overflow-y:auto; border-radius:8px; border:2px solid var(--line); background:#222;">
+      <img id="shotPreviewImg" src="" style="width:100%; display:block; object-fit:contain;">
+    </div>
+    <button class="primary-btn" onclick="document.getElementById('shotModal').style.display='none'" style="margin:0; flex-shrink:0;">取消返回</button>
+  </div>
+</div>
 </body>
 </html>
