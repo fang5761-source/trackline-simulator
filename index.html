@@ -2649,8 +2649,14 @@ function makeCaptureBackground(target) {
     ? bgLayer.getBoundingClientRect()
     : { left: 0, top: 0, width: window.innerWidth, height: window.innerHeight };
 
+  // iPhone 的 getBoundingClientRect() 回傳的 height 不含瀏海，
+  // 但背景圖 CSS position:fixed; height:100% 實際包含瀏海。
+  // 必須加回 safeAreaTop 才能讓 cover scale 和裁切位置正確。
+  const satEl = document.getElementById('status-bar-protector');
+  const safeAreaTop = satEl ? satEl.offsetHeight : 0;
+
   const viewportW = bgRect.width;
-  const viewportH = bgRect.height;
+  const viewportH = bgRect.height + safeAreaTop;  // 加回瀏海高度
   const scaleFactor = Math.min(2, window.devicePixelRatio || 1);
 
   // 畫完整 viewport 尺寸的背景圖
@@ -2680,14 +2686,12 @@ function makeCaptureBackground(target) {
   cropCanvas.width  = Math.round(rect.width  * scaleFactor);
   cropCanvas.height = Math.round(rect.height * scaleFactor);
   const cropCtx = cropCanvas.getContext('2d');
-  // cropX：mainCard 左邊距離 bgLayer 左邊（通常都是 0）
+  // cropX：mainCard 左邊距離 bgLayer 左邊
   const cropX = Math.round((rect.left - bgRect.left) * scaleFactor);
-  // cropY：bgLayer 在 iPhone 上 top 是負值（含瀏海），
-  // rect.top 是 viewport 座標（瀏海下方為 0）。
-  // 兩者相減等於把瀏海高度多算進去，造成裁切偏下→背景圖偏上。
-  // 正確做法：cropY 只用 rect.top（相對於 viewport/body 頂端），
-  // 讓背景圖從 mainCard 實際顯示位置開始裁切。
-  const cropY = Math.round(rect.top * scaleFactor);
+  // cropY：背景圖從「含瀏海的螢幕頂端」開始，
+  // cardTop 是 viewport 座標（瀏海下方為 0），所以要加上 safeAreaTop
+  // Android safeAreaTop=0，不影響結果
+  const cropY = Math.round((rect.top + safeAreaTop) * scaleFactor);
   cropCtx.drawImage(
     fullCanvas,
     cropX, cropY, cropCanvas.width, cropCanvas.height,
@@ -2699,7 +2703,7 @@ function makeCaptureBackground(target) {
     width:   rect.width,
     height:  rect.height,
     // debug 數值：傳給截圖後顯示
-    _debug: `sat=${document.getElementById('status-bar-protector')?.offsetHeight??-1} | bgTop=${bgRect.top.toFixed(1)} bgH=${bgRect.height.toFixed(1)} | cardTop=${rect.top.toFixed(1)} cardH=${rect.height.toFixed(1)} | cropY=${Math.round(rect.top*scaleFactor)} | innerH=${window.innerHeight}`
+    _debug: `sat=${safeAreaTop} | bgTop=${bgRect.top.toFixed(1)} bgH=${viewportH.toFixed(1)} | cardTop=${rect.top.toFixed(1)} cardH=${rect.height.toFixed(1)} | cropY=${Math.round((rect.top+safeAreaTop)*scaleFactor)} | innerH=${window.innerHeight}`
   };
 }
 
