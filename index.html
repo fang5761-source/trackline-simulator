@@ -2717,6 +2717,13 @@ async function takeScreenshot() {
         const dY = (bgY - targetRect.top)  * canvasScale;
 
         ctx.drawImage(media, dX, dY, drawW * canvasScale, drawH * canvasScale);
+
+        // DEBUG
+        const _di = document.getElementById('shotDebugInfo');
+        if (_di) {
+            _di.textContent = `sat=${safeAreaTop} | bgRect=t${bgLayerRect.top.toFixed(0)},h${bgLayerRect.height.toFixed(0)} | containerH=${containerH.toFixed(0)} | targetTop=${targetRect.top.toFixed(0)} | drawH=${drawH.toFixed(0)} | bgY=${bgY.toFixed(1)} | dY=${dY.toFixed(1)} | canvasH=${finalCanvas.height}`;
+            _di.style.display = 'block';
+        }
     }
 
     // ── 步驟4：疊上 UI 層 ──
