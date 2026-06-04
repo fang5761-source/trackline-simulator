@@ -2637,88 +2637,21 @@ function drawMediaToViewport(ctx, media, fitMode, viewportW, viewportH) {
   return true;
 }
 
-function makeCaptureBackground(target) {
-  const usingVideo = stream && video.videoWidth && getComputedStyle(video).opacity !== "0";
-  const usingImage = image.src && image.complete && image.naturalWidth && getComputedStyle(image).opacity !== "0";
-  if (!usingVideo && !usingImage) return null;
-
-  // 讀取 mainCard 和 bgLayer 的真實 viewport 位置（必須在任何 class 變更前）
-  const rect    = target.getBoundingClientRect();
-  const bgLayer = document.getElementById('bg-layer');
-  const bgRect  = bgLayer
-    ? bgLayer.getBoundingClientRect()
-    : { left: 0, top: 0, width: window.innerWidth, height: window.innerHeight };
-
-  // iPhone 的 getBoundingClientRect() 回傳的 height 不含瀏海，
-  // 但背景圖 CSS position:fixed; height:100% 實際包含瀏海。
-  // 必須加回 safeAreaTop 才能讓 cover scale 和裁切位置正確。
-  const satEl = document.getElementById('status-bar-protector');
-  const safeAreaTop = satEl ? satEl.offsetHeight : 0;
-
-  const viewportW = bgRect.width;
-  const viewportH = bgRect.height + safeAreaTop;  // 加回瀏海高度
-  const scaleFactor = Math.min(2, window.devicePixelRatio || 1);
-
-  // 畫完整 viewport 尺寸的背景圖
-  const fullCanvas = document.createElement('canvas');
-  fullCanvas.width  = Math.round(viewportW * scaleFactor);
-  fullCanvas.height = Math.round(viewportH * scaleFactor);
-  const fullCtx = fullCanvas.getContext('2d');
-  fullCtx.scale(scaleFactor, scaleFactor);
-  fullCtx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#0f1623';
-  fullCtx.fillRect(0, 0, viewportW, viewportH);
-
-  const media = usingVideo ? video : image;
-  const fitMode = usingVideo ? 'cover' : 'contain';
-  try {
-    if (!drawMediaToViewport(fullCtx, media, fitMode, viewportW, viewportH)) return null;
-  } catch (err) {
-    console.warn('背景截圖取樣失敗:', err);
-    return null;
-  }
-
-  // 關鍵修正：
-  // html2canvas 截的是 mainCard，mainCard 在截圖 canvas 裡 top=0、left=0。
-  // 但背景圖是 viewport 座標系，必須用 mainCard 在 viewport 中的偏移
-  // (rect.top - bgRect.top) 換算成背景圖上對應的起始點來裁切，
-  // 才能讓背景圖和 UI 完全對齊。
-  const cropCanvas = document.createElement('canvas');
-  cropCanvas.width  = Math.round(rect.width  * scaleFactor);
-  cropCanvas.height = Math.round(rect.height * scaleFactor);
-  const cropCtx = cropCanvas.getContext('2d');
-  // cropX：mainCard 左邊距離 bgLayer 左邊
-  const cropX = Math.round((rect.left - bgRect.left) * scaleFactor);
-  // cropY：背景圖從「含瀏海的螢幕頂端」開始，
-  // cardTop 是 viewport 座標（瀏海下方為 0），所以要加上 safeAreaTop
-  // Android safeAreaTop=0，不影響結果
-  const cropY = Math.round((rect.top + safeAreaTop) * scaleFactor);
-  cropCtx.drawImage(
-    fullCanvas,
-    cropX, cropY, cropCanvas.width, cropCanvas.height,
-    0,     0,     cropCanvas.width, cropCanvas.height
-  );
-
-  return {
-    dataUrl: cropCanvas.toDataURL('image/jpeg', 0.92),
-    width:   rect.width,
-    height:  rect.height,
-    // debug 數值：傳給截圖後顯示
-    _debug: `sat=${safeAreaTop} | bgTop=${bgRect.top.toFixed(1)} bgH=${viewportH.toFixed(1)} | cardTop=${rect.top.toFixed(1)} cardH=${rect.height.toFixed(1)} | cropY=${Math.round((rect.top+safeAreaTop)*scaleFactor)} | innerH=${window.innerHeight}`
-  };
-}
-
 async function takeScreenshot() {
-  const target = document.getElementById('mainCard'); 
-  let captureBg = null;
-  const bgSnapshot = makeCaptureBackground(target);
+  const target = document.getElementById('mainCard');
+
+  // ── 步驟1：隱藏前先記錄背景層真實位置（同上方固定點APP的驗證解法）──
+  const bgLayerEl = document.getElementById('bg-layer');
+  const bgLayerRect = bgLayerEl ? bgLayerEl.getBoundingClientRect() : { left:0, top:0, width:window.innerWidth, height:window.innerHeight };
+
+  // 加上截圖模式 class，讓 capture-hide 元素隱藏
   target.classList.add('capture-mode');
-  
+
+  // 替換 input 為 span（讓 html2canvas 正確渲染數值）
   const inputs = target.querySelectorAll('input[type="number"]');
   const placeholders = [];
-  
   inputs.forEach(inp => {
-      if(inp.closest('.capture-hide')) return;
-
+      if (inp.closest('.capture-hide')) return;
       const span = document.createElement('span');
       span.textContent = inp.value;
       span.style.color = 'var(--warn)';
@@ -2726,62 +2659,80 @@ async function takeScreenshot() {
       span.style.fontWeight = 'bold';
       span.style.fontFamily = 'monospace';
       span.style.margin = '0 2px';
-      
       inp.style.display = 'none';
       inp.parentNode.insertBefore(span, inp);
       placeholders.push({ span, inp });
   });
 
   await new Promise(r => setTimeout(r, 100));
-  if (bgSnapshot) {
-      captureBg = document.createElement('img');
-      captureBg.className = 'capture-bg';
-      captureBg.src = bgSnapshot.dataUrl;
-      captureBg.style.width  = `${bgSnapshot.width}px`;
-      captureBg.style.height = `${bgSnapshot.height}px`;
-      captureBg.style.top    = `0px`;
-      captureBg.style.left   = `0px`;
-      captureBg.style.objectFit = 'fill';
-      target.insertBefore(captureBg, target.firstChild);
-      if (captureBg.decode) {
-          await captureBg.decode().catch(() => {});
-      } else {
-          await new Promise(resolve => {
-              captureBg.onload = resolve;
-              captureBg.onerror = resolve;
-          });
-      }
-  }
-  
+
   try {
-    const canvas = await html2canvas(target, { 
-        backgroundColor: '#0f1623', 
-        scale: 2, 
+    // ── 步驟2：html2canvas 截 UI 層（不含背景） ──
+    const uiCanvas = await html2canvas(target, {
+        backgroundColor: null,
+        scale: 2,
         useCORS: true,
-        allowTaint: true,   // 允許 data: URL 的背景圖一起截入（Android 需要）
-        ignoreElements: (el) => el.hasAttribute('data-html2canvas-ignore') || el.classList.contains('capture-hide') 
+        ignoreElements: (el) => el.hasAttribute('data-html2canvas-ignore') || el.classList.contains('capture-hide')
     });
 
-    // DEBUG：顯示關鍵數值
-    const _di = document.getElementById('shotDebugInfo');
-    if (_di && bgSnapshot?._debug) {
-        _di.textContent = bgSnapshot._debug + ` | canvas=${canvas.width}x${canvas.height}`;
-        _di.style.display = 'block';
+    const canvasScale = uiCanvas.width / target.offsetWidth;
+
+    // ── 步驟3：建立最終 canvas，先畫背景，再疊 UI ──
+    const finalCanvas = document.createElement('canvas');
+    finalCanvas.width  = uiCanvas.width;
+    finalCanvas.height = uiCanvas.height;
+    const ctx = finalCanvas.getContext('2d');
+
+    // 畫深色底色
+    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#0f1623';
+    ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
+
+    // 畫背景圖（相機或照片）
+    const usingVideo = stream && video.videoWidth && getComputedStyle(video).opacity !== '0';
+    const usingImage = image.src && image.complete && image.naturalWidth && getComputedStyle(image).opacity !== '0';
+    if (usingVideo || usingImage) {
+        const media = usingVideo ? video : image;
+        const rawW  = usingVideo ? video.videoWidth  : image.naturalWidth;
+        const rawH  = usingVideo ? video.videoHeight : image.naturalHeight;
+        const fitMode = usingVideo ? 'cover' : 'contain';
+
+        // 用隱藏前記錄的 bgLayerRect 計算背景在 canvas 上的位置
+        // iPhone 的 getBoundingClientRect() 不含瀏海，需加回 safeAreaTop
+        const satEl = document.getElementById('status-bar-protector');
+        const safeAreaTop = satEl ? satEl.offsetHeight : 0;
+        const containerW = bgLayerRect.width;
+        const containerH = bgLayerRect.height + safeAreaTop;  // 加回瀏海高度
+        const mediaScale = fitMode === 'contain'
+            ? Math.min(containerW / rawW, containerH / rawH)
+            : Math.max(containerW / rawW, containerH / rawH);
+        const drawW = rawW * mediaScale;
+        const drawH = rawH * mediaScale;
+
+        // bgLayerRect 相對於 viewport，target 也相對於 viewport
+        // 背景圖置中於含瀏海的完整螢幕，再轉換到 mainCard 的 canvas 座標
+        // bgY 用 bgLayerRect.top - safeAreaTop 補回真實頂端位置
+        const bgX = bgLayerRect.left + (containerW - drawW) / 2;
+        const bgY = (bgLayerRect.top - safeAreaTop) + (containerH - drawH) / 2;
+        const targetRect = target.getBoundingClientRect();
+        const dX = (bgX - targetRect.left) * canvasScale;
+        const dY = (bgY - targetRect.top)  * canvasScale;
+
+        ctx.drawImage(media, dX, dY, drawW * canvasScale, drawH * canvasScale);
     }
 
-    // 顯示預覽視窗（Android/iPhone 都能長按儲存）
-    document.getElementById('shotPreviewImg').src = canvas.toDataURL('image/png');
+    // ── 步驟4：疊上 UI 層 ──
+    ctx.drawImage(uiCanvas, 0, 0);
+
+    // 顯示預覽視窗
+    document.getElementById('shotPreviewImg').src = finalCanvas.toDataURL('image/png');
     document.getElementById('shotModal').style.display = 'flex';
-  } catch(e) { 
-      showToast("❌ 截圖失敗：" + e, "bad"); 
+
+  } catch(e) {
+      showToast("❌ 截圖失敗：" + e, "bad");
   }
-  
-  placeholders.forEach(p => {
-      p.inp.style.display = '';
-      p.span.remove();
-  });
-  
-  if (captureBg) captureBg.remove();
+
+  // 還原
+  placeholders.forEach(p => { p.inp.style.display = ''; p.span.remove(); });
   target.classList.remove('capture-mode');
 }
 
