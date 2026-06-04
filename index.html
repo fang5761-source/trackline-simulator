@@ -2724,7 +2724,8 @@ async function takeScreenshot() {
         // DEBUG
         const _di = document.getElementById('shotDebugInfo');
         if (_di) {
-            _di.textContent = `sat=${safeAreaTop} | bgRect=t${bgLayerRect.top.toFixed(0)},h${bgLayerRect.height.toFixed(0)} | containerH=${containerH.toFixed(0)} | targetTop=${targetRectBefore.top.toFixed(0)} | drawH=${drawH.toFixed(0)} | bgY=${bgY.toFixed(1)} | dY=${dY.toFixed(1)} | canvasH=${finalCanvas.height}`;
+            const _tAfter = target.getBoundingClientRect();
+            _di.textContent = `sat=${safeAreaTop} | bgH=${bgLayerRect.height.toFixed(0)} | cH=${containerH} | tBefore=${targetRectBefore.top.toFixed(0)} tAfter=${_tAfter.top.toFixed(0)} | drawH=${drawH.toFixed(0)} | bgY=${bgY.toFixed(1)} | dY=${dY.toFixed(1)} | mediaW=${rawW}x${rawH}`;
             _di.style.display = 'block';
         }
     }
