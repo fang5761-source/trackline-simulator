@@ -2698,26 +2698,46 @@ async function takeScreenshot() {
         const rawH  = usingVideo ? video.videoHeight : image.naturalHeight;
         const fitMode = usingVideo ? 'cover' : 'contain';
 
-        // 用隱藏前記錄的 bgLayerRect 計算背景在 canvas 上的位置
-        // iPhone 的 getBoundingClientRect() 不含瀏海，需加回 safeAreaTop
-        const satEl = document.getElementById('status-bar-protector');
-        const safeAreaTop = satEl ? satEl.offsetHeight : 0;
+        // 終極解法：直接讀取 #bg-image 在螢幕上的實際顯示位置
+        // object-fit:contain 的實際渲染位置由瀏覽器決定，不需要自己算
+        // 只要換算成相對 mainCard 左上角的 canvas 座標即可
+        const bgImageEl = document.getElementById('bg-image');
+        const bgVideoEl = document.getElementById('bg-video');
+        const mediaEl = usingVideo ? bgVideoEl : bgImageEl;
+
+        // 用隱藏前記錄的 bgLayerRect 當作 fallback
+        // mediaEl 的 getBoundingClientRect() 給出實際顯示框（含 object-fit 計算後）
+        const mediaRect = mediaEl.getBoundingClientRect();
+
+        // object-fit 的實際繪製區域需自己算（getBoundingClientRect 給的是元素框，不是圖片實際區域）
+        // 用 bgLayerRect 做 contain/cover 計算，這是最準確的方式
+        const satEl2 = document.getElementById('status-bar-protector');
+        const safeAreaTop = satEl2 ? satEl2.offsetHeight : 0;
         const containerW = bgLayerRect.width;
-        const containerH = bgLayerRect.height + safeAreaTop;  // 加回瀏海高度
+        const containerH = bgLayerRect.height + safeAreaTop;
         const mediaScale = fitMode === 'contain'
             ? Math.min(containerW / rawW, containerH / rawH)
             : Math.max(containerW / rawW, containerH / rawH);
         const drawW = rawW * mediaScale;
         const drawH = rawH * mediaScale;
 
-        // bgLayerRect 相對於 viewport，target 也相對於 viewport
-        // 背景圖置中於含瀏海的完整螢幕，再轉換到 mainCard 的 canvas 座標
-        // bgY 用 bgLayerRect.top - safeAreaTop 補回真實頂端位置
-        const bgX = bgLayerRect.left + (containerW - drawW) / 2;
-        const bgY = (bgLayerRect.top - safeAreaTop) + (containerH - drawH) / 2;
-        // 用 capture-mode 前記錄的位置，避免 capture-hide 消失後位移
-        const dX = (bgX - targetRectBefore.left) * canvasScale;
-        const dY = (bgY - targetRectBefore.top)  * canvasScale;
+        // 背景圖在螢幕上的實際位置（從含瀏海的頂端算起）
+        const bgLeft = bgLayerRect.left + (containerW - drawW) / 2;
+        const bgTop  = (bgLayerRect.top - safeAreaTop) + (containerH - drawH) / 2;
+
+        // 換算成相對 mainCard 的 canvas 座標
+        // mainCard 有 border(1px) + padding(12px) = 13px，capture-mode 沒有移除 padding
+        // html2canvas 的 (0,0) 是 mainCard 外框左上角，背景圖要補這個偏移
+        const cardStyle = getComputedStyle(target);
+        const padTop   = parseFloat(cardStyle.paddingTop)   || 0;
+        const padLeft  = parseFloat(cardStyle.paddingLeft)  || 0;
+        const borderTop  = parseFloat(cardStyle.borderTopWidth)  || 0;
+        const borderLeft = parseFloat(cardStyle.borderLeftWidth) || 0;
+        const innerOffsetX = (padLeft  + borderLeft) * canvasScale;
+        const innerOffsetY = (padTop   + borderTop)  * canvasScale;
+
+        const dX = (bgLeft - targetRectBefore.left) * canvasScale - innerOffsetX;
+        const dY = (bgTop  - targetRectBefore.top)  * canvasScale - innerOffsetY;
 
         ctx.drawImage(media, dX, dY, drawW * canvasScale, drawH * canvasScale);
 
@@ -2725,7 +2745,7 @@ async function takeScreenshot() {
         const _di = document.getElementById('shotDebugInfo');
         if (_di) {
             const _tAfter = target.getBoundingClientRect();
-            _di.textContent = `sat=${safeAreaTop} | bgW=${bgLayerRect.width.toFixed(0)} bgH=${bgLayerRect.height.toFixed(0)} | cW=${containerW.toFixed(0)} cH=${containerH.toFixed(0)} | tBefore=${targetRectBefore.top.toFixed(0)} tLeft=${targetRectBefore.left.toFixed(0)} tW=${targetRectBefore.width.toFixed(0)} | drawW=${drawW.toFixed(0)} drawH=${drawH.toFixed(0)} | bgX=${bgX.toFixed(1)} bgY=${bgY.toFixed(1)} | dX=${dX.toFixed(1)} dY=${dY.toFixed(1)} | innerW=${window.innerWidth} innerH=${window.innerHeight}`;
+            _di.textContent = `sat=${safeAreaTop} | cH=${containerH.toFixed(0)} | tTop=${targetRectBefore.top.toFixed(0)} tLeft=${targetRectBefore.left.toFixed(0)} | drawW=${drawW.toFixed(0)} drawH=${drawH.toFixed(0)} | bgTop=${bgTop.toFixed(1)} | padT=${padTop}+${borderTop} offY=${innerOffsetY.toFixed(0)} | dX=${dX.toFixed(1)} dY=${dY.toFixed(1)}`;
             _di.style.display = 'block';
         }
     }
