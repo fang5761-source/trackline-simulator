@@ -2639,13 +2639,6 @@ function drawMediaToViewport(ctx, media, fitMode, viewportW, viewportH) {
 async function takeScreenshot() {
   const target = document.getElementById('mainCard');
 
-  // ── 步驟1：隱藏前先記錄背景層和 mainCard 的真實位置 ──
-  // 必須在 capture-mode 加上之前讀取，否則 capture-hide 元素消失後
-  // mainCard 的高度/位置會改變，導致 targetRect.top 不正確。
-  const bgLayerEl = document.getElementById('bg-layer');
-  const bgLayerRect = bgLayerEl ? bgLayerEl.getBoundingClientRect() : { left:0, top:0, width:window.innerWidth, height:window.innerHeight };
-  const targetRectBefore = target.getBoundingClientRect();  // ← capture-mode 前記錄
-
   // 加上截圖模式 class，讓 capture-hide 元素隱藏
   target.classList.add('capture-mode');
 
@@ -2677,84 +2670,74 @@ async function takeScreenshot() {
         ignoreElements: (el) => el.hasAttribute('data-html2canvas-ignore') || el.classList.contains('capture-hide')
     });
 
-    const canvasScale = uiCanvas.width / target.offsetWidth;
+    // ── 步驟3：把背景圖暫時移入 mainCard，讓 html2canvas 自己對齊 ──
+    // 原理：不自己算座標，而是在 mainCard 內建一個跟螢幕顯示完全一致的背景圖層，
+    // 讓 html2canvas 截圖時直接包含背景，所有 padding/border/object-fit 都由瀏覽器處理。
 
-    // ── 步驟3：建立最終 canvas，先畫背景，再疊 UI ──
-    const finalCanvas = document.createElement('canvas');
-    finalCanvas.width  = uiCanvas.width;
-    finalCanvas.height = uiCanvas.height;
-    const ctx = finalCanvas.getContext('2d');
-
-    // 畫深色底色
-    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#0f1623';
-    ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
-
-    // 畫背景圖（相機或照片）
     const usingVideo = stream && video.videoWidth && getComputedStyle(video).opacity !== '0';
     const usingImage = image.src && image.complete && image.naturalWidth && getComputedStyle(image).opacity !== '0';
+
+    // 建立 canvas 背景圖層（從 bg-layer 直接截取對應 mainCard 的區域）
+    let captureBgEl = null;
     if (usingVideo || usingImage) {
+        const bgLayerEl = document.getElementById('bg-layer');
+        const bgLayerRect = bgLayerEl.getBoundingClientRect();
+        const targetRect  = target.getBoundingClientRect();
+        const satEl = document.getElementById('status-bar-protector');
+        const safeAreaTop = satEl ? satEl.offsetHeight : 0;
+
         const media = usingVideo ? video : image;
         const rawW  = usingVideo ? video.videoWidth  : image.naturalWidth;
         const rawH  = usingVideo ? video.videoHeight : image.naturalHeight;
         const fitMode = usingVideo ? 'cover' : 'contain';
 
-        // 終極解法：直接讀取 #bg-image 在螢幕上的實際顯示位置
-        // object-fit:contain 的實際渲染位置由瀏覽器決定，不需要自己算
-        // 只要換算成相對 mainCard 左上角的 canvas 座標即可
-        const bgImageEl = document.getElementById('bg-image');
-        const bgVideoEl = document.getElementById('bg-video');
-        const mediaEl = usingVideo ? bgVideoEl : bgImageEl;
+        // 用 2x 解析度繪製完整螢幕背景
+        const sf = 2;
+        const fullW = bgLayerRect.width;
+        const fullH = bgLayerRect.height + safeAreaTop;
+        const ms = fitMode === 'contain'
+            ? Math.min(fullW / rawW, fullH / rawH)
+            : Math.max(fullW / rawW, fullH / rawH);
+        const dw = rawW * ms, dh = rawH * ms;
+        const ox = (fullW - dw) / 2;
+        const oy = (fullH - dh) / 2 - safeAreaTop;  // 相對 viewport 頂端
 
-        // 用隱藏前記錄的 bgLayerRect 當作 fallback
-        // mediaEl 的 getBoundingClientRect() 給出實際顯示框（含 object-fit 計算後）
-        const mediaRect = mediaEl.getBoundingClientRect();
+        // 裁出 mainCard 對應區域
+        const cropX = targetRect.left - bgLayerRect.left;
+        const cropY = targetRect.top  + safeAreaTop;   // mainCard top 相對含瀏海頂端
 
-        // object-fit 的實際繪製區域需自己算（getBoundingClientRect 給的是元素框，不是圖片實際區域）
-        // 用 bgLayerRect 做 contain/cover 計算，這是最準確的方式
-        const satEl2 = document.getElementById('status-bar-protector');
-        const safeAreaTop = satEl2 ? satEl2.offsetHeight : 0;
-        const containerW = bgLayerRect.width;
-        const containerH = bgLayerRect.height + safeAreaTop;
-        const mediaScale = fitMode === 'contain'
-            ? Math.min(containerW / rawW, containerH / rawH)
-            : Math.max(containerW / rawW, containerH / rawH);
-        const drawW = rawW * mediaScale;
-        const drawH = rawH * mediaScale;
+        const cropCanvas = document.createElement('canvas');
+        cropCanvas.width  = Math.round(targetRect.width  * sf);
+        cropCanvas.height = Math.round(targetRect.height * sf);
+        const cropCtx = cropCanvas.getContext('2d');
+        cropCtx.scale(sf, sf);
+        cropCtx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#0f1623';
+        cropCtx.fillRect(0, 0, targetRect.width, targetRect.height);
+        cropCtx.drawImage(media,
+            ox - cropX, oy - targetRect.top,
+            dw, dh
+        );
 
-        // 背景圖在螢幕上的實際位置（從含瀏海的頂端算起）
-        const bgLeft = bgLayerRect.left + (containerW - drawW) / 2;
-        const bgTop  = (bgLayerRect.top - safeAreaTop) + (containerH - drawH) / 2;
-
-        // 換算成相對 mainCard 的 canvas 座標
-        // mainCard 有 border(1px) + padding(12px) = 13px，capture-mode 沒有移除 padding
-        // html2canvas 的 (0,0) 是 mainCard 外框左上角，背景圖要補這個偏移
-        const cardStyle = getComputedStyle(target);
-        const padTop   = parseFloat(cardStyle.paddingTop)   || 0;
-        const padLeft  = parseFloat(cardStyle.paddingLeft)  || 0;
-        const borderTop  = parseFloat(cardStyle.borderTopWidth)  || 0;
-        const borderLeft = parseFloat(cardStyle.borderLeftWidth) || 0;
-        const innerOffsetX = (padLeft  + borderLeft) * canvasScale;
-        const innerOffsetY = (padTop   + borderTop)  * canvasScale;
-
-        const dX = (bgLeft - targetRectBefore.left) * canvasScale - innerOffsetX;
-        const dY = (bgTop  - targetRectBefore.top)  * canvasScale - innerOffsetY;
-
-        ctx.drawImage(media, dX, dY, drawW * canvasScale, drawH * canvasScale);
-
-        // DEBUG
-        const _di = document.getElementById('shotDebugInfo');
-        if (_di) {
-            const _tAfter = target.getBoundingClientRect();
-            _di.textContent = `sat=${safeAreaTop} | cH=${containerH.toFixed(0)} | tTop=${targetRectBefore.top.toFixed(0)} tLeft=${targetRectBefore.left.toFixed(0)} | drawW=${drawW.toFixed(0)} drawH=${drawH.toFixed(0)} | bgTop=${bgTop.toFixed(1)} | padT=${padTop}+${borderTop} offY=${innerOffsetY.toFixed(0)} | dX=${dX.toFixed(1)} dY=${dY.toFixed(1)}`;
-            _di.style.display = 'block';
-        }
+        // 插入 mainCard 作為絕對定位底層
+        captureBgEl = document.createElement('img');
+        captureBgEl.src = cropCanvas.toDataURL('image/jpeg', 0.95);
+        captureBgEl.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:fill;z-index:0;pointer-events:none;';
+        target.insertBefore(captureBgEl, target.firstChild);
     }
 
-    // ── 步驟4：疊上 UI 層 ──
-    ctx.drawImage(uiCanvas, 0, 0);
+    await new Promise(r => setTimeout(r, 50));
+
+    // ── 步驟4：重新截圖（含背景圖層）──
+    const finalCanvas = await html2canvas(target, {
+        backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#0f1623',
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        ignoreElements: (el) => el.hasAttribute('data-html2canvas-ignore') || el.classList.contains('capture-hide')
+    });
 
     // 顯示預覽視窗
-    document.getElementById('shotPreviewImg').src = finalCanvas.toDataURL('image/png');
+    document.getElementById('shotPreviewImg').src = finalCanvas.toDataURL('image/jpeg', 0.95);
     document.getElementById('shotModal').style.display = 'flex';
 
   } catch(e) {
@@ -2763,6 +2746,7 @@ async function takeScreenshot() {
 
   // 還原
   placeholders.forEach(p => { p.inp.style.display = ''; p.span.remove(); });
+  if (captureBgEl && captureBgEl.parentNode) captureBgEl.parentNode.removeChild(captureBgEl);
   target.classList.remove('capture-mode');
 }
 
