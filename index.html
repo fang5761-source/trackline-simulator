@@ -113,8 +113,9 @@
     backdrop-filter: none !important; -webkit-backdrop-filter: none !important; box-shadow: none !important;
   }
   .card.capture-mode {
-    background-color: transparent !important;
-    background-image: none !important;
+    background-color: var(--bg) !important;
+    background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px) !important;
+    background-size: 20px 20px !important;
     border-color: var(--line) !important; box-shadow: none !important; border-radius: 0 !important; 
     backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
   }
@@ -2069,7 +2070,7 @@ const svgW = 400, svgH = 460;
 let scale = 10, offsetX = 50, offsetY = 140; 
 let currentSliderPct = 0.5;
 let currentMA = 1; 
-const CAPTURE_BG_Y_OFFSET = 0; // 已修正：裁切位置由 getBoundingClientRect() 精確計算，不需要硬寫偏移
+const CAPTURE_BG_Y_OFFSET = -128;
 
 const maBtns = document.querySelectorAll('.ma-btn');
 maBtns.forEach(btn => {
@@ -2636,17 +2637,70 @@ function drawMediaToViewport(ctx, media, fitMode, viewportW, viewportH) {
   return true;
 }
 
+function makeCaptureBackground(target) {
+  const usingVideo = stream && video.videoWidth && getComputedStyle(video).opacity !== "0";
+  const usingImage = image.src && image.complete && image.naturalWidth && getComputedStyle(image).opacity !== "0";
+  if (!usingVideo && !usingImage) return null;
+
+  const rect = target.getBoundingClientRect();
+  const bgLayer = document.getElementById('bg-layer');
+  const bgRect = bgLayer ? bgLayer.getBoundingClientRect() : { left: 0, top: 0, width: window.innerWidth, height: window.innerHeight };
+  const viewportW = bgRect.width;
+  const viewportH = bgRect.height;
+  const scaleFactor = Math.min(2, window.devicePixelRatio || 1);
+  const fullCanvas = document.createElement('canvas');
+  fullCanvas.width = Math.round(viewportW * scaleFactor);
+  fullCanvas.height = Math.round(viewportH * scaleFactor);
+  const fullCtx = fullCanvas.getContext('2d');
+  fullCtx.scale(scaleFactor, scaleFactor);
+  fullCtx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#0f1623';
+  fullCtx.fillRect(0, 0, viewportW, viewportH);
+
+  const media = usingVideo ? video : image;
+  const fitMode = usingVideo ? 'cover' : 'contain';
+  try {
+    if (!drawMediaToViewport(fullCtx, media, fitMode, viewportW, viewportH)) return null;
+  } catch (err) {
+    console.warn('背景截圖取樣失敗:', err);
+    return null;
+  }
+
+  const cropCanvas = document.createElement('canvas');
+  cropCanvas.width = Math.round(rect.width * scaleFactor);
+  cropCanvas.height = Math.round(rect.height * scaleFactor);
+  const cropCtx = cropCanvas.getContext('2d');
+  const cropX = Math.round((rect.left - bgRect.left) * scaleFactor);
+  const cropY = Math.round((rect.top - bgRect.top) * scaleFactor);
+  cropCtx.drawImage(
+    fullCanvas,
+    cropX,
+    cropY,
+    cropCanvas.width,
+    cropCanvas.height,
+    0,
+    0,
+    cropCanvas.width,
+    cropCanvas.height
+  );
+  return {
+    dataUrl: cropCanvas.toDataURL('image/jpeg', 0.92),
+    width: rect.width,
+    height: rect.height
+  };
+}
+
 async function takeScreenshot() {
-  const target = document.getElementById('mainCard');
-
-  // 加上截圖模式 class，讓 capture-hide 元素隱藏
+  const target = document.getElementById('mainCard'); 
+  let captureBg = null;
+  const bgSnapshot = makeCaptureBackground(target);
   target.classList.add('capture-mode');
-
-  // 替換 input 為 span（讓 html2canvas 正確渲染數值）
+  
   const inputs = target.querySelectorAll('input[type="number"]');
   const placeholders = [];
+  
   inputs.forEach(inp => {
-      if (inp.closest('.capture-hide')) return;
+      if(inp.closest('.capture-hide')) return;
+
       const span = document.createElement('span');
       span.textContent = inp.value;
       span.style.color = 'var(--warn)';
@@ -2654,99 +2708,54 @@ async function takeScreenshot() {
       span.style.fontWeight = 'bold';
       span.style.fontFamily = 'monospace';
       span.style.margin = '0 2px';
+      
       inp.style.display = 'none';
       inp.parentNode.insertBefore(span, inp);
       placeholders.push({ span, inp });
   });
 
   await new Promise(r => setTimeout(r, 100));
-
-  try {
-    // ── 步驟2：html2canvas 截 UI 層（不含背景） ──
-    const uiCanvas = await html2canvas(target, {
-        backgroundColor: null,
-        scale: 2,
-        useCORS: true,
-        ignoreElements: (el) => el.hasAttribute('data-html2canvas-ignore') || el.classList.contains('capture-hide')
-    });
-
-    // ── 步驟3：把背景圖暫時移入 mainCard，讓 html2canvas 自己對齊 ──
-    // 原理：不自己算座標，而是在 mainCard 內建一個跟螢幕顯示完全一致的背景圖層，
-    // 讓 html2canvas 截圖時直接包含背景，所有 padding/border/object-fit 都由瀏覽器處理。
-
-    const usingVideo = stream && video.videoWidth && getComputedStyle(video).opacity !== '0';
-    const usingImage = image.src && image.complete && image.naturalWidth && getComputedStyle(image).opacity !== '0';
-
-    // 建立 canvas 背景圖層（從 bg-layer 直接截取對應 mainCard 的區域）
-    let captureBgEl = null;
-    if (usingVideo || usingImage) {
-        const bgLayerEl = document.getElementById('bg-layer');
-        const bgLayerRect = bgLayerEl.getBoundingClientRect();
-        const targetRect  = target.getBoundingClientRect();
-        const satEl = document.getElementById('status-bar-protector');
-        const safeAreaTop = satEl ? satEl.offsetHeight : 0;
-
-        const media = usingVideo ? video : image;
-        const rawW  = usingVideo ? video.videoWidth  : image.naturalWidth;
-        const rawH  = usingVideo ? video.videoHeight : image.naturalHeight;
-        const fitMode = usingVideo ? 'cover' : 'contain';
-
-        // 用 2x 解析度繪製完整螢幕背景
-        const sf = 2;
-        const fullW = bgLayerRect.width;
-        const fullH = bgLayerRect.height + safeAreaTop;
-        const ms = fitMode === 'contain'
-            ? Math.min(fullW / rawW, fullH / rawH)
-            : Math.max(fullW / rawW, fullH / rawH);
-        const dw = rawW * ms, dh = rawH * ms;
-        const ox = (fullW - dw) / 2;
-        const oy = (fullH - dh) / 2 - safeAreaTop;  // 相對 viewport 頂端
-
-        // 裁出 mainCard 對應區域
-        const cropX = targetRect.left - bgLayerRect.left;
-        const cropY = targetRect.top  + safeAreaTop;   // mainCard top 相對含瀏海頂端
-
-        const cropCanvas = document.createElement('canvas');
-        cropCanvas.width  = Math.round(targetRect.width  * sf);
-        cropCanvas.height = Math.round(targetRect.height * sf);
-        const cropCtx = cropCanvas.getContext('2d');
-        cropCtx.scale(sf, sf);
-        cropCtx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#0f1623';
-        cropCtx.fillRect(0, 0, targetRect.width, targetRect.height);
-        cropCtx.drawImage(media,
-            ox - cropX, oy - targetRect.top,
-            dw, dh
-        );
-
-        // 插入 mainCard 作為絕對定位底層
-        captureBgEl = document.createElement('img');
-        captureBgEl.src = cropCanvas.toDataURL('image/jpeg', 0.95);
-        captureBgEl.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:fill;z-index:0;pointer-events:none;';
-        target.insertBefore(captureBgEl, target.firstChild);
-    }
-
-    await new Promise(r => setTimeout(r, 50));
-
-    // ── 步驟4：重新截圖（含背景圖層）──
-    const finalCanvas = await html2canvas(target, {
-        backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#0f1623',
-        scale: 2,
-        useCORS: true,
-        allowTaint: true,
-        ignoreElements: (el) => el.hasAttribute('data-html2canvas-ignore') || el.classList.contains('capture-hide')
-    });
-
-    // 顯示預覽視窗
-    document.getElementById('shotPreviewImg').src = finalCanvas.toDataURL('image/jpeg', 0.95);
-    document.getElementById('shotModal').style.display = 'flex';
-
-  } catch(e) {
-      showToast("❌ 截圖失敗：" + e, "bad");
+  if (bgSnapshot) {
+      captureBg = document.createElement('img');
+      captureBg.className = 'capture-bg';
+      captureBg.src = bgSnapshot.dataUrl;
+      captureBg.style.width = `${bgSnapshot.width}px`;
+      captureBg.style.height = `${bgSnapshot.height + Math.abs(CAPTURE_BG_Y_OFFSET)}px`;
+      captureBg.style.top = `${CAPTURE_BG_Y_OFFSET}px`;
+      captureBg.style.objectFit = 'fill';
+      target.insertBefore(captureBg, target.firstChild);
+      if (captureBg.decode) {
+          await captureBg.decode().catch(() => {});
+      } else {
+          await new Promise(resolve => {
+              captureBg.onload = resolve;
+              captureBg.onerror = resolve;
+          });
+      }
   }
-
-  // 還原
-  placeholders.forEach(p => { p.inp.style.display = ''; p.span.remove(); });
-  if (captureBgEl && captureBgEl.parentNode) captureBgEl.parentNode.removeChild(captureBgEl);
+  
+  try {
+    const canvas = await html2canvas(target, { 
+        backgroundColor: '#0f1623', 
+        scale: 2, 
+        useCORS: true, 
+        ignoreElements: (el) => el.hasAttribute('data-html2canvas-ignore') || el.classList.contains('capture-hide') 
+    });
+    
+    const link = document.createElement('a'); 
+    link.download = `散木索道儀_戰術報告_${new Date().getTime()}.png`; 
+    link.href = canvas.toDataURL('image/png'); 
+    link.click();
+  } catch(e) { 
+      showToast("❌ 截圖失敗：" + e, "bad"); 
+  }
+  
+  placeholders.forEach(p => {
+      p.inp.style.display = '';
+      p.span.remove();
+  });
+  
+  if (captureBg) captureBg.remove();
   target.classList.remove('capture-mode');
 }
 
@@ -2845,16 +2854,5 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 </script>
-<div id="shotModal" class="modal-overlay" style="z-index:10000; flex-direction:column; justify-content:center; align-items:center;">
-  <div class="modal-box" style="padding:15px; max-width:95%; max-height:90vh; display:flex; flex-direction:column; gap:10px;">
-    <h3 style="color:var(--safe); margin:0;">📸 戰術截圖已生成</h3>
-    <p style="font-size:13px; color:var(--muted); margin:0;">請 <b>長按下方圖片</b> 選擇「儲存圖片」或「分享」</p>
-    <div id="shotDebugInfo" style="display:none; font-size:11px; background:#c00; color:#fff; padding:4px 8px; border-radius:6px; word-break:break-all;"></div>
-    <div style="flex:1; overflow-y:auto; border-radius:8px; border:2px solid var(--line); background:#222;">
-      <img id="shotPreviewImg" src="" style="width:100%; display:block; object-fit:contain;">
-    </div>
-    <button class="primary-btn" onclick="document.getElementById('shotModal').style.display='none'" style="margin:0; flex-shrink:0;">取消返回</button>
-  </div>
-</div>
 </body>
 </html>
