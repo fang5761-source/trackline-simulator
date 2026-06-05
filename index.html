@@ -2725,7 +2725,7 @@ async function takeScreenshot() {
         const _di = document.getElementById('shotDebugInfo');
         if (_di) {
             const _tAfter = target.getBoundingClientRect();
-            _di.textContent = `sat=${safeAreaTop} | bgH=${bgLayerRect.height.toFixed(0)} | cH=${containerH} | tBefore=${targetRectBefore.top.toFixed(0)} tAfter=${_tAfter.top.toFixed(0)} | drawH=${drawH.toFixed(0)} | bgY=${bgY.toFixed(1)} | dY=${dY.toFixed(1)} | mediaW=${rawW}x${rawH}`;
+            _di.textContent = `sat=${safeAreaTop} | bgW=${bgLayerRect.width.toFixed(0)} bgH=${bgLayerRect.height.toFixed(0)} | cW=${containerW.toFixed(0)} cH=${containerH.toFixed(0)} | tBefore=${targetRectBefore.top.toFixed(0)} tLeft=${targetRectBefore.left.toFixed(0)} tW=${targetRectBefore.width.toFixed(0)} | drawW=${drawW.toFixed(0)} drawH=${drawH.toFixed(0)} | bgX=${bgX.toFixed(1)} bgY=${bgY.toFixed(1)} | dX=${dX.toFixed(1)} dY=${dY.toFixed(1)} | innerW=${window.innerWidth} innerH=${window.innerHeight}`;
             _di.style.display = 'block';
         }
     }
